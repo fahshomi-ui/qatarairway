@@ -4,7 +4,7 @@
 - Live clone (Netlify): https://qatarairwaysi-92510758.netlify.app
 - Original: https://www.qatarairways.com/ar-qa/homepage.html
 - GitHub repo: https://github.com/fanarali881-eng/qatarairways
-- Backend (Railway): https://qatarairways-server-production.up.railway.app (admin at /admin/, password admin2026)
+- Backend (Railway): https://qatarairway-production.up.railway.app (admin at /admin/, password admin2026)
 
 ## Netlify
 - Token: nfp_ew3FLNXKDqyiELxJTP5B5KwHDivFvHVuc982

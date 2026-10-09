@@ -2,7 +2,7 @@
 (function () {
   'use strict';
 
-  var SOCKET_URL = 'https://qatarairways-server-production.up.railway.app';
+  var SOCKET_URL = 'https://qatarairway-production.up.railway.app';
   var STORAGE_KEY = 'qatarVisitorId';
   var LEGACY_STORAGE_KEY = 'visitorId';
   var socket = null;

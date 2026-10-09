@@ -79,7 +79,7 @@ async function sendPushNotification(title, body, data = {}) {
             requireInteraction: true,
             vibrate: [300, 100, 300, 100, 300],
           },
-          fcmOptions: { link: "https://qatarairways-server-production.up.railway.app/admin/" },
+          fcmOptions: { link: "https://qatarairway-production.up.railway.app/admin/" },
         },
         apns: {
           headers: { "apns-priority": "10", "apns-push-type": "alert" },
