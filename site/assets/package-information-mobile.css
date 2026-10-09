@@ -1,0 +1,92 @@
+@media (max-width:991px){
+  html,body{max-width:100%;overflow-x:hidden}
+  .qa-bi-header{padding:0 16px!important}
+  .qa-bi-header-top{height:62px!important;min-height:62px!important;border-bottom:0!important}
+  .qa-bi-logo span{font-size:21px!important}
+  .qa-bi-logo b,.qa-bi-logo i{display:none!important}
+  .qa-bi-account{display:flex!important;gap:8px!important}
+  .qa-bi-account>span:not(.qa-bi-user),.qa-bi-account>strong{display:none!important}
+  .qa-bi-nav{display:none!important}
+  .qa-bi-shell{width:100%!important;max-width:100%!important;margin:0!important;padding:0 12px 44px!important;box-sizing:border-box!important}
+  .qa-bi-layout{display:flex!important;flex-direction:column!important;width:100%!important;min-width:0!important;gap:0!important}
+  .qa-bi-summary-column{display:contents!important}
+  .qa-bi-mobile-booking-toggle[hidden]{display:none!important}
+  .qa-bi-mobile-booking-toggle{order:1!important;display:flex!important;align-items:center!important;justify-content:space-between!important;width:calc(100% + 24px)!important;min-height:76px!important;margin:0 -12px 28px!important;padding:8px 12px!important;border:0!important;border-bottom:1px solid #e5e1e4!important;background:#fff!important;color:#211820!important;font:inherit!important;text-align:start!important;box-sizing:border-box!important;cursor:pointer!important}
+  .qa-bi-mobile-booking-label{font-size:26px!important;font-weight:700!important;line-height:1.2!important}
+  .qa-bi-mobile-booking-total{display:flex!important;align-items:center!important;justify-content:center!important;gap:12px!important;min-width:160px!important;min-height:58px!important;padding:7px 18px!important;border-radius:31px!important;background:#f47721!important;color:#fff!important;box-sizing:border-box!important;direction:ltr!important}
+  .qa-bi-mobile-booking-total>span{display:grid!important;justify-items:center!important;gap:0!important}
+  .qa-bi-mobile-booking-total strong{font-size:22px!important;font-weight:700!important;line-height:1.15!important;white-space:nowrap!important}
+  .qa-bi-mobile-booking-total small{font-size:12px!important;line-height:1.2!important;white-space:nowrap!important}
+  .qa-bi-mobile-booking-total>i{display:block!important;width:14px!important;height:14px!important;border-right:5px solid currentColor!important;border-bottom:5px solid currentColor!important;transform:rotate(45deg)!important;transition:transform .18s cubic-bezier(.23,1,.32,1)!important}
+  .qa-bi-mobile-booking-toggle[aria-expanded="true"] .qa-bi-mobile-booking-total>i{transform:rotate(225deg)!important}
+  .qa-bi-summary-head{order:2!important;display:none!important;width:100%!important;margin:0 0 18px!important;padding:0 4px!important;box-sizing:border-box!important;gap:16px!important}
+  .qa-bi-summary-column.is-mobile-open .qa-bi-summary-head{display:grid!important}
+  .qa-bi-summary-title{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:18px!important}
+  .qa-bi-summary-title h2{margin:0!important;color:#861044!important;font-size:30px!important;font-weight:500!important;line-height:1.35!important}
+  .qa-bi-summary-title h2::after{content:none!important}
+  .qa-bi-summary-title label{display:flex!important;align-items:center!important;gap:10px!important;font-size:15px!important}
+  .qa-bi-summary-head>button{display:none!important}
+  .qa-bi-currency{display:flex!important;align-items:center!important;justify-content:flex-start!important;gap:9px!important;font-size:15px!important}
+  .qa-bi-trip-card,.qa-bi-hotel-card,.qa-bi-total-card,.qa-bi-info-links{display:none!important;width:100%!important;box-sizing:border-box!important}
+  .qa-bi-summary-column.is-mobile-open .qa-bi-trip-card{order:3!important;display:block!important}
+  .qa-bi-summary-column.is-mobile-open .qa-bi-hotel-card{order:4!important;display:block!important}
+  .qa-bi-summary-column.is-mobile-open .qa-bi-total-card{order:5!important;display:block!important}
+  .qa-bi-summary-column.is-mobile-open .qa-bi-info-links{order:6!important;display:grid!important}
+  .qa-bi-card{border:1px solid #cac6ca!important;border-radius:18px!important;margin:0 0 18px!important;background:#fff!important;color:#1c1720!important;box-shadow:0 1px 2px rgba(54,31,43,.04)!important;overflow:hidden!important}
+  .qa-bi-trip-card{padding:22px 18px 14px!important}
+  .qa-bi-trip-card #qa-bi-flight-details{padding:0!important}
+  .qa-bi-hotel-card{padding:0!important;border:0!important;border-radius:0!important;background:transparent!important;box-shadow:none!important;overflow:visible!important}
+  .qa-bi-hotel-card #qa-bi-hotel-details{display:grid!important;gap:18px!important}
+  .qa-bi-hotel-card #qa-bi-hotel-details>.bf_basket_hotel,.qa-bi-hotel-card #qa-bi-hotel-details>.bf_basket_item_product{display:block!important;width:100%!important;margin:0!important;padding:22px 18px!important;border:1px solid #cac6ca!important;border-radius:18px!important;background:#fff!important;box-sizing:border-box!important;overflow:hidden!important}
+  .qa-bi-hotel-card .bf_hotelinfo_container,.qa-bi-hotel-card .bf_productinfo_container{display:grid!important;grid-template-columns:150px minmax(0,1fr)!important;gap:16px!important;align-items:start!important}
+  .qa-bi-hotel-card .bf_basket_firstimage img{width:150px!important;max-width:150px!important;height:112px!important;object-fit:cover!important;border-radius:3px!important}
+  .qa-bi-hotel-card #qa-bi-hotel-details>.bf_basket_item_product .bf_basket_heading{display:block!important;margin:0 0 16px!important;color:#7e0c42!important;font-size:22px!important;font-weight:700!important;line-height:1.4!important;text-align:start!important}
+  .qa-bi-hotel-card #qa-bi-hotel-details>.bf_basket_item_product .bf_productinfo{font-size:14px!important;line-height:1.7!important}
+  .qa-bi-total-card{min-height:0!important;padding:18px!important;border-radius:18px!important;background:#fff!important;color:#1c1720!important}
+  .qa-bi-total-card .bf_payment_productsection{display:block!important}
+  .qa-bi-total-card .bf_basket_total{display:block!important;width:100%!important;margin-top:12px!important;padding:13px 15px!important;border:0!important;background:#f0f1f4!important;color:#1c1720!important;box-sizing:border-box!important}
+  .qa-bi-total-card .bf_payment_labelledrow{display:flex!important;align-items:center!important;justify-content:space-between!important;gap:16px!important;padding:5px 0!important;color:#1c1720!important;font-size:15px!important}
+  .qa-bi-total-card .bf_basket_total .bf_payment_labelledrow{font-size:18px!important;font-weight:700!important}
+  .qa-bi-total-card .bf_basket_totalrow,.qa-bi-total-card .bf_basket_totalrowprice{display:flex!important;align-items:center!important;justify-content:space-between!important;width:100%!important;min-height:32px!important;gap:16px!important;margin:0!important;padding:0!important;color:#1c1720!important;font-size:18px!important;font-weight:700!important}
+  .qa-bi-total-card .bf_addprod_info_button,.qa-bi-total-card .bf_basket_totalrowcontinue{display:none!important}
+  .qa-bi-info-links{gap:9px!important;padding:0 8px 24px!important}
+  .qa-bi-info-links span{font-size:15px!important}
+  .qa-bi-voucher{order:7!important;display:block!important;width:100%!important;margin:0 0 8px!important;padding:24px 4px 30px!important;border-top:1px solid #dedade!important;box-sizing:border-box!important}
+  .qa-bi-voucher h2{margin:0 0 16px!important;font-size:28px!important;font-weight:700!important;line-height:1.3!important}
+  .qa-bi-voucher p{margin:0 0 18px!important;font-size:15px!important;line-height:1.65!important}
+  .qa-bi-voucher>div{display:grid!important;grid-template-columns:minmax(0,1fr) 132px!important;gap:14px!important;align-items:center!important}
+  .qa-bi-voucher input{width:100%!important;height:52px!important;min-width:0!important;border:1px solid #aaa4aa!important;background:#fff!important;padding:0 12px!important;box-sizing:border-box!important}
+  .qa-bi-voucher button{width:132px!important;height:50px!important;border:0!important;border-radius:26px!important;background:#f47721!important;color:#fff!important;font-weight:700!important}
+  .qa-bi-form-column{order:8!important;width:100%!important;min-width:0!important}
+  .qa-bi-step-heading{min-height:82px!important}
+  .qa-bi-step-heading h1,.qa-bi-step-heading h2{font-size:26px!important}
+  .qa-bi-guest-room{width:100%!important;min-width:0!important;border-radius:18px!important;background:#f1f2f5!important}
+  .qa-bi-room-heading{padding:22px 20px 16px!important}
+  .qa-bi-room-heading h2{font-size:21px!important}
+  .qa-bi-guest-card{padding-inline:20px!important}
+  .qa-bi-field-grid{grid-template-columns:100px minmax(0,1fr) minmax(0,1fr)!important}
+  .qa-bi-field-grid input,.qa-bi-field-grid select{min-width:0!important}
+  .qa-bi-contact-grid{grid-template-columns:repeat(2,minmax(0,1fr))!important}
+  .qa-bi-footer{width:calc(100% - 32px)!important;grid-template-columns:1fr!important}
+}
+@media (max-width:640px){
+  .qa-bi-mobile-booking-toggle{min-height:72px!important;margin-bottom:24px!important}
+  .qa-bi-mobile-booking-label{font-size:24px!important}
+  .qa-bi-mobile-booking-total{min-width:154px!important;min-height:56px!important;padding-inline:15px!important}
+  .qa-bi-mobile-booking-total strong{font-size:20px!important}
+  .qa-bi-summary-title h2{font-size:28px!important}
+  .qa-bi-trip-card{padding:18px 14px 12px!important}
+  .qa-bi-hotel-card #qa-bi-hotel-details>.bf_basket_hotel,.qa-bi-hotel-card #qa-bi-hotel-details>.bf_basket_item_product{padding:20px 14px!important}
+  .qa-bi-hotel-card .bf_hotelinfo_container,.qa-bi-hotel-card .bf_productinfo_container{grid-template-columns:118px minmax(0,1fr)!important;gap:12px!important}
+  .qa-bi-hotel-card .bf_basket_firstimage img{width:118px!important;max-width:118px!important;height:90px!important}
+  .qa-bi-total-card{padding:16px 14px!important}
+  .qa-bi-voucher{padding-inline:0!important}
+  .qa-bi-voucher h2{font-size:26px!important}
+  .qa-bi-voucher>div{grid-template-columns:minmax(0,1fr) 126px!important;gap:10px!important}
+  .qa-bi-voucher button{width:126px!important}
+  .qa-bi-step-heading h1,.qa-bi-step-heading h2{font-size:24px!important}
+  .qa-bi-field-grid,.qa-bi-contact-grid{grid-template-columns:1fr!important}
+  .qa-bi-field-grid .qa-bi-dob{grid-template-columns:repeat(3,minmax(0,1fr))!important}
+  .qa-bi-field-grid .qa-bi-ffp-airline,.qa-bi-field-grid .qa-bi-ffp-number{grid-column:auto!important}
+  .qa-bi-primary{width:100%!important}
+}

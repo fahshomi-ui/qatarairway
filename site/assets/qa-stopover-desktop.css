@@ -1,0 +1,1486 @@
+@media (min-width: 992px) {
+  #qa-static-bw.qa-so-active > .qbw-body {
+    display: none !important;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[hidden] {
+    display: none !important;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop,
+  #qa-static-bw > .qa-stopover-desktop * {
+    box-sizing: border-box;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop {
+    display: block;
+    position: relative;
+    min-height: 0;
+    padding: 0 30px 27px;
+    overflow: visible;
+    background: #fff;
+    color: #1f212b;
+    font-family: "Almarai", "Graphik Web", Arial, sans-serif;
+    font-size: 16px;
+    font-weight: 400;
+  }
+
+  #qa-static-bw .qa-so-subtabs {
+    display: flex;
+    align-items: stretch;
+    justify-content: flex-start;
+    width: 100%;
+    min-height: 52px;
+    margin: 0 0 24px;
+    padding: 0;
+    border-bottom: 1px solid #dbdee8;
+    list-style: none;
+  }
+
+  #qa-static-bw .qa-so-subtabs button {
+    display: inline-flex;
+    position: relative;
+    align-items: center;
+    justify-content: center;
+    min-width: 126px;
+    padding: 10px 20px;
+    border: 0;
+    border-bottom: 1px solid transparent;
+    background: transparent;
+    color: #1f212b;
+    font: 400 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-subtabs button:hover,
+  #qa-static-bw .qa-so-subtabs button.is-active {
+    border-bottom-color: #8e2157;
+    color: #8e2157;
+  }
+
+  #qa-static-bw .qa-so-pane {
+    position: relative;
+  }
+
+  #qa-static-bw .qa-so-trip {
+    display: flex;
+    align-items: center;
+    justify-content: flex-start;
+    gap: 32px;
+    min-height: 32px;
+    margin: 0;
+    padding: 0;
+  }
+
+  #qa-static-bw .qa-so-trip label,
+  #qa-static-bw .qa-so-stop-leg label {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    color: #1f212b;
+    font: 400 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+    white-space: nowrap;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-trip input,
+  #qa-static-bw .qa-so-stop-leg input {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+  }
+
+  #qa-static-bw .qa-so-trip label > span,
+  #qa-static-bw .qa-so-stop-leg label > span {
+    display: inline-flex;
+    position: relative;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid #9099a2;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  #qa-static-bw .qa-so-trip input:checked + span,
+  #qa-static-bw .qa-so-stop-leg input:checked + span {
+    border-color: #413cb1;
+    background: #413cb1;
+  }
+
+  #qa-static-bw .qa-so-trip input:checked + span::after,
+  #qa-static-bw .qa-so-stop-leg input:checked + span::after {
+    content: "";
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  #qa-static-bw .qa-so-trip input:focus-visible + span,
+  #qa-static-bw .qa-so-stop-leg input:focus-visible + span {
+    outline: 2px solid #1f212b;
+    outline-offset: 2px;
+  }
+
+  #qa-static-bw .qa-so-stop-leg input:disabled + span,
+  #qa-static-bw .qa-so-stop-leg input:disabled + span + * {
+    border-color: #dbdee8;
+    color: #9099a2;
+    cursor: default;
+  }
+
+  #qa-static-bw .qa-so-blurb {
+    margin: 0;
+    padding: 24px 0;
+    color: #4a525d;
+    font: 400 14px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-hotel-blurb {
+    color: #1f212b;
+    font-size: 16px;
+  }
+
+  #qa-static-bw .qa-so-row-wrap {
+    width: 100%;
+    margin: 0 0 24px;
+  }
+
+  #qa-static-bw .qa-so-row-wrap.is-second {
+    width: calc(100% - 310px);
+  }
+
+  #qa-static-bw .qa-so-multi-caption {
+    display: block;
+    margin: 0 0 8px;
+    color: #1f212b;
+    font: 500 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-journey,
+  #qa-static-bw .qa-so-hotel-row {
+    display: flex;
+    position: relative;
+    align-items: stretch;
+    width: 100%;
+    min-height: 50px;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+    overflow: visible;
+  }
+
+  #qa-static-bw .qa-so-route {
+    display: flex;
+    min-width: 0;
+    flex: 1 1 50%;
+    align-items: stretch;
+  }
+
+  #qa-static-bw .qa-so-field {
+    position: relative;
+    min-width: 0;
+    height: 48px;
+    padding: 4px 14px 3px;
+    border: 0;
+    background: #fff;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-airport {
+    flex: 1 1 0;
+  }
+
+  #qa-static-bw .qa-so-hotel-row > .qa-so-airport {
+    flex: 1 1 auto;
+  }
+
+  #qa-static-bw .qa-so-field.is-invalid {
+    border-radius: 8px;
+    outline: 1px solid #cc4726;
+    outline-offset: -1px;
+  }
+
+  #qa-static-bw .qa-so-label {
+    display: block;
+    min-height: 16px;
+    overflow: hidden;
+    color: #4a525d;
+    font: 400 12px/16px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-value,
+  #qa-static-bw .qa-so-date-cell strong,
+  #qa-static-bw .qa-so-guest-trigger strong {
+    display: block;
+    width: 100%;
+    min-width: 0;
+    margin: 0;
+    padding: 0;
+    overflow: hidden;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #1f212b;
+    font: 400 16px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-airport-input::placeholder {
+    color: #9099a2;
+    font-weight: 300;
+  }
+
+  #qa-static-bw .qa-so-swap-wrap {
+    display: flex;
+    width: 50px;
+    min-width: 50px;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    padding: 0 5px;
+    border-inline-start: 1px solid #dbdee8;
+    border-inline-end: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-so-swap {
+    display: flex;
+    width: 38px;
+    height: 38px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #1f212b;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-swap:hover {
+    background: #f2f3fa;
+  }
+
+  #qa-static-bw .qa-so-swap svg {
+    width: 28px;
+    height: 28px;
+    fill: none;
+    stroke: currentColor;
+    stroke-width: 1.35;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #qa-static-bw .qa-so-calendar-field {
+    display: flex;
+    width: 260px;
+    min-width: 260px;
+    height: 48px;
+    border-inline-start: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-so-calendar-field.is-single {
+    width: 180px;
+    min-width: 180px;
+  }
+
+  #qa-static-bw .qa-so-date-cell {
+    display: flex;
+    position: relative;
+    min-width: 0;
+    height: 48px;
+    flex: 1 1 0;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px 10px 3px;
+    border: 0;
+    border-inline-start: 1px solid #dbdee8;
+    background: #fff;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-date-cell:first-child {
+    border-inline-start: 0;
+  }
+
+  #qa-static-bw .qa-so-date-cell:focus-visible,
+  #qa-static-bw .qa-so-field:focus-within,
+  #qa-static-bw .qa-so-guest-trigger:focus-visible,
+  #qa-static-bw .qa-so-cabin-trigger:focus-visible {
+    position: relative;
+    z-index: 3;
+    border-radius: 8px;
+    outline: 2px solid #1f212b;
+    outline-offset: 1px;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-field:focus-within,
+  #qa-static-bw .qa-so-hotel-destination:focus-within {
+    border-radius: 0;
+    outline: 0;
+    outline-offset: 0;
+  }
+
+  #qa-static-bw .qa-so-date-cell strong {
+    font-size: 14px;
+    font-weight: 500;
+  }
+
+  #qa-static-bw .qa-so-guest {
+    display: grid;
+    width: 310px;
+    min-width: 310px;
+    flex: 0 0 310px;
+    grid-template-columns: minmax(0, 1fr) 132px;
+    padding: 0;
+    border-inline-start: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-so-guest:not(.has-cabin) {
+    display: block;
+  }
+
+  #qa-static-bw .qa-so-guest-trigger,
+  #qa-static-bw .qa-so-cabin-trigger {
+    display: flex;
+    position: relative;
+    min-width: 0;
+    height: 48px;
+    flex-direction: column;
+    justify-content: center;
+    padding: 4px 14px 3px;
+    border: 0;
+    background: transparent;
+    color: #1f212b;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-guest-trigger {
+    width: 100%;
+  }
+
+  #qa-static-bw .qa-so-guest.has-cabin .qa-so-guest-trigger {
+    border-inline-end: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-so-cabin-trigger {
+    width: 132px;
+    padding-inline-start: 14px;
+    padding-inline-end: 32px;
+  }
+
+  #qa-static-bw .qa-so-guest-trigger > strong,
+  #qa-static-bw .qa-so-cabin-trigger > strong {
+    display: block;
+    width: 100%;
+    overflow: hidden;
+    color: #1f212b;
+    font: 500 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-guest-trigger > svg,
+  #qa-static-bw .qa-so-cabin-trigger > svg {
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 10px;
+    width: 18px;
+    height: 18px;
+    fill: none;
+    stroke: #1f212b;
+    stroke-width: 1.5;
+    transform: translateY(-50%);
+    transition: transform .2s ease;
+  }
+
+  #qa-static-bw .qa-so-cabin-trigger > svg {
+    inset-inline-start: auto;
+    inset-inline-end: 10px;
+  }
+
+  #qa-static-bw .qa-so-guest.is-open .qa-so-guest-trigger > svg,
+  #qa-static-bw .qa-so-guest.is-cabin-open .qa-so-cabin-trigger > svg {
+    transform: translateY(-50%) rotate(180deg);
+  }
+
+  #qa-static-bw .qa-so-guest-pop {
+    position: absolute;
+    z-index: 160;
+    top: calc(100% + 6px);
+    inset-inline-end: 0;
+    width: 440px;
+    min-width: 440px;
+    max-height: 1000px;
+    grid-column: 1 / -1;
+    padding: 30px;
+    overflow: auto;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 16px #1f212b14;
+  }
+
+  #qa-static-bw .qa-so-cabin-pop {
+    position: absolute;
+    z-index: 165;
+    top: calc(100% + 6px);
+    inset-inline-end: 0;
+    width: 315px;
+    overflow: hidden;
+    border-radius: 4px;
+    background: #fff;
+    box-shadow: 0 6px 14px rgba(0, 0, 0, .22);
+  }
+
+  #qa-static-bw .qa-so-cabin-pop button {
+    display: block;
+    width: 100%;
+    min-height: 58px;
+    padding: 9px 18px;
+    border: 0;
+    background: #fff;
+    color: #1f212b;
+    font: 400 16px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-align: center;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-cabin-pop button:hover,
+  #qa-static-bw .qa-so-cabin-pop button.is-selected {
+    background: #e4e4e4;
+  }
+
+  #qa-static-bw .qa-so-room + .qa-so-room {
+    margin-top: 18px;
+    padding-top: 18px;
+    border-top: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-so-room > header {
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 20px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid #dbdee8;
+    color: #1f212b;
+    font: 600 22px/28px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-room > header button.qa-so-remove-room {
+    display: flex;
+    width: 32px;
+    height: 32px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1f212b;
+    font: 300 30px/30px Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-stepper {
+    display: flex;
+    min-height: 40px;
+    align-items: center;
+    margin-bottom: 24px;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    color: #1f212b;
+    font: 400 16px/24px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-stepper > .qa-so-passenger-copy {
+    display: flex;
+    min-width: 118px;
+    flex: 1 1 auto;
+    flex-direction: column;
+    order: 1;
+  }
+
+  #qa-static-bw .qa-so-stepper > .qa-so-passenger-copy b {
+    font: 400 16px/24px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-stepper > .qa-so-passenger-copy small {
+    color: #4a525d;
+    font: 400 12px/16px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-step-controls,
+  #qa-static-bw .qa-so-days-step {
+    display: inline-flex;
+    align-items: center;
+    direction: ltr;
+  }
+
+  #qa-static-bw .qa-so-step-controls {
+    flex: 0 0 auto;
+    order: 3;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-step-controls {
+    flex-direction: row-reverse;
+  }
+
+  #qa-static-bw .qa-so-step-controls button,
+  #qa-static-bw .qa-so-days-step button {
+    width: 40px;
+    min-width: 40px;
+    height: 40px;
+    min-height: 40px;
+    padding: 2px 0 0;
+    border: 1px solid #9099a2;
+    border-radius: 8px;
+    background: #fff;
+    color: #1f212b;
+    font: 400 25px/30px Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-step-controls button:hover,
+  #qa-static-bw .qa-so-days-step button:hover {
+    border-color: #1f212b;
+  }
+
+  #qa-static-bw .qa-so-step-controls button:disabled,
+  #qa-static-bw .qa-so-days-step button:disabled {
+    border-color: #dbdee8;
+    color: #c9ccd2;
+    cursor: default;
+    pointer-events: none;
+  }
+
+  #qa-static-bw .qa-so-step-controls > strong,
+  #qa-static-bw .qa-so-days-step > span {
+    width: 14px;
+    margin: 0 20px;
+    color: #1f212b;
+    font: 500 18px/24px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-align: center;
+  }
+
+  #qa-static-bw .qa-so-passenger-info {
+    display: flex;
+    width: 26px;
+    min-width: 26px;
+    height: 26px;
+    min-height: 26px;
+    flex: 0 0 26px;
+    align-items: center;
+    justify-content: center;
+    order: 2;
+    padding: 0;
+    border: 0;
+    border-radius: 50%;
+    background: #5b50c6;
+    color: #fff;
+    font: 600 16px/26px Georgia, serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-passenger-note {
+    display: grid;
+    position: relative;
+    width: 100%;
+    flex: 0 0 100%;
+    grid-template-columns: minmax(0, 1fr) 24px;
+    order: 4;
+    gap: 8px 12px;
+    margin-top: 8px;
+    padding: 18px 20px;
+    border-radius: 8px;
+    background: #f2f2f7;
+    color: #1f212b;
+  }
+
+  #qa-static-bw .qa-so-passenger-note > button {
+    grid-column: 2;
+    grid-row: 1;
+    padding: 0;
+    border: 0;
+    background: transparent;
+    color: #1f212b;
+    font: 300 26px/24px Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-passenger-note > strong {
+    grid-column: 1;
+    grid-row: 1;
+    margin: 0;
+    font: 500 14px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-passenger-note > p {
+    grid-column: 1 / -1;
+    grid-row: 2;
+    margin: 0;
+    color: #4a525d;
+    font: 400 12px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-passenger-note {
+    grid-template-columns: 24px minmax(0, 1fr);
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-passenger-note > button {
+    grid-column: 1;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-passenger-note > strong {
+    grid-column: 2;
+  }
+
+  #qa-static-bw .qa-so-cabin,
+  #qa-static-bw .qa-so-child-ages label {
+    display: flex;
+    min-height: 50px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    border-top: 1px solid #dbdee8;
+    color: #1f212b;
+    font: 400 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-cabin select,
+  #qa-static-bw .qa-so-child-ages select {
+    min-width: 140px;
+    height: 36px;
+    padding: 0 10px;
+    border: 1px solid #9099a2;
+    border-radius: 8px;
+    background: #fff;
+    color: #1f212b;
+    font: inherit;
+  }
+
+  #qa-static-bw .qa-so-add-room {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    width: 100%;
+    margin: 4px 0 32px;
+    padding: 22px 0 0;
+    border: 0;
+    border-top: 1px solid #dbdee8;
+    background: transparent;
+    color: #8e2157;
+    font: 400 15px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-add-room > span {
+    font-size: 21px;
+    line-height: 1;
+  }
+
+  #qa-static-bw .qa-so-add-room:disabled {
+    color: #9099a2;
+    cursor: default;
+  }
+
+  #qa-static-bw .qa-so-pop-done {
+    width: 100%;
+    height: 56px;
+    margin-top: 0;
+    padding: 16px 32px;
+    border: 1px solid #8e2157;
+    border-radius: 32px;
+    background: #8e2157;
+    color: #fff;
+    font: 500 16px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-airport-menu {
+    position: absolute;
+    z-index: 170;
+    top: calc(100% + 7px);
+    inset-inline-start: 0;
+    width: 420px;
+    max-height: 310px;
+    padding: 8px;
+    overflow-y: auto;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 16px #1f212b14;
+  }
+
+  #qa-static-bw .qa-so-airport-menu button {
+    display: grid;
+    width: 100%;
+    min-height: 58px;
+    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-areas: "city code" "airport code";
+    gap: 2px 14px;
+    padding: 8px 10px;
+    border: 0;
+    border-bottom: 1px solid #f2f3fa;
+    background: #fff;
+    color: #1f212b;
+    text-align: inherit;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-airport-menu button:hover {
+    background: #f2f3fa;
+  }
+
+  #qa-static-bw .qa-so-airport-menu strong {
+    grid-area: city;
+    overflow: hidden;
+    font: 500 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-airport-menu span {
+    grid-area: airport;
+    overflow: hidden;
+    color: #4a525d;
+    font: 400 12px/16px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-airport-menu b {
+    grid-area: code;
+    align-self: center;
+    color: #8e2157;
+    font: 500 14px/20px "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-airport-menu > p {
+    margin: 0;
+    padding: 18px;
+    color: #4a525d;
+    font-size: 14px;
+    text-align: center;
+  }
+
+  /* Hotel Vibe destinations: Qatar's original 492px autocomplete panel. */
+  #qa-static-bw .qa-so-hotel-menu {
+    top: calc(100% + 7px);
+    width: 492px;
+    max-height: 390px;
+    padding: 0;
+    overflow-x: hidden;
+    overflow-y: auto;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 8px 16px rgba(31, 33, 43, .12);
+    scrollbar-color: #94999d transparent;
+    scrollbar-width: auto;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu::-webkit-scrollbar {
+    width: 11px;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu::-webkit-scrollbar-thumb {
+    min-height: 38px;
+    border: 3px solid #fff;
+    border-radius: 8px;
+    background: #94999d;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu button.qa-so-hotel-option {
+    min-height: 72px;
+    grid-template-columns: minmax(0, 1fr) 64px;
+    grid-template-areas: "city code" "airport code";
+    align-content: center;
+    gap: 2px 22px;
+    padding: 10px 28px;
+    border-bottom: 1px solid #eceef2;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu button.qa-so-hotel-option:last-child {
+    border-bottom: 0;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu button.qa-so-hotel-option strong {
+    color: #1f212b;
+    font: 500 16px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu button.qa-so-hotel-option span {
+    color: #4a525d;
+    font: 400 15px/21px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-hotel-menu button.qa-so-hotel-option b {
+    color: #8e2157;
+    font: 500 18px/24px "Graphik Web", Arial, sans-serif;
+  }
+
+  /* From / To: exact parity with the existing Book a flight fields. */
+  #qa-static-bw .qa-so-route .qa-so-airport {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    padding: 0 14px;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-airport.is-from {
+    padding-inline-start: 44px;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-airport > .qa-so-plane-icon {
+    position: absolute;
+    top: 50%;
+    inset-inline-start: 12px;
+    width: 22px;
+    height: 22px;
+    fill: none;
+    stroke: #d0217e;
+    stroke-width: 1.4;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+
+  #qa-static-bw .qa-stopover-desktop[dir="rtl"] .qa-so-route .qa-so-airport > .qa-so-plane-icon {
+    transform: translateY(-50%) scaleX(-1);
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-label {
+    min-height: 0;
+    color: #6d6d75;
+    font-size: 11px;
+    line-height: 1.4;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-airport-input {
+    color: #1c1c20;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.4;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-airport-input::placeholder {
+    color: #a6a6ad;
+    font-weight: 400;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-swap-wrap {
+    width: 46px;
+    min-width: 46px;
+    padding: 0;
+    border-inline-start: 0;
+    border-inline-end: 0;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-swap {
+    width: 46px;
+    height: 100%;
+    border-radius: 0;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-swap:hover {
+    background: transparent;
+  }
+
+  #qa-static-bw .qa-so-route .qa-so-swap svg {
+    width: 22px;
+    height: 22px;
+    stroke: #26262b;
+    stroke-width: 1.4;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu {
+    width: 470px;
+    max-height: 412px;
+    padding: 0;
+    border: 0;
+    border-radius: 2px;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, .22);
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu::-webkit-scrollbar {
+    width: 10px;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu::-webkit-scrollbar-track {
+    background: #f4f4f6;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu::-webkit-scrollbar-thumb {
+    border-radius: 6px;
+    background: #b9b9c0;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu button.qa-so-ac-row {
+    display: flex;
+    min-height: 0;
+    align-items: center;
+    gap: 14px;
+    padding: 13px 18px;
+    border-bottom: 1px solid #ececef;
+    flex-direction: row;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu button.qa-so-ac-row:last-child {
+    border-bottom: 0;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu button.qa-so-ac-row:hover {
+    background: #eeecee;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-plane-icon,
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-location-icon {
+    position: static;
+    width: 26px;
+    height: 26px;
+    flex: 0 0 26px;
+    fill: none;
+    stroke: #9a9aa2;
+    stroke-width: 1.3;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #qa-static-bw .qa-stopover-desktop[dir="rtl"] .qa-so-route-airport-menu .qa-so-plane-icon {
+    transform: scaleX(-1);
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-ac-txt {
+    display: block;
+    min-width: 0;
+    flex: 1 1 auto;
+    overflow: hidden;
+    color: inherit;
+    text-align: inherit;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-ac-city {
+    display: block;
+    overflow: hidden;
+    color: #1c1c20;
+    font-size: 15px;
+    font-weight: 700;
+    line-height: 1.45;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-ac-name {
+    display: block;
+    overflow: hidden;
+    color: #77777f;
+    font-size: 13px;
+    font-weight: 400;
+    line-height: 1.5;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-ac-code {
+    display: block;
+    flex: 0 0 46px;
+    align-self: center;
+    color: #1c1c20;
+    font-size: 15px;
+    font-weight: 400;
+    letter-spacing: .3px;
+    line-height: 1.4;
+    text-align: end;
+    direction: ltr;
+  }
+
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-ac-city b,
+  #qa-static-bw .qa-so-route-airport-menu .qa-so-ac-name b {
+    color: #8e2157;
+    font-weight: 700;
+  }
+
+  #qa-static-bw .qa-so-stop-controls {
+    display: flex;
+    width: 100%;
+    min-height: 116px;
+    flex-direction: row;
+    flex-wrap: wrap;
+    align-items: center;
+    padding: 24px 0;
+  }
+
+  #qa-static-bw .qa-so-stop-controls > div {
+    min-width: 0;
+    flex: 1 1 50%;
+  }
+
+  #qa-static-bw .qa-so-stop-leg > p,
+  #qa-static-bw .qa-so-days > p {
+    margin: 0 0 16px;
+    color: #4a525d;
+    font: 400 14px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-stop-leg > div {
+    display: flex;
+    align-items: center;
+    gap: 28px;
+  }
+
+  #qa-static-bw .qa-so-days {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    justify-content: center;
+  }
+
+  #qa-static-bw .qa-so-days-step {
+    justify-content: center;
+  }
+
+  #qa-static-bw .qa-so-actions {
+    display: flex;
+    min-height: 64px;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 20px;
+    padding: 0;
+  }
+
+  #qa-static-bw .qa-so-search {
+    width: 330px;
+    min-width: 330px;
+    min-height: 56px;
+    padding: 20px 24px;
+    border: 1px solid #8e2157;
+    border-radius: 32px;
+    background: #8e2157;
+    color: #fff;
+    font: 500 16px/16px "Almarai", "Graphik Web", Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-search:hover {
+    background: #741a47;
+  }
+
+  #qa-static-bw .qa-so-promo {
+    display: flex;
+    position: relative;
+    min-height: 48px;
+    align-items: center;
+  }
+
+  #qa-static-bw .qa-so-promo > button {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    outline: none;
+    background: none;
+    color: #1f212b;
+    font: 500 16px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-plus {
+    color: #1f212b;
+    font: 400 24px/24px Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-promo label {
+    display: flex;
+    position: relative;
+    width: 250px;
+    height: 48px;
+    flex-direction: column;
+    justify-content: center;
+    padding: 3px 12px;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  #qa-static-bw .qa-so-promo label > span {
+    color: #4a525d;
+    font: 400 11px/15px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-promo input {
+    width: 100%;
+    border: 0;
+    outline: 0;
+    background: transparent;
+    color: #1f212b;
+    font: 500 15px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-error {
+    display: flex;
+    margin-top: 10px;
+    color: #cc4726;
+    font: 400 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-so-hotel-row {
+    margin: 0 0 24px;
+  }
+
+  #qa-static-bw .qa-so-hotel-row.is-truncated {
+    width: calc(100% - 310px);
+  }
+
+  #qa-static-bw .qa-stopover-desktop[data-qa-view="flight-hotel"] .qa-so-trip {
+    margin-bottom: 24px;
+  }
+
+  #qa-static-bw .qa-stopover-desktop[data-qa-view="hotels"] .qa-so-hotel-blurb {
+    padding-bottom: 24px;
+  }
+
+  #qa-static-bw .qa-stopover-desktop[data-qa-view="flight-hotel"] .qa-so-search,
+  #qa-static-bw .qa-stopover-desktop[data-qa-view="hotels"] .qa-so-search {
+    width: 231px;
+    min-width: 231px;
+  }
+
+  #qa-static-bw .qa-so-hotel-row > .qa-so-calendar-field {
+    width: 300px;
+    min-width: 300px;
+  }
+
+  #qa-static-bw .qa-so-hotel-row > .qa-so-guest {
+    width: 260px;
+    min-width: 260px;
+    flex-basis: 260px;
+  }
+
+  #qa-static-bw .qa-so-calendar-pop {
+    position: absolute;
+    z-index: 200;
+    top: 178px;
+    inset-inline-end: 0;
+    width: 800px;
+    padding: 24px 24px 0;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+    box-shadow: 0 2px 4px 2px #1f212b14;
+  }
+
+  #qa-static-bw .qa-so-calendar-months {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 34px;
+  }
+
+  #qa-static-bw .qa-so-calendar-month h3 {
+    height: 38px;
+    margin: 0;
+    color: #1f212b;
+    font: 500 16px/24px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-align: center;
+  }
+
+  #qa-static-bw .qa-so-calendar-weekdays,
+  #qa-static-bw .qa-so-calendar-week {
+    display: grid;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
+  }
+
+  #qa-static-bw .qa-so-calendar-weekdays span,
+  #qa-static-bw .qa-so-calendar-day {
+    display: flex;
+    height: 48px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    background: #fff;
+    color: #1f212b;
+    font: 500 13px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-align: center;
+  }
+
+  #qa-static-bw .qa-so-calendar-weekdays span {
+    font-weight: 400;
+  }
+
+  #qa-static-bw .qa-so-calendar-day {
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-calendar-day:hover,
+  #qa-static-bw .qa-so-calendar-day.is-selected {
+    border-radius: 8px;
+    background: #3a35af;
+    color: #fff;
+  }
+
+  #qa-static-bw .qa-so-calendar-day.is-range:not(.is-selected) {
+    border-radius: 0;
+    background: #f2f3fa;
+    color: #1f212b;
+  }
+
+  #qa-static-bw .qa-so-calendar-day.is-disabled,
+  #qa-static-bw .qa-so-calendar-day.is-outside {
+    color: #9099a2;
+    cursor: default;
+    visibility: hidden;
+  }
+
+  #qa-static-bw .qa-so-calendar-nav {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    left: 20px;
+    display: flex;
+    justify-content: space-between;
+    pointer-events: none;
+  }
+
+  #qa-static-bw .qa-so-calendar-nav button {
+    display: flex;
+    width: 40px;
+    height: 40px;
+    align-items: center;
+    justify-content: center;
+    padding: 0;
+    border: 0;
+    border-radius: 8px;
+    background: transparent;
+    color: #1f212b;
+    font: 400 30px/34px Arial, sans-serif;
+    pointer-events: auto;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-calendar-nav button:hover {
+    background: #f2f3fa;
+  }
+
+  #qa-static-bw .qa-so-calendar-footer {
+    display: flex;
+    min-height: 72px;
+    align-items: center;
+    justify-content: flex-end;
+    gap: 10px;
+    margin-top: 8px;
+    border-top: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-so-calendar-clear,
+  #qa-static-bw .qa-so-calendar-confirm {
+    min-width: 105px;
+    height: 48px;
+    padding: 0 20px;
+    border: 1px solid #8e2157;
+    border-radius: 100px;
+    background: #fff;
+    color: #8e2157;
+    font: 500 15px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-so-calendar-confirm {
+    background: #8e2157;
+    color: #fff;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] {
+    font-family: "Graphik Web", Arial, sans-serif;
+    text-align: left;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] {
+    text-align: right;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-subtabs,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-trip,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-stop-leg > div,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-journey,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-hotel-row {
+    direction: ltr;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-subtabs,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-trip,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-stop-leg > div,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-journey,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-hotel-row {
+    direction: rtl;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-field,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-date-cell,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-airport-menu button,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-guest-trigger,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-cabin-trigger {
+    text-align: left;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-field,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-date-cell,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-airport-menu button,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-guest-trigger,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-cabin-trigger {
+    text-align: right;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-row-wrap.is-second,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-hotel-row.is-truncated {
+    margin-right: 310px;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-row-wrap.is-second,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-hotel-row.is-truncated {
+    margin-left: 310px;
+  }
+
+  @media (min-width: 1500px) {
+    html body #qa-static-bw-wrap {
+      max-width: none !important;
+      padding-right: 80px !important;
+      padding-left: 80px !important;
+    }
+
+    #qa-static-bw > .qa-stopover-desktop {
+      padding: 0 34px 27px;
+    }
+
+    #qa-static-bw .qbw-tab {
+      min-height: 64px;
+      padding-top: 18px;
+      padding-bottom: 18px;
+    }
+
+    #qa-static-bw .qa-so-subtabs {
+      min-height: 86px;
+    }
+
+    #qa-static-bw .qa-so-blurb {
+      padding-bottom: 44px;
+    }
+
+    #qa-static-bw .qa-so-journey,
+    #qa-static-bw .qa-so-hotel-row {
+      min-height: 66px;
+    }
+
+    #qa-static-bw .qa-so-field,
+    #qa-static-bw .qa-so-swap-wrap,
+    #qa-static-bw .qa-so-calendar-field,
+    #qa-static-bw .qa-so-date-cell,
+    #qa-static-bw .qa-so-guest,
+    #qa-static-bw .qa-so-guest-trigger,
+    #qa-static-bw .qa-so-cabin-trigger {
+      height: 64px;
+    }
+
+    #qa-static-bw .qa-so-stop-controls {
+      min-height: 142px;
+    }
+
+    #qa-static-bw .qa-so-actions {
+      min-height: 72px;
+    }
+
+    #qa-static-bw .qa-so-search {
+      min-height: 64px;
+    }
+  }
+
+  @media (max-width: 1180px) {
+    #qa-static-bw > .qa-stopover-desktop {
+      padding-right: 20px;
+      padding-left: 20px;
+    }
+
+    #qa-static-bw .qa-so-row-wrap.is-second,
+    #qa-static-bw .qa-so-hotel-row.is-truncated {
+      width: calc(100% - 250px);
+    }
+
+    #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-row-wrap.is-second,
+    #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-so-hotel-row.is-truncated {
+      margin-right: 250px;
+    }
+
+    #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-row-wrap.is-second,
+    #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-so-hotel-row.is-truncated {
+      margin-left: 250px;
+    }
+
+    #qa-static-bw .qa-so-guest {
+      width: 250px;
+      min-width: 250px;
+      flex-basis: 250px;
+    }
+
+    #qa-static-bw .qa-so-calendar-field {
+      width: 240px;
+      min-width: 240px;
+    }
+
+    #qa-static-bw .qa-so-calendar-field.is-single {
+      width: 155px;
+      min-width: 155px;
+    }
+
+    #qa-static-bw .qa-so-date-cell {
+      padding-right: 6px;
+      padding-left: 6px;
+    }
+
+    #qa-static-bw .qa-so-date-cell strong,
+    #qa-static-bw .qa-so-guest-trigger > strong,
+    #qa-static-bw .qa-so-cabin-trigger > strong {
+      font-size: 12px;
+    }
+
+    #qa-static-bw .qa-so-field {
+      padding-right: 9px;
+      padding-left: 9px;
+    }
+
+    #qa-static-bw .qa-so-value {
+      font-size: 14px;
+    }
+
+    #qa-static-bw .qa-so-calendar-pop {
+      width: 740px;
+    }
+  }
+}
+
+@media (max-width: 991px) {
+  #qa-static-bw > .qa-stopover-desktop {
+    display: none !important;
+  }
+}

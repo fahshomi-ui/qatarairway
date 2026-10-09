@@ -1,0 +1,43 @@
+@media (max-width:991px){
+  html,body{max-width:100%;overflow-x:hidden}
+  body.mobile #qa-pr-official-header #sso_login_cc{display:none!important}
+  body.mobile #qa-pr-official-header #menu-wrap{
+    position:fixed!important;
+    inset:0!important;
+    display:flex!important;
+    width:100vw!important;
+    max-width:100vw!important;
+    height:0!important;
+    max-height:0!important;
+    margin:0!important;
+    opacity:0!important;
+    visibility:hidden!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    z-index:6002!important;
+  }
+  body.mobile #qa-pr-official-header #menu-wrap #menu-row{
+    width:100%!important;
+    max-width:100%!important;
+    height:100%!important;
+    margin:0!important;
+    transform:translateX(-100%)!important;
+    transition:transform .25s cubic-bezier(.23,1,.32,1)!important;
+  }
+  html[dir="rtl"] body.mobile #qa-pr-official-header #menu-wrap #menu-row{transform:translateX(100%)!important}
+  body.mobile #qa-pr-official-header #menu-wrap.qa-pr-mobile-menu-open{
+    height:100vh!important;
+    max-height:100vh!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  body.mobile #qa-pr-official-header #menu-wrap.qa-pr-mobile-menu-open #menu-row{transform:none!important}
+  body.qa-pr-mobile-menu-visible{overflow:hidden!important}
+  #qa-pr-content .bf_prtgl{overflow:hidden!important}
+  #qa-pr-content .bf_prtgl>img.bf_clickable{width:80px!important;max-width:80px!important;height:64px!important;max-height:64px!important}
+  .qa-pr-details-slidebox,.qa-pr-selection-slidebox{width:100vw!important;max-width:100vw!important}
+  html[dir="rtl"] .qa-pr-details-slidebox,html[dir="rtl"] .qa-pr-selection-slidebox{left:0!important;right:auto!important}
+  html[dir="ltr"] .qa-pr-details-slidebox,html[dir="ltr"] .qa-pr-selection-slidebox{right:0!important;left:auto!important}
+  .qa-pr-details-slidebox .rwd_hide_onmobilelarge,.qa-pr-selection-slidebox .rwd_hide_onmobilelarge{display:none!important}
+}

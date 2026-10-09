@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" viewBox="0 0 25 25">
+  <g id="ic_lock" data-name="ic/lock" transform="translate(0.5 0.5)">
+    <rect id="Rectangle_685" data-name="Rectangle 685" width="24" height="24" fill="none" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+    <path id="Path_1116" data-name="Path 1116" d="M17.488,9.9V6.507a5.489,5.489,0,0,0-10.977,0V9.9a2.5,2.5,0,0,0-2.494,2.5v8.053a2.5,2.5,0,0,0,2.5,2.5H17.483a2.5,2.5,0,0,0,2.5-2.5V12.4A2.5,2.5,0,0,0,17.488,9.9ZM12,2.024a4.49,4.49,0,0,1,4.488,4.483V9.9H7.511V6.507A4.491,4.491,0,0,1,12,2.024Zm6.983,18.425a1.5,1.5,0,0,1-1.5,1.5H6.517a1.5,1.5,0,0,1-1.5-1.5V12.4a1.5,1.5,0,0,1,1.5-1.5H17.483a1.5,1.5,0,0,1,1.5,1.5Z" transform="translate(-0.017 -0.025)" fill="#0a0a0a" stroke="rgba(0,0,0,0)" stroke-width="1"/>
+  </g>
+</svg>

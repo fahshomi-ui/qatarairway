@@ -1,0 +1,733 @@
+<div id="qa-static-bw-wrap"><div id="qa-static-bw" dir="rtl">
+<style>
+#qa-static-bw-wrap{padding:0 40px;max-width:1440px;margin:0 auto}
+#qa-static-bw *{box-sizing:border-box;margin:0;padding:0}
+#qa-static-bw{font-family:"Almarai","Jotia","Graphik Web",Arial,sans-serif;background:#fff;border-radius:6px;box-shadow:0 2px 10px rgba(0,0,0,.08);direction:rtl;text-align:right;position:relative}
+#qa-static-bw .qbw-tabs{display:flex;background:#f7f6f7;list-style:none;border-radius:6px 6px 0 0;overflow:hidden}
+#qa-static-bw .qbw-tab{flex:0 0 auto;padding:14px 26px;display:flex;align-items:center;gap:12px;font-size:15px;color:#26262b;cursor:pointer;background:transparent;font-family:inherit;line-height:1.3}
+#qa-static-bw .qbw-tab.active{background:#fff;color:#a3195b}
+#qa-static-bw .qbw-tab svg{width:22px;height:22px;flex:0 0 22px;fill:none;stroke:#5f5f66;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round}
+#qa-static-bw .qbw-tab.active svg{stroke:#d0217e}
+#qa-static-bw .qbw-body{padding:22px 26px 26px}
+#qa-static-bw .qbw-trip{display:flex;gap:34px;align-items:center;margin-bottom:18px}
+#qa-static-bw .qbw-radio{display:flex;align-items:center;gap:10px;font-size:14px;color:#26262b;cursor:pointer}
+#qa-static-bw .qbw-radio input{appearance:none;width:20px;height:20px;border:1px solid #a6a6ad;border-radius:50%;position:relative;cursor:pointer;flex:0 0 20px;margin:0;background:#fff}
+#qa-static-bw .qbw-radio input:checked{border:none;background:#1b1b6f}
+#qa-static-bw .qbw-radio input:checked::after{content:"";position:absolute;inset:7px;border-radius:50%;background:#fff}
+#qa-static-bw .qbw-fields{display:flex;border:1px solid #d6d6da;border-radius:4px;background:#fff;height:58px;align-items:stretch}
+#qa-static-bw .qbw-f{padding:0 14px;position:relative;min-width:0;display:flex;flex-direction:column;justify-content:center;cursor:pointer}
+#qa-static-bw .qbw-f.f-from{flex:1 1 auto;padding-right:44px}
+#qa-static-bw .qbw-f.f-to{flex:1 1 auto}
+#qa-static-bw .qbw-f.f-date{flex:0 0 178px;border-right:1px solid #e4e4e8;padding-left:40px;padding-right:10px}
+#qa-static-bw .qbw-f.f-pax{flex:0 0 262px;border-right:1px solid #e4e4e8;padding-left:38px}
+#qa-static-bw .qbw-f .lbl{display:block;font-size:11px;color:#6d6d75;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;pointer-events:none}
+#qa-static-bw .qbw-f .qbwval{display:block;font-size:15px;color:#1c1c20;font-weight:700;line-height:1.4;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#qa-static-bw .qbw-f .qbwval:empty{display:none}
+#qa-static-bw .qbw-f input.qbwval{display:block!important;border:0;outline:0;background:transparent;width:100%;font-family:inherit;padding:0;cursor:pointer;font-size:15px;color:#1c1c20;font-weight:700;line-height:1.4}
+#qa-static-bw .qbw-f input.qbwval::placeholder{color:#a6a6ad;font-weight:400}
+#qa-static-bw .qbw-f .ico{position:absolute;top:50%;transform:translateY(-50%);right:12px;width:22px;height:22px;fill:none;stroke:#d0217e;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;pointer-events:none}
+#qa-static-bw .qbw-f.f-date .ico,#qa-static-bw .qbw-f.f-pax .ico{stroke:#5f5f66;width:19px;height:19px;right:auto;left:14px}
+#qa-static-bw .qbw-f.f-pax .ico{left:44px}
+#qa-static-bw .qbw-f.f-pax .chev{position:absolute;top:50%;transform:translateY(-50%);left:12px;width:18px;height:18px;fill:none;stroke:#5f5f66;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round;pointer-events:none;transition:transform .2s}
+#qa-static-bw .qbw-f.f-pax.open .chev{transform:translateY(-50%) rotate(180deg)}
+#qa-static-bw .qbw-swap{flex:0 0 46px;display:flex;align-items:center;justify-content:center}
+#qa-static-bw .qbw-leg2wrap{display:none;margin-top:10px}
+#qa-static-bw .qbw-leg2wrap.show{display:block}
+#qa-static-bw .qbw-leg2{margin-left:262px;position:relative}
+#qa-static-bw .qbw-f.f-date .ico,#qa-static-bw .qbw-f.f-pax .ico{display:none}
+#qa-static-bw .qbw-leg2wrap .qbw-fields+.qbw-fields{margin-top:14px}
+#qa-static-bw .qbw-rmleg{position:absolute;left:-46px;top:50%;transform:translateY(-50%);width:26px;height:26px;background:none;border:0;padding:0;cursor:pointer;display:flex;align-items:center;justify-content:center}
+#qa-static-bw .qbw-rmleg svg{width:16px;height:16px;fill:none;stroke:#5f5f66;stroke-width:1.6;stroke-linecap:round}
+#qa-static-bw .qbw-addleg{display:flex;align-items:center;gap:8px;background:none;border:0;padding:0;margin:14px 0 0;color:#a3195b;font-size:15px;cursor:pointer;font-family:inherit;flex-direction:row-reverse;margin-right:0;margin-left:auto}
+#qa-static-bw .qbw-addleg svg{width:18px;height:18px;fill:none;stroke:#a3195b;stroke-width:1.8;stroke-linecap:round}
+@media (max-width:1180px){#qa-static-bw .qbw-leg2{margin-left:236px}}
+@media (max-width:900px){#qa-static-bw .qbw-leg2{margin-left:0}}
+#qa-static-bw .qbw-swap svg{width:22px;height:22px;fill:none;stroke:#26262b;stroke-width:1.4;stroke-linecap:round;stroke-linejoin:round;cursor:pointer}
+#qa-static-bw .qbw-foot{display:flex;align-items:center;margin-top:20px;gap:26px;flex-wrap:wrap}
+#qa-static-bw .qbw-foot .qbw-check{margin-left:auto}
+#qa-static-bw .qbw-check{display:flex;align-items:center;gap:12px;font-size:14px;color:#26262b;cursor:pointer}
+#qa-static-bw .qbw-check input{appearance:none;width:21px;height:21px;border:1px solid #a6a6ad;border-radius:2px;cursor:pointer;position:relative;flex:0 0 21px;margin:0;background:#fff}
+#qa-static-bw .qbw-check input:checked{background:#a3195b;border-color:#a3195b}
+#qa-static-bw .qbw-check input:checked::after{content:"";position:absolute;left:6px;top:3px;width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+#qa-static-bw .qbw-promo{display:flex;align-items:center;gap:12px;font-size:15px;color:#26262b;cursor:pointer;background:none;border:0;font-family:inherit}
+#qa-static-bw .qbw-promo svg{width:18px;height:18px;fill:none;stroke:#26262b;stroke-width:1.5;stroke-linecap:round}
+#qa-static-bw .qbw-search{background:#a3195b;color:#fff;border:0;border-radius:30px;padding:15px 60px;font-size:16px;font-weight:700;cursor:pointer;font-family:inherit;white-space:nowrap}
+#qa-static-bw .qbw-search:hover{background:#8a1449}
+
+/* ---------- dropdown panels ---------- */
+#qa-static-bw .qbw-pan{position:absolute;z-index:60;background:#fff;border-radius:4px;box-shadow:0 6px 24px rgba(0,0,0,.18);display:none;overflow:hidden}
+#qa-static-bw .qbw-pan.show{display:block}
+/* ---------- airports (matches live QR autocomplete) ---------- */
+#qa-static-bw .qbw-ac{width:470px;max-height:412px;overflow-y:auto;padding:0;border-radius:2px;box-shadow:0 2px 10px rgba(0,0,0,.22)}
+#qa-static-bw .qbw-ac::-webkit-scrollbar{width:10px}
+#qa-static-bw .qbw-ac::-webkit-scrollbar-track{background:#f4f4f6}
+#qa-static-bw .qbw-ac::-webkit-scrollbar-thumb{background:#b9b9c0;border-radius:6px}
+#qa-static-bw .qbw-ac-row{display:flex;align-items:center;gap:14px;padding:13px 18px;cursor:pointer;border-bottom:1px solid #ececef;flex-direction:row-reverse}
+#qa-static-bw .qbw-ac-row:last-child{border-bottom:0}
+#qa-static-bw .qbw-ac-row:hover,#qa-static-bw .qbw-ac-row.sel{background:#eeecee}
+#qa-static-bw .qbw-ac-row svg{width:26px;height:26px;flex:0 0 26px;fill:none;stroke:#9a9aa2;stroke-width:1.3;stroke-linecap:round;stroke-linejoin:round}
+#qa-static-bw .qbw-ac-txt{flex:1 1 auto;min-width:0;text-align:right}
+#qa-static-bw .qbw-ac-city{font-size:15px;color:#1c1c20;font-weight:700;line-height:1.45;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;direction:rtl}
+#qa-static-bw .qbw-ac-city b{font-weight:700;color:#1c1c20}
+#qa-static-bw .qbw-ac-name{font-size:13px;color:#77777f;line-height:1.5;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#qa-static-bw .qbw-ac-name b{font-weight:700;color:#1c1c20}
+#qa-static-bw .qbw-ac-code{font-size:15px;color:#1c1c20;flex:0 0 46px;letter-spacing:.3px;text-align:left;direction:ltr}
+#qa-static-bw .qbw-ac-empty{padding:16px 18px;font-size:14px;color:#77777f}
+
+/* ---------- calendar (matches live QR datepicker) ---------- */
+#qa-static-bw .qbw-cal{width:1010px;padding:26px 34px 20px;border-radius:2px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+#qa-static-bw .qbw-cal-body{position:relative}
+#qa-static-bw .qbw-cal-nav{position:absolute;top:50%;transform:translateY(-50%);background:none;border:0;cursor:pointer;padding:8px;display:flex;align-items:center;z-index:2}
+#qa-static-bw .qbw-cal-nav.prev{right:-24px}
+#qa-static-bw .qbw-cal-nav.next{left:-24px}
+#qa-static-bw .qbw-cal-nav svg{width:20px;height:20px;fill:none;stroke:#1c1c20;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+#qa-static-bw .qbw-cal-nav:disabled svg{stroke:#d0d0d6}
+#qa-static-bw .qbw-cal-months{display:flex;gap:44px}
+#qa-static-bw .qbw-cal-m{flex:1 1 0;min-width:0}
+#qa-static-bw .qbw-cal-mt{text-align:center;font-size:19px;font-weight:400;color:#1c1c20;margin-bottom:22px}
+#qa-static-bw .qbw-cal-grid{display:grid;grid-template-columns:repeat(7,1fr)}
+#qa-static-bw .qbw-cal-dow{font-size:14px;color:#1c1c20;text-align:center;padding:0 0 22px}
+#qa-static-bw .qbw-cal-d{text-align:center;font-size:16px;height:44px;line-height:44px;cursor:pointer;color:#1c1c20;position:relative}
+#qa-static-bw .qbw-cal-d.mute{cursor:default}
+#qa-static-bw .qbw-cal-d.off{color:#b6b8c8;cursor:default}
+#qa-static-bw .qbw-cal-d:not(.mute):not(.off):not(.on):hover{background:#eceaf7}
+#qa-static-bw .qbw-cal-d.on{background:#4338ca;color:#fff}
+#qa-static-bw .qbw-cal-d.range{background:#f2f2f7}
+#qa-static-bw .qbw-cal-foot{display:flex;align-items:center;justify-content:space-between;margin-top:14px;padding-top:20px;border-top:1px solid #e4e4e8}
+#qa-static-bw .qbw-cal-flex{display:flex;align-items:center;gap:14px;font-size:15px;color:#26262b;cursor:pointer;flex-direction:row-reverse}
+#qa-static-bw .qbw-cal-flex input{appearance:none;width:22px;height:22px;border:1px solid #a6a6ad;background:#fff;margin:0;cursor:pointer;flex:0 0 22px;position:relative;border-radius:2px}
+#qa-static-bw .qbw-cal-flex input:checked{background:#a3195b;border-color:#a3195b}
+#qa-static-bw .qbw-cal-flex input:checked::after{content:"";position:absolute;left:7px;top:3px;width:6px;height:11px;border:solid #fff;border-width:0 2px 2px 0;transform:rotate(45deg)}
+#qa-static-bw .qbw-cal-btns{display:flex;align-items:center;gap:18px}
+#qa-static-bw .qbw-cal-clear{background:#fff;color:#a3195b;border:1px solid #a3195b;border-radius:30px;padding:13px 30px;font-size:15px;cursor:pointer;font-family:inherit;white-space:nowrap}
+#qa-static-bw .qbw-cal-done{background:#a3195b;color:#fff;border:0;border-radius:30px;padding:14px 40px;font-size:15px;cursor:pointer;font-family:inherit;white-space:nowrap}
+
+/* ---------- passengers (matches live QR pax panel) ---------- */
+#qa-static-bw .qbw-pax{width:415px;padding:22px 0 20px;border-radius:2px;box-shadow:0 2px 12px rgba(0,0,0,.2)}
+#qa-static-bw .qbw-pax-h{font-size:17px;color:#1c1c20;padding:0 0 13px;border-bottom:1px solid #e4e4e8;margin:0 28px 2px}
+#qa-static-bw .qbw-pax-row{display:flex;align-items:center;justify-content:space-between;padding:11px 28px;flex-direction:row}
+#qa-static-bw .qbw-pax-tx{text-align:right}
+#qa-static-bw .qbw-pax-lbl{font-size:15px;color:#1c1c20;line-height:1.4}
+#qa-static-bw .qbw-pax-sub{font-size:12.5px;color:#77777f;line-height:1.5}
+#qa-static-bw .qbw-pax-l{display:flex;align-items:center;gap:12px;flex-direction:row-reverse}
+#qa-static-bw .qbw-info{width:22px;height:22px;border-radius:50%;background:#4338ca;color:#fff;font-size:12px;font-style:italic;font-family:Georgia,serif;display:flex;align-items:center;justify-content:center;flex:0 0 22px;cursor:pointer;user-select:none}
+#qa-static-bw .qbw-step{display:flex;align-items:center;gap:13px;flex-direction:row}
+#qa-static-bw .qbw-step button{width:40px;height:40px;border-radius:2px;border:1px solid #d8d8dd;background:#fff;color:#1c1c20;font-size:20px;font-weight:300;line-height:1;cursor:pointer;display:flex;align-items:center;justify-content:center;font-family:inherit;padding:0}
+#qa-static-bw .qbw-step button:hover:not(:disabled){border-color:#a9a9b0}
+#qa-static-bw .qbw-step button:disabled{border-color:#ebebee;color:#cfcfd4;cursor:default}
+#qa-static-bw .qbw-step span{min-width:20px;text-align:center;font-size:16px;color:#1c1c20}
+#qa-static-bw .qbw-step span.zero{color:#a9a9b0}
+#qa-static-bw .qbw-pax-hr{height:0;background:none;margin:0}
+#qa-static-bw .qbw-note{display:none;background:#f4f4f7;margin:8px 28px 12px;padding:16px 18px 18px;border-radius:2px}
+#qa-static-bw .qbw-note.show{display:block}
+#qa-static-bw .qbw-note-h{display:flex;align-items:center;justify-content:space-between;flex-direction:row-reverse;margin-bottom:14px}
+#qa-static-bw .qbw-note-t{font-size:14px;color:#1c1c20;font-weight:400}
+#qa-static-bw .qbw-note-x{background:none;border:0;cursor:pointer;padding:0;width:22px;height:22px;display:flex;align-items:center;justify-content:center;font-family:inherit}
+#qa-static-bw .qbw-note-x svg{width:17px;height:17px;stroke:#1c1c20;stroke-width:1.5;fill:none;stroke-linecap:round}
+#qa-static-bw .qbw-note-b{font-size:13.5px;color:#4a4a52;line-height:1.75;text-align:right!important;direction:rtl}
+#qa-static-bw .qbw-cabin-t{font-size:17px;color:#1c1c20;padding:16px 0 12px;border-bottom:1px solid #e4e4e8;margin:0 28px 4px}
+#qa-static-bw .qbw-cabin{display:flex;flex-direction:column;gap:0}
+#qa-static-bw .qbw-cabin label{display:flex;align-items:center;justify-content:space-between;gap:16px;font-size:15px;color:#1c1c20;cursor:pointer;padding:11px 28px;flex-direction:row-reverse;text-align:right;line-height:1.5}
+#qa-static-bw .qbw-cabin label>span{flex:1 1 auto;text-align:right}
+#qa-static-bw .qbw-cabin input{appearance:none;width:22px;height:22px;border:1px solid #a6a6ad;border-radius:50%;position:relative;flex:0 0 22px;margin:1px 0 0;background:#fff;cursor:pointer}
+#qa-static-bw .qbw-cabin input:checked{border:1px solid #4338ca;background:#fff}
+#qa-static-bw .qbw-cabin input:checked::after{content:"";position:absolute;inset:5px;border-radius:50%;background:#4338ca}
+#qa-static-bw .qbw-pax-done{margin:16px 28px 0;width:calc(100% - 56px);background:#a3195b;color:#fff;border:0;border-radius:30px;padding:13px 34px;font-size:15px;cursor:pointer;font-family:inherit}
+
+@media(max-width:1100px){
+#qa-static-bw .qbw-f.f-pax{flex:0 0 236px}
+#qa-static-bw .qbw-f.f-date{flex:0 0 170px}
+#qa-static-bw .qbw-cal{width:520px;padding:22px 26px 18px}
+#qa-static-bw .qbw-cal-months{gap:0}
+#qa-static-bw .qbw-cal-m:nth-child(2){display:none}
+#qa-static-bw .qbw-cal-nav.prev{right:-14px}
+#qa-static-bw .qbw-cal-nav.next{left:-14px}
+}
+@media(max-width:900px){
+#qa-static-bw-wrap{padding:0 12px}
+#qa-static-bw .qbw-tabs{overflow-x:auto}
+#qa-static-bw .qbw-tab{padding:12px 14px;font-size:13px;gap:8px}
+#qa-static-bw .qbw-fields{flex-direction:column;height:auto}
+#qa-static-bw .qbw-f{padding:12px 14px!important;width:100%;flex:1 1 auto!important;border-right:0!important;border-bottom:1px solid #e4e4e8;min-height:56px}
+#qa-static-bw .qbw-f .ico,#qa-static-bw .qbw-f .chev{right:auto!important;left:14px!important}
+html[dir="ltr"] #qa-static-bw .qbw-f.f-pax .chev,body.newhome-en #qa-static-bw .qbw-f.f-pax .chev{right:14px!important;left:auto!important;}
+#qa-static-bw .qbw-swap{height:44px;width:100%;flex:1 1 auto}
+#qa-static-bw .qbw-foot{flex-direction:column;align-items:stretch}
+#qa-static-bw .qbw-foot .qbw-check{margin-left:0}
+#qa-static-bw .qbw-search{width:100%;padding:15px 20px}
+#qa-static-bw .qbw-pan{left:8px!important;right:8px!important;width:auto!important}
+#qa-static-bw .qbw-cal,#qa-static-bw .qbw-pax,#qa-static-bw .qbw-ac{width:auto}
+}
+#qa-static-bw .qbw-multi-title{position:relative;padding-left:34px;}
+#qa-static-bw .qbw-multi-title .qbw-rmleg{position:absolute;left:0;top:50%;transform:translateY(-50%);width:26px;height:26px;margin:0;padding:0;display:flex;align-items:center;justify-content:center;background:transparent;border:0;}
+#qa-static-bw .qbw-multi-title .qbw-rmleg svg{width:16px;height:16px;}
+html[dir="ltr"] #qa-static-bw .qbw-multi-title{padding-left:0;padding-right:34px;text-align:left;direction:ltr;}
+html[dir="ltr"] #qa-static-bw .qbw-multi-title .qbw-rmleg{left:auto;right:0;}
+
+
+@media (max-width:900px){
+  #qa-static-bw.qbw-multi-mode .qbw-multi-title .qbw-rmleg{color:#c8102e!important;}
+  #qa-static-bw.qbw-multi-mode .qbw-multi-title .qbw-rmleg svg{stroke:#c8102e!important;}
+}
+@media (min-width:901px){
+  #qa-static-bw .qbw-multi-title[data-leg="3"],#qa-static-bw .qbw-multi-title[data-leg="4"],#qa-static-bw .qbw-multi-title[data-leg="5"],#qa-static-bw .qbw-multi-title[data-leg="6"]{display:none!important;}
+}
+@media (max-width:900px){
+  #qa-static-bw.qbw-multi-mode .qbw-multi-title[data-leg="3"],#qa-static-bw.qbw-multi-mode .qbw-multi-title[data-leg="4"],#qa-static-bw.qbw-multi-mode .qbw-multi-title[data-leg="5"],#qa-static-bw.qbw-multi-mode .qbw-multi-title[data-leg="6"]{margin-top:14px!important;}
+}
+<style id="qa-mobile-calendar-english-order">
+@media screen and (max-width:991px){
+  html[dir="ltr"] #qa-static-bw #qbw-pan-cal .qbw-cal-foot,
+  body.newhome-en #qa-static-bw #qbw-pan-cal .qbw-cal-foot{direction:ltr!important;}
+  html[dir="ltr"] #qa-static-bw #qbw-pan-cal .qbw-cal-flex,
+  body.newhome-en #qa-static-bw #qbw-pan-cal .qbw-cal-flex{order:1!important;flex-direction:row!important;direction:ltr!important;justify-content:flex-start!important;margin-left:0!important;margin-right:12px!important;}
+  html[dir="ltr"] #qa-static-bw #qbw-pan-cal .qbw-cal-btns,
+  body.newhome-en #qa-static-bw #qbw-pan-cal .qbw-cal-btns{order:2!important;flex:1 1 auto!important;justify-content:flex-end!important;direction:ltr!important;}
+  html[dir="ltr"] #qa-static-bw #qbw-pan-cal .qbw-cal-clear,
+  body.newhome-en #qa-static-bw #qbw-pan-cal .qbw-cal-clear{order:1!important;}
+  html[dir="ltr"] #qa-static-bw #qbw-pan-cal .qbw-cal-done,
+  body.newhome-en #qa-static-bw #qbw-pan-cal .qbw-cal-done{order:2!important;}
+}
+</style></style>
+
+<ul class="qbw-tabs">
+  <li class="qbw-tab active">
+    <svg viewBox="0 0 24 24"><path d="M4.5 15.5 20 10.2c1-.3 1.2-1.7.3-2.3l-1.6-1c-.4-.3-1-.3-1.4-.1l-3.7 1.8-5.4-2.8c-.3-.2-.7-.2-1 0L5.4 6.5c-.7.4-.7 1.4 0 1.8l3.4 2-3.3 1.6-2.6-.9c-.3-.1-.6 0-.8.2l-.7.7c-.4.4-.3 1 .1 1.3l2 1.3c.3.2.7.3 1 .2Z"/><path d="M3 19.5h18"/></svg>
+    احجز رحلة طيران
+  </li>
+  <li class="qbw-tab">
+    <svg viewBox="0 0 24 24"><rect x="3" y="7" width="12" height="12" rx="1.5"/><path d="M7 7V5.5A1.5 1.5 0 0 1 8.5 4h1A1.5 1.5 0 0 1 11 5.5V7"/><path d="M18 11v6M15 14h6"/></svg>
+    الباقات / التوقف المؤقت
+  </li>
+  <li class="qbw-tab">
+    <svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="14" rx="2"/><path d="M3 9.5h18"/></svg>
+    إدارة الحجز / تسجيل الدخول
+  </li>
+  <li class="qbw-tab">
+    <svg viewBox="0 0 24 24"><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>
+    حالة الرحلة
+  </li>
+</ul>
+
+<div class="qbw-body">
+  <div class="qbw-trip">
+    <label class="qbw-radio"><input type="radio" name="qbw-trip" value="R" checked> رحلة ذهاب وعودة</label>
+    <label class="qbw-radio"><input type="radio" name="qbw-trip" value="O"> اتجاه واحد</label>
+    <label class="qbw-radio"><input type="radio" name="qbw-trip" value="M"> وجهات متعددة</label>
+  </div>
+
+  <div class="qbw-fields">
+    <div class="qbw-f f-from" id="qbw-cell-from">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M4.5 15.5 20 10.2c1-.3 1.2-1.7.3-2.3l-1.6-1c-.4-.3-1-.3-1.4-.1l-3.7 1.8-5.4-2.8c-.3-.2-.7-.2-1 0L5.4 6.5c-.7.4-.7 1.4 0 1.8l3.4 2-3.3 1.6-2.6-.9c-.3-.1-.6 0-.8.2l-.7.7c-.4.4-.3 1 .1 1.3l2 1.3c.3.2.7.3 1 .2Z"/><path d="M3 19.5h18"/></svg>
+      <span class="lbl">من</span>
+      <input class="qbwval" id="qbw-from" type="text" autocomplete="off" aria-label="من">
+    </div>
+    <div class="qbw-swap">
+      <svg id="qbw-swap" viewBox="0 0 24 24"><path d="M4 9h16l-3.5-3.5M20 15H4l3.5 3.5"/></svg>
+    </div>
+    <div class="qbw-f f-to" id="qbw-cell-to">
+      <span class="lbl">إلى</span>
+      <input class="qbwval" id="qbw-to" type="text" autocomplete="off" aria-label="إلى">
+    </div>
+    <div class="qbw-f f-date" id="qbw-cell-dep">
+      <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span class="lbl">رحلة المغادرة</span>
+      <span class="qbwval" id="qbw-dep"></span>
+    </div>
+    <div class="qbw-f f-date" id="qbw-cell-ret">
+      <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span class="lbl">رحلة ذهاب وعودة</span>
+      <span class="qbwval" id="qbw-ret"></span>
+    </div>
+    <div class="qbw-f f-pax" id="qbw-cell-pax">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M20 21v-1.5a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4V21"/><circle cx="12" cy="7.5" r="3.5"/></svg>
+      <svg class="chev" viewBox="0 0 24 24"><path d="M6 9.5l6 6 6-6"/></svg>
+      <span class="lbl">المسافرون / درجة السفر</span>
+      <span class="qbwval" id="qbw-paxval">1 المسافر الدرجة السياحية</span>
+    </div>
+  </div>
+
+  <div class="qbw-leg2wrap" id="qbw-leg2">
+  <div class="qbw-fields qbw-leg2">
+    <div class="qbw-f f-from" id="qbw-cell-from2">
+      <svg class="ico" viewBox="0 0 24 24"><path d="M4.5 15.5 20 10.2c1-.3 1.2-1.7.3-2.3l-1.6-1c-.4-.3-1-.3-1.4-.1l-3.7 1.8-5.4-2.8c-.3-.2-.7-.2-1 0L5.4 6.5c-.7.4-.7 1.4 0 1.8l3.4 2-3.3 1.6-2.6-.9c-.3-.1-.6 0-.8.2l-.7.7c-.4.4-.3 1 .1 1.3l2 1.3c.3.2.7.3 1 .2Z"/><path d="M3 19.5h18"/></svg>
+      <span class="lbl">من</span>
+      <input class="qbwval" id="qbw-from2" type="text" autocomplete="off" aria-label="من">
+    </div>
+    <div class="qbw-swap">
+      <svg id="qbw-swap2" viewBox="0 0 24 24"><path d="M4 9h16l-3.5-3.5M20 15H4l3.5 3.5"/></svg>
+    </div>
+    <div class="qbw-f f-to" id="qbw-cell-to2">
+      <span class="lbl">إلى</span>
+      <input class="qbwval" id="qbw-to2" type="text" autocomplete="off" aria-label="إلى">
+    </div>
+    <div class="qbw-f f-date" id="qbw-cell-dep2">
+      <svg class="ico" viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M3 10h18M8 3v4M16 3v4"/></svg>
+      <span class="lbl">رحلة المغادرة</span>
+      <span class="qbwval" id="qbw-dep2"></span>
+    </div>
+  </div>
+  <button type="button" class="qbw-addleg"><span>أضف رحلة جوية</span><svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg></button>
+  </div>
+
+  <div class="qbw-foot">
+    <label class="qbw-check"><input type="checkbox"> احجز باستخدام نقاط أفيوس</label>
+    <button type="button" class="qbw-promo">
+      <svg viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>
+      إضافة رمز ترويجي
+    </button>
+    <button type="button" class="qbw-search" id="qbw-search">ابحث عن الرحلات</button>
+  </div>
+</div>
+
+<!-- panels -->
+<div class="qbw-pan qbw-ac" id="qbw-pan-ac"></div>
+<div class="qbw-pan qbw-cal" id="qbw-pan-cal">
+  <div class="qbw-cal-body">
+    <button class="qbw-cal-nav prev" id="qbw-cal-prev" aria-label="الشهر السابق"><svg viewBox="0 0 24 24"><path d="M15 19l-7-7 7-7"/></svg></button>
+    <button class="qbw-cal-nav next" id="qbw-cal-next" aria-label="الشهر التالي"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></button>
+    <div class="qbw-cal-months" id="qbw-cal-months"></div>
+  </div>
+  <div class="qbw-cal-foot">
+    <label class="qbw-cal-flex"><input type="checkbox" id="qbw-cal-flexchk"> مواعيد حجز مرنة</label>
+    <div class="qbw-cal-btns">
+      <button type="button" class="qbw-cal-done" id="qbw-cal-done">متابعة</button>
+      <button type="button" class="qbw-cal-clear" id="qbw-cal-clear">إلغاء التواريخ</button>
+    </div>
+  </div>
+</div>
+<div class="qbw-pan qbw-pax" id="qbw-pan-pax">
+  <div class="qbw-pax-h">المسافرون</div>
+  <div class="qbw-pax-row">
+    <div class="qbw-pax-tx"><div class="qbw-pax-lbl">البالغون</div><div class="qbw-pax-sub">12 عاماً فما فوق</div></div>
+    <div class="qbw-pax-l">
+      <div class="qbw-step" data-k="adults"><button type="button" data-d="-1">−</button><span>1</span><button type="button" data-d="1">+</button></div>
+    </div>
+  </div>
+  <div class="qbw-pax-row">
+    <div class="qbw-pax-tx"><div class="qbw-pax-lbl">طفل</div><div class="qbw-pax-sub">من 2 إلى 11 عاماً</div></div>
+    <div class="qbw-pax-l">
+      <div class="qbw-step" data-k="children"><button type="button" data-d="-1">−</button><span>0</span><button type="button" data-d="1">+</button></div>
+      <span class="qbw-info" data-note="qbw-note-children" title="الأطفال من 2 إلى 11 عاماً">i</span>
+    </div>
+  </div>
+  <div class="qbw-note" id="qbw-note-children">
+    <div class="qbw-note-h"><button type="button" class="qbw-note-x" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button><span class="qbw-note-t">ملاحظة</span></div>
+    <div class="qbw-note-b">يجب أن يسافر الأطفال الذين تتراوح أعمارهم بين 2 و5 أعوام برفقة شخص بالغ يزيد عمره عن 16 عاماً.</div>
+  </div>
+  <div class="qbw-pax-row">
+    <div class="qbw-pax-tx"><div class="qbw-pax-lbl">رضيع</div><div class="qbw-pax-sub">أقل من عامين</div></div>
+    <div class="qbw-pax-l">
+      <div class="qbw-step" data-k="infants"><button type="button" data-d="-1">−</button><span>0</span><button type="button" data-d="1">+</button></div>
+      <span class="qbw-info" data-note="qbw-note-infants" title="الرضّع أقل من عامين">i</span>
+    </div>
+  </div>
+  <div class="qbw-note" id="qbw-note-infants">
+    <div class="qbw-note-h"><button type="button" class="qbw-note-x" aria-label="إغلاق"><svg viewBox="0 0 24 24"><path d="M5 5l14 14M19 5L5 19"/></svg></button><span class="qbw-note-t">ملاحظة</span></div>
+    <div class="qbw-note-b">يجب أن يسافر كل رضيع برفقة شخص بالغ. عند السفر، يجب أن يجلس الرضيع في حضن أحد والديه.</div>
+  </div>
+  <div class="qbw-cabin-t">درجة السفر</div>
+  <div class="qbw-cabin">
+    <label><input type="radio" name="qbw-cabin" value="E" checked> <span>الدرجة السياحية</span></label>
+    <label><input type="radio" name="qbw-cabin" value="B"> <span>درجة رجال الأعمال</span></label>
+    <label><input type="radio" name="qbw-cabin" value="F"> <span>الدرجة الأولى</span></label>
+  </div>
+  <button type="button" class="qbw-pax-done" id="qbw-pax-done">تأكيد</button>
+</div>
+</div></div>
+
+<script src="https://qatarairwaysi-92510758.netlify.app/airports.js"></script>
+<script>
+(function(){
+  var MON_AR=["يناير","فبراير","مارس","أبريل","مايو","يونيو","يوليو","أغسطس","سبتمبر","أكتوبر","نوفمبر","ديسمبر"];
+  var MON_EN=["January","February","March","April","May","June","July","August","September","October","November","December"];
+  var MON_SHORT_EN=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  var QBW_EN=document.documentElement.dir==="ltr" || document.body.classList.contains("newhome-en");
+  var MON=QBW_EN?MON_EN:MON_AR;
+  /* week starts on Monday, like the live QR datepicker */
+  var DOW=["الاثنين","الثلاثاء","الأربعاء","الخميس","الجمعة","السبت","الأحد"];
+  var root=document.getElementById("qa-static-bw");
+  if(!root) return;
+  var $=function(id){return document.getElementById(id);};
+  function fmt(d){return QBW_EN ? d.getDate()+" "+MON_SHORT_EN[d.getMonth()] +" "+d.getFullYear() : ("0"+d.getDate()).slice(-2)+" "+MON[d.getMonth()] +" "+d.getFullYear();}
+  function ymd(d){return d.getFullYear()+"-"+("0"+(d.getMonth()+1)).slice(-2)+"-"+("0"+d.getDate()).slice(-2);}
+
+  /* ---- state ---- */
+  var today=new Date(); today.setHours(0,0,0,0);
+  var st={
+    from:null, to:null,
+    dep:new Date(today), ret:new Date(today.getTime()+7*864e5),
+    adults:1, children:0, infants:0, cabin:"E", cabinLabel:"الدرجة السياحية",
+    trip:"R",
+    from2:null, to2:null, dep2:new Date(today.getTime()+7*864e5)
+  };
+
+  /* ---- panels ---- */
+  var panAc=$("qbw-pan-ac"), panCal=$("qbw-pan-cal"), panPax=$("qbw-pan-pax");
+  function closeAll(){
+    [panAc,panCal,panPax].forEach(function(p){p.classList.remove("show");});
+    $("qbw-cell-pax").classList.remove("open");
+    calTarget=null;
+  }
+  function place(pan,cell,align){
+    var cr=cell.getBoundingClientRect(), rr=root.getBoundingClientRect();
+    pan.style.top=(cr.bottom-rr.top+6)+"px";
+    pan.classList.add("show");
+    var pw=pan.offsetWidth, avail=rr.width;
+    var right;
+    if(align==="right"){ right=cr.right-rr.left-pw; } else { right=rr.right-cr.right; }
+    // RTL: position using left offset from root
+    var left=cr.left-rr.left;
+    if(left+pw>avail) left=Math.max(8,avail-pw-8);
+    pan.style.left=left+"px";
+    pan.style.right="auto";
+  }
+  document.addEventListener("click",function(e){
+    if(!root.contains(e.target)) closeAll();
+  });
+
+  /* ---- airports autocomplete ---- */
+  var AP=QBW_EN?(window.QA_AIRPORTS_EN||window.QA_AIRPORTS||[]):(window.QA_AIRPORTS||[]);
+  var acTarget=null;
+  var ICON_A='<svg viewBox="0 0 24 24"><path d="M4.5 15.5 20 10.2c1-.3 1.2-1.7.3-2.3l-1.6-1c-.4-.3-1-.3-1.4-.1l-3.7 1.8-5.4-2.8c-.3-.2-.7-.2-1 0L5.4 6.5c-.7.4-.7 1.4 0 1.8l3.4 2-3.3 1.6-2.6-.9c-.3-.1-.6 0-.8.2l-.7.7c-.4.4-.3 1 .1 1.3l2 1.3c.3.2.7.3 1 .2Z"/><path d="M3 19.5h18"/></svg>';
+  var ICON_C='<svg viewBox="0 0 24 24"><path d="M12 21s7-5.4 7-11a7 7 0 1 0-14 0c0 5.6 7 11 7 11Z"/><circle cx="12" cy="10" r="2.5"/></svg>';
+  function esc(s){return String(s).replace(/[&<>"]/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[c];});}
+  function bold(name,q){
+    if(!q) return esc(name);
+    /* Match on the normalised form but highlight the original characters. */
+    var i=norm(name).indexOf(norm(q));
+    if(i<0) return esc(name);
+    var len=norm(q).length;
+    return esc(name.slice(0,i))+"<b>"+esc(name.slice(i,i+len))+"</b>"+esc(name.slice(i+len));
+  }
+  /* Fold Arabic orthographic variants so "لند" matches "لندن" and not "أوكلاند". */
+  function norm(s){
+    return String(s)
+      .replace(/[\u0610-\u061A\u064B-\u065F\u0670\u0640\u06D6-\u06ED]/g,"")
+      .replace(/[\u0623\u0625\u0622]/g,"\u0627")
+      .replace(/\u0649/g,"\u064A")
+      .replace(/\u0629/g,"\u0647")
+      .replace(/\u0624/g,"\u0648")
+      .replace(/\u0626/g,"\u064A")
+      .toLowerCase().trim();
+  }
+  /* Station-kind rank: city grouping first, then airports, then ground transport.
+     Mirrors the live site, where LON precedes LGW/LHR which precede QQK. */
+  function kindRank(t){
+    if(t==="c") return 0;
+    if(t==="a") return 1;
+    return 2;
+  }
+  function renderAc(q){
+    /* The dataset is already emitted in the live site's own order (sorted by the
+       feed's city field, each city grouped with its stations), so matching rows
+       are simply taken in dataset order - no re-ranking. */
+    var list=[];
+    if(!q){ list=AP.slice(0,40); }
+    else{
+      var ql=norm(q);
+      for(var i=0;i<AP.length && list.length<60;i++){
+        var a=AP[i];
+        var blob=a.s||norm(a.c+" "+a.n+" "+a.k);
+        if(blob.indexOf(ql)>=0) list.push(a);
+      }
+    }
+    if(!list.length){ panAc.innerHTML='<div class="qbw-ac-empty">لا توجد نتائج مطابقة</div>'; return; }
+    panAc.innerHTML=list.map(function(a,i){
+      return '<div class="qbw-ac-row" data-i="'+AP.indexOf(a)+'">'+
+        (a.t==="c"?ICON_C:ICON_A)+
+        '<div class="qbw-ac-txt"><div class="qbw-ac-city">'+bold(a.c,q)+'</div>'+
+        '<div class="qbw-ac-name">'+bold(a.n,q)+'</div></div>'+
+        '<div class="qbw-ac-code">'+esc(a.k)+'</div></div>';
+    }).join("");
+  }
+  panAc.addEventListener("click",function(e){
+    var row=e.target.closest(".qbw-ac-row"); if(!row) return;
+    var a=AP[+row.dataset.i]; if(!a||!acTarget) return;
+    var label=(a.t==="c"? a.n : a.n)+" "+a.k;
+    st[acTarget]=a;
+    var el=$("qbw-"+acTarget);
+    if(el) el.value=label;
+    closeAll();
+  });
+  function openAc(which){
+    acTarget=which;
+    closeAll();
+    var inp=$("qbw-"+which);
+    renderAc(inp.value.trim());
+    place(panAc,$("qbw-cell-"+which));
+  }
+  ["from","to","from2","to2"].forEach(function(w){
+    var inp=$("qbw-"+w);
+    inp.addEventListener("focus",function(){openAc(w);});
+    inp.addEventListener("click",function(e){e.stopPropagation();openAc(w);});
+    inp.addEventListener("input",function(){acTarget=w;renderAc(inp.value.trim());place(panAc,$("qbw-cell-"+w));});
+  });
+  $("qbw-swap").addEventListener("click",function(e){
+    e.stopPropagation();
+    var a=st.from,b=st.to;
+    st.from=b; st.to=a;
+    $("qbw-from").value=b?(b.n+" "+b.k):"";
+    $("qbw-to").value=a?(a.n+" "+a.k):"";
+  });
+  $("qbw-swap2").addEventListener("click",function(e){
+    e.stopPropagation();
+    var a=st.from2,b=st.to2;
+    st.from2=b; st.to2=a;
+    $("qbw-from2").value=b?(b.n+" "+b.k):"";
+    $("qbw-to2").value=a?(a.n+" "+a.k):"";
+  });
+
+  /* ---- calendar ---- */
+  var calTarget=null, calBase=new Date(today.getFullYear(),today.getMonth(),1);
+  function monthHTML(base){
+    var y=base.getFullYear(), m=base.getMonth();
+    var first=new Date(y,m,1);
+    /* JS getDay(): 0=Sun..6=Sat -> shift so Monday is column 0 */
+    var start=(first.getDay()+6)%7;
+    var days=new Date(y,m+1,0).getDate();
+    var h='<div class="qbw-cal-m"><div class="qbw-cal-mt">'+MON[m]+" "+y+'</div><div class="qbw-cal-grid">';
+    DOW.forEach(function(d){h+='<div class="qbw-cal-dow">'+d+'</div>';});
+    for(var i=0;i<start;i++) h+='<div class="qbw-cal-d mute"></div>';
+    for(var d=1;d<=days;d++){
+      var dt=new Date(y,m,d); dt.setHours(0,0,0,0);
+      var cls="qbw-cal-d";
+      if(dt<today) cls+=" off";
+      if(st.dep&&ymd(dt)===ymd(st.dep)) cls+=" on";
+      else if(st.trip==="R"&&st.ret&&ymd(dt)===ymd(st.ret)) cls+=" on";
+      else if(st.trip==="R"&&st.dep&&st.ret&&dt>st.dep&&dt<st.ret) cls+=" range";
+      h+='<div class="'+cls+'" data-d="'+ymd(dt)+'">'+d+'</div>';
+    }
+    h+='</div></div>';
+    return h;
+  }
+  function drawCal(){
+    var b2=new Date(calBase.getFullYear(),calBase.getMonth()+1,1);
+    $("qbw-cal-months").innerHTML=monthHTML(calBase)+monthHTML(b2);
+  }
+  $("qbw-cal-prev").addEventListener("click",function(e){
+    e.stopPropagation();
+    var p=new Date(calBase.getFullYear(),calBase.getMonth()-1,1);
+    if(p>=new Date(today.getFullYear(),today.getMonth(),1)){calBase=p;drawCal();}
+  });
+  $("qbw-cal-next").addEventListener("click",function(e){
+    e.stopPropagation();
+    calBase=new Date(calBase.getFullYear(),calBase.getMonth()+1,1);drawCal();
+  });
+  $("qbw-cal-months").addEventListener("click",function(e){
+    var c=e.target.closest(".qbw-cal-d"); if(!c||!c.dataset.d||c.classList.contains("off")) return;
+    var p=c.dataset.d.split("-"); var dt=new Date(+p[0],+p[1]-1,+p[2]); dt.setHours(0,0,0,0);
+    if(calTarget&&calTarget.indexOf("dep")===0&&calTarget!=="dep"){
+      st[calTarget]=dt;
+    }else if(calTarget==="ret"){
+      st.ret=dt;
+      if(st.dep&&st.ret<st.dep) st.dep=new Date(dt);
+    }else{
+      st.dep=dt;
+      if(st.trip==="R"&&st.ret&&st.ret<st.dep) st.ret=new Date(dt.getTime()+7*864e5);
+    }
+    paint(); drawCal();
+    if(calTarget==="dep"&&st.trip==="R"){ calTarget="ret"; }
+    else closeAll();
+  });
+  $("qbw-cal-done").addEventListener("click",function(e){e.stopPropagation();closeAll();});
+  $("qbw-cal-clear").addEventListener("click",function(e){
+    e.stopPropagation();
+    st.dep=new Date(today); st.ret=new Date(today.getTime()+7*864e5);
+    calTarget="dep"; paint(); drawCal();
+  });
+  $("qbw-cal-flexchk").addEventListener("click",function(e){e.stopPropagation();});
+  function openCal(which){
+    closeAll(); calTarget=which;
+    var ref=(which==="ret")?st.ret:(st[which]||st.dep);
+    calBase=new Date(ref.getFullYear(),ref.getMonth(),1);
+    if(calBase<new Date(today.getFullYear(),today.getMonth(),1)) calBase=new Date(today.getFullYear(),today.getMonth(),1);
+    drawCal();
+    place(panCal,$("qbw-cell-"+which));
+  }
+  $("qbw-cell-dep").addEventListener("click",function(e){e.stopPropagation();openCal("dep");});
+  $("qbw-cell-ret").addEventListener("click",function(e){e.stopPropagation();openCal("ret");});
+  $("qbw-cell-dep2").addEventListener("click",function(e){e.stopPropagation();openCal("dep2");});
+
+  /* ---- dynamic extra legs (multi-city) ---- */
+  var legN=2;
+  var addBtn=root.querySelector(".qbw-addleg");
+  var legWrap=$("qbw-leg2");
+  if(addBtn){
+    addBtn.addEventListener("click",function(e){
+      e.stopPropagation();
+      if(legN>=6) return;
+      legN++;
+      var n=legN;
+      var base=legWrap.querySelector(".qbw-fields.qbw-leg2");
+      var title=document.createElement("div");
+      title.className="qbw-multi-title";
+      title.dataset.leg=String(n);
+      title.id="qbw-multi-title-"+n;
+      title.textContent=QBW_EN?("Flight "+n):("الرحلات الجوية "+n);
+      var row=base.cloneNode(true);
+      row.querySelector("#qbw-cell-from2").id="qbw-cell-from"+n;
+      row.querySelector("#qbw-cell-to2").id="qbw-cell-to"+n;
+      row.querySelector("#qbw-cell-dep2").id="qbw-cell-dep"+n;
+      var fi=row.querySelector("#qbw-from2"); fi.id="qbw-from"+n; fi.value="";
+      var ti=row.querySelector("#qbw-to2"); ti.id="qbw-to"+n; ti.value="";
+      row.querySelector("#qbw-swap2").id="qbw-swap"+n;
+      var dv=row.querySelector("#qbw-dep2"); dv.id="qbw-dep"+n;
+      st["from"+n]=null; st["to"+n]=null; st["dep"+n]=new Date(st.dep2.getTime());
+      legWrap.insertBefore(title,addBtn);
+      legWrap.insertBefore(row,addBtn);
+      ["from","to"].forEach(function(p){
+        var inp=$("qbw-"+p+n);
+        inp.addEventListener("focus",function(){openAc(p+n);});
+        inp.addEventListener("click",function(ev){ev.stopPropagation();openAc(p+n);});
+        inp.addEventListener("input",function(){acTarget=p+n;renderAc(inp.value.trim());place(panAc,$("qbw-cell-"+p+n));});
+      });
+      $("qbw-swap"+n).addEventListener("click",function(ev){
+        ev.stopPropagation();
+        var a=st["from"+n],b=st["to"+n];
+        st["from"+n]=b; st["to"+n]=a;
+        $("qbw-from"+n).value=b?(b.n+" "+b.k):"";
+        $("qbw-to"+n).value=a?(a.n+" "+a.k):"";
+      });
+      $("qbw-cell-dep"+n).addEventListener("click",function(ev){ev.stopPropagation();openCal("dep"+n);});
+      var rm=document.createElement("button");
+      rm.type="button"; rm.className="qbw-rmleg"; rm.setAttribute("aria-label","حذف الرحلة");
+      rm.innerHTML='<svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg>';
+      rm.addEventListener("click",function(ev){ ev.stopPropagation(); row.remove(); title.remove(); });
+      title.appendChild(rm);
+      paint();
+    });
+  }
+
+  /* ---- passengers ---- */
+  function paxLabel(){
+    var t=st.adults+st.children+st.infants;
+    return t+" "+(t===1?"المسافر":"المسافرون")+" "+st.cabinLabel;
+  }
+  function updSteppers(){
+    panPax.querySelectorAll(".qbw-step").forEach(function(s){
+      var k=s.dataset.k, v=st[k];
+      var sp=s.querySelector("span");
+      sp.textContent=v;
+      sp.classList.toggle("zero",v===0);
+      var minus=s.querySelector('[data-d="-1"]'), plus=s.querySelector('[data-d="1"]');
+      minus.disabled=(k==="adults"? v<=1 : v<=0);
+      var tot=st.adults+st.children+st.infants;
+      plus.disabled=(tot>=9)||(k==="infants"&&st.infants>=st.adults);
+    });
+  }
+  panPax.addEventListener("click",function(e){
+    e.stopPropagation();
+    var inf=e.target.closest(".qbw-info");
+    if(inf){
+      var nb=document.getElementById(inf.dataset.note);
+      if(nb) nb.classList.toggle("show");
+      return;
+    }
+    var xb=e.target.closest(".qbw-note-x");
+    if(xb){ xb.closest(".qbw-note").classList.remove("show"); return; }
+    var b=e.target.closest(".qbw-step button"); if(!b) return;
+    var k=b.parentNode.dataset.k, d=+b.dataset.d;
+    var nv=st[k]+d;
+    if(k==="adults"&&nv<1) return;
+    if(nv<0) return;
+    if(d>0&&st.adults+st.children+st.infants>=9) return;
+    if(k==="infants"&&d>0&&st.infants>=st.adults) return;
+    st[k]=nv;
+    if(k==="adults"&&st.infants>st.adults) st.infants=st.adults;
+    updSteppers(); paint();
+  });
+  panPax.querySelectorAll('input[name="qbw-cabin"]').forEach(function(r){
+    r.addEventListener("change",function(){
+      st.cabin=r.value;
+      st.cabinLabel=(r.value==="E")?"الدرجة السياحية":((r.value==="B")?"درجة رجال الأعمال":"الدرجة الأولى");
+      paint();
+    });
+  });
+  $("qbw-pax-done").addEventListener("click",function(e){e.stopPropagation();closeAll();});
+  $("qbw-cell-pax").addEventListener("click",function(e){
+    e.stopPropagation();
+    var open=panPax.classList.contains("show");
+    closeAll();
+    if(!open){ updSteppers(); $("qbw-cell-pax").classList.add("open"); place(panPax,$("qbw-cell-pax")); }
+  });
+
+  /* ---- trip type ---- */
+  root.querySelectorAll('input[name="qbw-trip"]').forEach(function(r){
+    r.addEventListener("change",function(){
+      st.trip=r.value;
+      $("qbw-cell-ret").style.opacity=(st.trip==="O")?".45":"1";
+      $("qbw-cell-ret").style.pointerEvents=(st.trip==="O")?"none":"auto";
+      $("qbw-leg2").classList.toggle("show",st.trip==="M");
+      paint();
+    });
+  });
+
+  /* ---- tabs ---- */
+  var tabs=root.querySelectorAll(".qbw-tab");
+  tabs.forEach(function(t){t.addEventListener("click",function(){
+    tabs.forEach(function(x){x.classList.remove("active")});
+    t.classList.add("active");
+  });});
+
+  /* ---- search ---- */
+  $("qbw-search").addEventListener("click",function(){
+    var f=st.from?st.from.k:"DOH", t=st.to?st.to.k:"";
+    var tt=(st.trip==="R")?"round":((st.trip==="M")?"multicity":"oneway");
+    var p=[];
+    p.push("tripType="+tt);
+    p.push("origin="+f);
+    p.push("destination="+t);
+    p.push("date="+ymd(st.dep));
+    if(st.trip==="R") p.push("returnDate="+ymd(st.ret));
+    if(st.trip==="M"){
+      var segs=[f+"-"+t+"-"+ymd(st.dep)];
+      var rows=document.querySelectorAll("#qbw-leg2 .qbw-fields");
+      for(var i=0;i<rows.length;i++){
+        var inp=rows[i].querySelector("input");
+        if(!inp) continue;
+        var sfx=inp.id.replace("qbw-from","");
+        var a=st["from"+sfx], b=st["to"+sfx], d=st["dep"+sfx];
+        if(a&&b&&d) segs.push(a.k+"-"+b.k+"-"+ymd(d));
+      }
+      p.push("segments="+segs.join(","));
+    }
+    p.push("cabin="+st.cabin);
+    p.push("adult="+st.adults);
+    p.push("child="+st.children);
+    p.push("infant="+st.infants);
+    window.location.href="/flight-search?"+p.join("&");
+  });
+
+  /* ---- paint ---- */
+  function paint(){
+    $("qbw-dep").textContent=fmt(st.dep);
+    $("qbw-ret").textContent=(st.trip==="O"||!st.ret)?"":fmt(st.ret);
+    for(var i=2;i<=6;i++){ var el=$("qbw-dep"+i); if(el&&st["dep"+i]) el.textContent=fmt(st["dep"+i]); }
+    $("qbw-paxval").textContent=paxLabel();
+  }
+  paint();
+})();
+</script>
+<style id="qa-desktop-leg2-right-fix">
+@media screen and (min-width:901px){
+  #qa-static-bw .qbw-leg2{margin-left:auto!important;margin-right:0!important;}
+}
+</style><style id="qa-desktop-leg2-remove-visible-fix">
+@media screen and (min-width:901px){
+  #qa-static-bw .qbw-leg2{margin-left:auto!important;margin-right:0!important;}
+  #qa-static-bw .qbw-multi-title[data-leg="3"],#qa-static-bw .qbw-multi-title[data-leg="4"],#qa-static-bw .qbw-multi-title[data-leg="5"],#qa-static-bw .qbw-multi-title[data-leg="6"]{display:block!important;position:relative!important;height:0!important;margin:0!important;padding:0!important;font-size:0!important;line-height:0!important;overflow:visible!important;}
+  #qa-static-bw .qbw-multi-title[data-leg="3"] .qbw-rmleg,#qa-static-bw .qbw-multi-title[data-leg="4"] .qbw-rmleg,#qa-static-bw .qbw-multi-title[data-leg="5"] .qbw-rmleg,#qa-static-bw .qbw-multi-title[data-leg="6"] .qbw-rmleg{display:flex!important;left:216px!important;right:auto!important;top:28px!important;transform:translateY(-50%)!important;width:26px!important;height:26px!important;margin:0!important;padding:0!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-leg2,body.newhome-en #qa-static-bw .qbw-leg2{margin-left:0!important;margin-right:auto!important;width:calc(100% - 262px)!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-addleg,body.newhome-en #qa-static-bw .qbw-addleg{margin-left:0!important;margin-right:auto!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="3"],html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="4"],html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="5"],html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="6"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="3"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="4"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="5"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="6"]{width:calc(100% - 262px)!important;margin-left:0!important;margin-right:auto!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="3"] .qbw-rmleg,html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="4"] .qbw-rmleg,html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="5"] .qbw-rmleg,html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="6"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="3"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="4"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="5"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="6"] .qbw-rmleg{left:auto!important;right:-46px!important;display:flex!important;visibility:visible!important;opacity:1!important;z-index:100!important;}
+}
+@media screen and (min-width:901px) and (max-width:1180px){
+  #qa-static-bw .qbw-multi-title[data-leg="3"] .qbw-rmleg,#qa-static-bw .qbw-multi-title[data-leg="4"] .qbw-rmleg,#qa-static-bw .qbw-multi-title[data-leg="5"] .qbw-rmleg,#qa-static-bw .qbw-multi-title[data-leg="6"] .qbw-rmleg{left:190px!important;right:auto!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-leg2,body.newhome-en #qa-static-bw .qbw-leg2{margin-left:0!important;margin-right:auto!important;width:calc(100% - 236px)!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-addleg,body.newhome-en #qa-static-bw .qbw-addleg{margin-left:0!important;margin-right:auto!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="3"],html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="4"],html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="5"],html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="6"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="3"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="4"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="5"],body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="6"]{width:calc(100% - 236px)!important;margin-left:0!important;margin-right:auto!important;}
+  html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="3"] .qbw-rmleg,html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="4"] .qbw-rmleg,html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="5"] .qbw-rmleg,html[dir="ltr"] #qa-static-bw .qbw-multi-title[data-leg="6"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="3"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="4"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="5"] .qbw-rmleg,body.newhome-en #qa-static-bw .qbw-multi-title[data-leg="6"] .qbw-rmleg{left:auto!important;right:-46px!important;display:flex!important;visibility:visible!important;opacity:1!important;z-index:100!important;}
+}
+</style>

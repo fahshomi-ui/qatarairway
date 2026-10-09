@@ -1,0 +1,70 @@
+.cartrecovery{margin:var(--f-base-space-16) 0;display:flex;flex-direction:column}
+.cartrecovery{margin-bottom:0}
+.cartrecovery .container{width:100%;max-width:1192px;margin:0 auto}
+.section-title{font:var(--f-brand-type-title-1);color:var(--f-brand-color-text-default);margin:0;padding-bottom:var(--f-base-space-6)}
+.section-subtitle{font:var(--f-brand-type-body);color:var(--f-brand-color-text-muted);padding-bottom:var(--f-base-space-6)}
+.cartcontainer{background-color:#fff;border:1px solid #e4e4e4;border-radius:var(--f-brand-border-radius-outer);min-height:50px;display:flex;position:relative}
+.imagefullheight{width:13%;display:inline-flex;min-height:200px;border-radius:var(--f-brand-border-radius-outer) 0 0 var(--f-brand-border-radius-outer)}
+.imagefullheight img{border-radius:var(--f-brand-border-radius-outer) 0 0 var(--f-brand-border-radius-outer);object-fit:cover}
+.cartdetails{display:inline-flex;width:87%}
+.cartdetails .seperatorline{border-bottom:1px solid #e4e4e4 !important}
+.cartdetails .bookingupcoming{margin:0;border:0;width:100%;display:inline;padding:var(--f-base-space-6)}
+.cartdetails .bookingdetails,.triptypewithpax,.completebooking{width:31%;display:inline-flex;flex-direction:column}
+.completebooking{width:30%;display:inline;float:right}
+.cartdetails .seperatorline{margin:var(--f-base-space-6) 0}
+.cartdetails .tripdate{width:100%;font:var(--f-brand-type-body)}
+.triptypewithpax{text-align:center;color:var(--f-brand-color-text-muted);font:var(--f-brand-type-subheading-medium);width:35%}
+.cartdetails .tripdestinations{background:none transparent;margin:var(--f-base-space-6) 0 0 0;position:relative}
+.cartrecovery .tripdestinations::before{border-bottom:1px solid var(--f-base-color-solid-grey-25);width:40%;position:absolute;content:'';left:30%;top:15px;z-index:0}
+.cartrecovery .tripdestinations::after{content:"\a900";font-family:icomoon !important;font-size:24px;color:var(--f-brand-color-text-default);position:absolute;left:calc(50% - 20px);top:4px;background:#fff;width:34px;padding-left:5px}
+.cartdetails .tripdestinations .tripfrom,.cartdetails .tripdestinations .tripto{font:var(--f-brand-type-numerals);color:var(--f-brand-color-text-default)}
+.cartdetails .tripcountry .tripfrom,.cartdetails .tripcountry .tripto{font:var(--f-brand-type-body);color:var(--f-brand-color-text-muted)}
+.collapsesection{display:inline-flex;width:100%;transition:height 1s ease-in-out;min-height:32px;justify-content:space-between;gap:var(--f-brand-space-lg)}
+.flexibilty{width:33%}
+.collapsesection .flexibilty:last-child{margin-right:0}
+.flexibilty a{color:var(--f-brand-color-text-default);display:block}
+.flexibilty a img{width:32px}
+.flexibilty .cart-desc{color:var(--f-brand-color-text-default);display:block}
+.flexibilty .cart-desc img{width:32px}
+.flexibilty .cart-desc span{padding-left:var(--f-base-space-1);font:var(--f-brand-type-headline-medium);color:var(--f-brand-color-text-default);padding-bottom:var(--f-base-space-1)}
+.collapsesection .dropdown-toggle{position:relative;width:7%}
+.collapsemessage{float:right;display:none;margin-top:10px}
+.collapsemessage button{display:inline-flex;border:0 !important;background-color:transparent;padding:0}
+.collapsemessage button::after{position:static !important;color:var(--f-brand-color-text-muted) !important}
+.collapsemessage button:hover,.collapsemessage button:focus{background:transparent !important}
+.collapsemessage button::after{padding-top:1px;font-family:icomoon !important;speak:none;font-style:normal;font-weight:400;font-variant:normal;text-transform:none;border:0;color:var(--primary1);background:0;font-size:9px;position:absolute;width:17px;z-index:9;right:13px;top:13px;content:'\e926' !important}
+.collapsemessage[aria-expanded=true] button::after{transform:rotate(180deg);transition:transform .5s ease-in-out}
+.collapsemessage[aria-expanded=false] button::after{transition:transform .5s ease-in-out}
+.collapsesection.collapse:not(.show){display:inline-flex;max-height:32px;overflow:hidden}
+.cartcontainer .close-upcoming-trip{position:absolute;top:20px;right:15px}
+.close-upcoming-trip button.close{background:url(clientlibs-cartrecovery/resources/Close_icon.svg) no-repeat center center;opacity:1;background-size:17px;width:22px;height:22px;margin:0;display:inline}
+.triptypewithpax span{display:none}
+.triptypewithpax span.trip{display:inline;color:var(--f-brand-color-text-default);font:var(--f-brand-type-body-medium)}
+@media(max-width:768px){.close-upcoming-trip button.close{display:inline;width:32px;height:32px;background-color:#fff;border-radius:50%;background-size:12px}
+.cartdetails .bookingupcoming{padding:0}
+.cartcontainer{flex-direction:column}
+.imagefullheight{width:100%;min-height:150px;border-radius:var(--f-brand-border-radius-outer) var(--f-brand-border-radius-outer) 0 0;display:inline}
+.imagefullheight img{border-radius:var(--f-brand-border-radius-outer) var(--f-brand-border-radius-outer) 0 0;width:100%;height:193px}
+.collapsesection{flex-direction:column;margin-bottom:20px;gap:0}
+.collapsemessage{display:inline-flex}
+.flexibilty:last-child{margin-bottom:0}
+.flexibilty,.cartdetails,.cartdetails .bookingdetails,.triptypewithpax,.completebooking{width:100%}
+.flexibilty{padding:0 var(--f-brand-space-md);margin-bottom:30px}
+.flexibilty span{font-size:13px;padding-right:30px}
+.triptypewithpax{text-align:left;padding:30px 0 30px 15px;display:flow-root}
+.completebooking{padding:0 15px;display:flex;float:none}
+.flexibilty .cart-desc{margin-bottom:var(--f-brand-space-sm)}
+.cartdetails .tripdate,.bookingdetails{padding:20px 15px 0 15px}
+.bookingdetails{padding:5px 15px 0 15px}
+.section-subtitle,.triptypewithpax br{display:none}
+.section-title{padding-bottom:20px}
+.cartdetails .tripdestinations{background:none transparent;margin:15px 0 -4px 0;position:relative}
+.collapsemessage{position:absolute;width:11%;right:0;margin-top:0}
+.collapsemessage button{font-size:0 !important}
+.cartdetails .seperatorline{margin-top:20px}
+.triptypewithpax span{display:none;padding:0 5px}
+.triptypewithpax span.trip{display:inline;padding:0 5px}
+}
+.cartdetails .submitbutton{display:inline-block;vertical-align:top;padding:13px 25px 13px;white-space:nowrap;font:var(--f-button-type) !important;text-align:center;color:var(--f-button-primary-text-color);border-radius:5px;background:var(--f-button-primary);border:0 solid var(--f-button-primary);outline:0;border-radius:var(--f-brand-border-radius-rounded) !important}
+@media(min-width:768px){.imagefullheight{min-width:219px}
+}

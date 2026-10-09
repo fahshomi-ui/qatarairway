@@ -1,0 +1,337 @@
+@media (max-width: 991px) {
+  .qr-pay-page.qa-payment-mobile {
+    min-height: 100dvh !important;
+    overflow-x: hidden !important;
+    padding-bottom: calc(102px + env(safe-area-inset-bottom, 0px)) !important;
+    background: #f3f4fa !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-header {
+    position: relative !important;
+    z-index: 20 !important;
+    width: 100% !important;
+    height: 124px !important;
+    min-height: 124px !important;
+    padding: 0 20px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    background: #fff !important;
+    border-bottom: 1px solid #e5e6ed !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-header-logos {
+    display: none !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-header-logos {
+    direction: ltr !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    gap: 12px !important;
+    width: 180px !important;
+    max-width: calc(100vw - 112px) !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-oneworld {
+    display: block !important;
+    width: 30px !important;
+    height: 30px !important;
+    flex: 0 0 30px !important;
+    object-fit: contain !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-qatar {
+    display: block !important;
+    width: 138px !important;
+    height: 52px !important;
+    object-fit: contain !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-back {
+    position: absolute !important;
+    top: 50% !important;
+    right: 8px !important;
+    left: auto !important;
+    width: 40px !important;
+    height: 40px !important;
+    padding: 8px !important;
+    transform: translateY(-50%) !important;
+    border-radius: 50% !important;
+    display: inline-flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-back svg {
+    transform: scaleX(-1) !important;
+  }
+
+  html[dir="ltr"] .qr-pay-page.qa-payment-mobile .qr-pay-back {
+    left: 8px !important;
+    right: auto !important;
+  }
+
+  html[dir="ltr"] .qr-pay-page.qa-payment-mobile .qr-pay-back svg {
+    transform: none !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-container {
+    display: block !important;
+    width: 100% !important;
+    max-width: none !important;
+    margin: 0 !important;
+    padding: 0 16px 24px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-sidebar-col {
+    display: none !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-form-col {
+    width: 100% !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    padding: 12px 14px 30px !important;
+    border-radius: 0 0 14px 14px !important;
+    background: #fff !important;
+    box-shadow: none !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-section-title {
+    margin: 0 0 12px !important;
+    font-size: 20px !important;
+    line-height: 28px !important;
+    font-weight: 500 !important;
+    color: #1f212b !important;
+    text-align: start !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-info-text {
+    margin: 0 0 14px !important;
+    font-size: 14px !important;
+    line-height: 22px !important;
+    color: #4a525d !important;
+    text-align: start !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-accept-label {
+    margin: 0 0 8px !important;
+    font-size: 14px !important;
+    line-height: 22px !important;
+    color: #4a525d !important;
+    text-align: start !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logos {
+    direction: ltr !important;
+    display: grid !important;
+    grid-template-columns: repeat(6, minmax(0, 1fr)) !important;
+    align-items: center !important;
+    gap: 8px 6px !important;
+    width: 100% !important;
+    margin: 0 0 18px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo {
+    width: 100% !important;
+    height: 28px !important;
+    padding: 2px !important;
+    border: 0 !important;
+    border-radius: 3px !important;
+    background: #fff !important;
+    object-fit: contain !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="Mastercard"] { grid-column: 1 !important; grid-row: 1 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="Maestro"] { grid-column: 2 !important; grid-row: 1 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="JCB"] { grid-column: 3 !important; grid-row: 1 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="Discover"] { grid-column: 4 !important; grid-row: 1 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="Diners Club"] { grid-column: 5 !important; grid-row: 1 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="AmEx"] { grid-column: 6 !important; grid-row: 1 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="VISA"] { grid-column: 5 !important; grid-row: 2 !important; }
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-logo[alt="UATP"] { grid-column: 6 !important; grid-row: 2 !important; }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-form {
+    display: flex !important;
+    flex-direction: column !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field-row--card {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) minmax(0, 1fr) !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field-row--card .qr-pay-field--cardnum {
+    grid-column: 1 / -1 !important;
+    width: 100% !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field-row--card .qr-pay-field--exp,
+  .qr-pay-page.qa-payment-mobile .qr-pay-field-row--card .qr-pay-field--cvv {
+    width: 100% !important;
+    min-width: 0 !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field-row--2 {
+    display: grid !important;
+    grid-template-columns: minmax(0, 1fr) !important;
+    gap: 16px !important;
+    width: 100% !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field,
+  .qr-pay-page.qa-payment-mobile .qr-pay-field-row--2 .qr-pay-field {
+    width: 100% !important;
+    min-width: 0 !important;
+    height: 66px !important;
+    border: 1px solid #d6d8df !important;
+    border-radius: 9px !important;
+    background: #fff !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field:focus-within {
+    border-color: #1f212b !important;
+    box-shadow: 0 0 0 1px #1f212b !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-input {
+    min-width: 0 !important;
+    padding: 27px 14px 9px !important;
+    font-size: 16px !important;
+    line-height: 22px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-float-label {
+    right: 14px !important;
+    left: auto !important;
+    max-width: calc(100% - 28px) !important;
+    overflow: hidden !important;
+    white-space: nowrap !important;
+    text-overflow: ellipsis !important;
+    font-size: 14px !important;
+    color: #686f7a !important;
+  }
+
+  html[dir="ltr"] .qr-pay-page.qa-payment-mobile .qr-pay-float-label {
+    left: 14px !important;
+    right: auto !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-field--float .qr-pay-input:focus ~ .qr-pay-float-label,
+  .qr-pay-page.qa-payment-mobile .qr-pay-field--float:focus-within .qr-pay-float-label,
+  .qr-pay-page.qa-payment-mobile .qr-pay-field--float:focus-within > .qr-pay-float-label,
+  .qr-pay-page.qa-payment-mobile .qr-pay-field--float.has-value .qr-pay-float-label,
+  .qr-pay-page.qa-payment-mobile .qr-pay-field--float.has-value > .qr-pay-float-label {
+    top: 7px !important;
+    font-size: 11px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-card-brand,
+  .qr-pay-page.qa-payment-mobile .qr-pay-info-icon {
+    left: 14px !important;
+  }
+
+  html[dir="ltr"] .qr-pay-page.qa-payment-mobile .qr-pay-info-icon {
+    left: auto !important;
+    right: 14px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-section-title[style] {
+    margin-top: 26px !important;
+    margin-bottom: 18px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-agree {
+    width: 100% !important;
+    margin: 20px 0 0 !important;
+    gap: 10px !important;
+    align-items: flex-start !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-agree input {
+    width: 22px !important;
+    height: 22px !important;
+    margin: 1px 0 0 !important;
+    flex: 0 0 22px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-agree span {
+    font-size: 15px !important;
+    line-height: 25px !important;
+    color: #4a525d !important;
+    text-align: start !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-submit {
+    width: 100% !important;
+    height: 58px !important;
+    margin: 10px 0 0 !important;
+    padding: 0 18px !important;
+    border-radius: 31px !important;
+    font-size: 16px !important;
+    line-height: 24px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qr-pay-footer {
+    display: none !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-total {
+    position: fixed !important;
+    z-index: 900 !important;
+    left: 0 !important;
+    right: 0 !important;
+    bottom: 0 !important;
+    width: 100% !important;
+    min-height: 98px !important;
+    padding: 25px 28px calc(20px + env(safe-area-inset-bottom, 0px)) !important;
+    display: block !important;
+    background: #fff !important;
+    border-radius: 17px 17px 0 0 !important;
+    box-shadow: 0 -6px 22px rgba(31, 33, 43, .08) !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-total-handle {
+    position: absolute !important;
+    top: 10px !important;
+    left: 50% !important;
+    width: 46px !important;
+    height: 4px !important;
+    transform: translateX(-50%) !important;
+    border-radius: 4px !important;
+    background: #d8dbe3 !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-total-row {
+    direction: inherit !important;
+    width: 100% !important;
+    min-height: 46px !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 20px !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-total-label {
+    font-size: 17px !important;
+    line-height: 25px !important;
+    color: #4a525d !important;
+    white-space: nowrap !important;
+  }
+
+  .qr-pay-page.qa-payment-mobile .qa-pay-mobile-total-value {
+    direction: ltr !important;
+    unicode-bidi: isolate !important;
+    font-size: 20px !important;
+    line-height: 30px !important;
+    font-weight: 700 !important;
+    color: #1f212b !important;
+    white-space: nowrap !important;
+  }
+}

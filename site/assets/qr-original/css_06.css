@@ -1,0 +1,8 @@
+@media(min-width:768px){
+  /* Styles for desktops only */
+  #bookingWidget-showHide.hidden-desktop{display:none;}
+}
+@media(max-width:768px){
+  /* Styles for mobiles only */
+  #bookingWidget-showHide.hidden-mobile{display:none;}
+}

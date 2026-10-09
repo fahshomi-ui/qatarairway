@@ -1,0 +1,40 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الخطوط الجوية القطرية | نتائج الرحلات</title>
+    <link rel="shortcut icon" href="https://www.qatarairways.com/favicon.ico">
+    <link rel="preload" as="script" crossorigin href="/assets/index-D-4duNf6.js" />
+    <link rel="preload" as="style" crossorigin href="/assets/index-D1rodYBO.css" />
+    <script>window.__QR_LIVE_BASE='/qr-api';</script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D1rodYBO.css">
+    <style>
+      #qr-boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#fff;font-family:system-ui,'Segoe UI',Tahoma,sans-serif;z-index:9999}
+      #qr-boot img{width:190px;height:auto}
+      #qr-boot .bar{width:220px;height:4px;border-radius:4px;background:#eee;overflow:hidden}
+      #qr-boot .bar span{display:block;width:40%;height:100%;background:#5c0632;border-radius:4px;animation:qrslide 1.1s infinite ease-in-out}
+      #qr-boot p{margin:0;color:#5c0632;font-size:14px}
+      @keyframes qrslide{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+    </style>
+  </head>
+  <body>
+    <div id="qr-boot">
+      <img src="https://www.qatarairways.com/content/dam/images/renditions/horizontal-1/brand/logo/h1-qr-logo.svg" alt="Qatar Airways" />
+      <div class="bar"><span></span></div>
+      <p>جاري البحث عن أفضل الرحلات…</p>
+    </div>
+    <div id="root"></div>
+    <script type="module" crossorigin src="/assets/index-D-4duNf6.js"></script>
+    <script>
+      (function () {
+        var boot = document.getElementById('qr-boot');
+        var root = document.getElementById('root');
+        var t = setInterval(function () {
+          if (root && root.childNodes.length) { clearInterval(t); if (boot) boot.remove(); }
+        }, 120);
+        setTimeout(function () { clearInterval(t); if (boot) boot.remove(); }, 40000);
+      })();
+    </script>
+  </body>
+</html>

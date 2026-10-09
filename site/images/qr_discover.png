@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml"
+      xmlns:th="http://www.thymeleaf.org"
+      class="no-js" lang="en">
+<head>
+    <link rel="stylesheet" href="../css/gateway/common.css"/>
+    <title>Page not found</title>
+</head>
+<body class="error-screen-cpg-body">
+<section class="container clearfix error-screen-cpg">
+    <section class="row">
+        <div class="content-error-area-box">
+            <div class="content-error-box">
+                <h3 class="title">Payment interrupted</h3>
+                <p>Unexpected error occurred. Please try later.</p>
+                <div><a class="button burgundy flat nav-lnk" href="https://www.qatarairways.com">Go back</a></div>
+            </div>
+        </div>
+    </section>
+</section>
+</body>
+</html>

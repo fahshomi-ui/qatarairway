@@ -1,0 +1,27 @@
+.qa-passport-block{width:100%;margin-top:32px;color:#1f212b;box-sizing:border-box}
+.qa-passport-title{margin:0 0 16px;font-size:20px;font-weight:500;line-height:28px;color:#1f212b;text-align:start}
+.qa-passport-field{display:block;width:100%;margin:0 0 20px}
+.qa-passport-field>.qa-passport-label{display:block;margin:0 0 8px;font-size:14px;font-weight:400;line-height:21px;color:#4a525d;text-align:start}
+.qa-passport-input{width:100%;height:56px;border:1px solid #b8bbc2;border-radius:8px;background:#fff;color:#1f212b;padding:0 16px;font:inherit;font-size:16px;line-height:24px;outline:none;box-sizing:border-box;text-align:start}
+.qa-passport-input:focus,.qa-passport-select:focus{border-color:#1f212b;box-shadow:0 0 0 1px #1f212b}
+.qa-passport-input::placeholder{color:#757b84;opacity:1}
+.qa-passport-expiry{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:12px;width:100%}
+.qa-passport-select{width:100%;height:56px;border:1px solid #d2d5db;border-radius:8px;background-color:#fff;color:#4a525d;padding:0 28px 0 10px;font:inherit;font-size:14px;line-height:20px;outline:none;box-sizing:border-box}
+[dir=rtl] .qa-passport-select{padding:0 10px 0 28px}
+.qa-passport-error{display:none;margin:7px 0 0;color:#c7202f;font-size:12px;line-height:18px;text-align:start}
+.qa-passport-field.qa-invalid .qa-passport-input,.qa-passport-field.qa-invalid .qa-passport-select{border-color:#c7202f;box-shadow:0 0 0 1px #c7202f}
+.qa-passport-field.qa-invalid .qa-passport-error{display:block}
+
+@media(max-width:767px){
+  .qa-passport-block{margin-top:28px}
+  .qa-passport-title{margin-bottom:14px;font-size:18px;line-height:26px}
+  .qa-passport-field{margin-bottom:18px}
+  .qa-passport-expiry{gap:12px}
+  body > div[class*="z-[9999]"] input[placeholder="ابحث عن بلد..."],
+  body > div[class*="z-[9999]"] input[placeholder="Search countries..."]{font-size:16px!important}
+}
+
+@media(max-width:359px){
+  .qa-passport-expiry{gap:8px}
+  .qa-passport-select{padding-inline:8px 28px;font-size:13px}
+}

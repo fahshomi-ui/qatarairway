@@ -1,0 +1,13 @@
+[build]
+  publish = "site"
+  command = ""
+  functions = "netlify/functions"
+
+[functions]
+  node_bundler = "esbuild"
+
+[[redirects]]
+  from = "/api/qr-flights"
+  to = "/.netlify/functions/qr-flights"
+  status = 200
+  force = true

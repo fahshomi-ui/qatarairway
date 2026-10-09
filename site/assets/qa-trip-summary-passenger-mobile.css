@@ -1,0 +1,64 @@
+@media (max-width: 767px) {
+  .qr-ts-section-title:has(+ .qr-ts-pax-card) {
+    margin-bottom: 24px;
+    padding-inline: 8px;
+  }
+
+  .qr-ts-pax-card {
+    border-radius: 20px;
+    padding: 28px 16px 20px;
+  }
+
+  .qr-ts-pax-head {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .qr-ts-pax-id {
+    width: 100%;
+    min-width: 0;
+    gap: 12px;
+  }
+
+  .qr-ts-pax-id .qr-pax-card-icon {
+    order: -1;
+    flex: 0 0 auto;
+  }
+
+  .qr-ts-pax-name {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  .qr-ts-pax-facts {
+    width: 100%;
+    flex: 0 0 auto;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  .qr-ts-pax-facts > span {
+    width: 100%;
+    max-width: none;
+    text-align: start;
+  }
+
+  .qr-ts-pax-fact {
+    line-height: 20px;
+  }
+
+  .qr-ts-pax-contact-title {
+    margin-top: 12px;
+    margin-bottom: 8px;
+    padding-top: 20px;
+  }
+
+  .qr-ts-pax-contact {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+    overflow-wrap: anywhere;
+  }
+}

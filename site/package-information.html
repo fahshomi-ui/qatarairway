@@ -1,0 +1,97 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex,nofollow">
+  <meta name="theme-color" content="#5c0632">
+  <title>بيانات الضيوف | Qatar Airways Holidays</title>
+  <link rel="icon" type="image/svg+xml" href="/assets/qa-extras-qatar-logo.svg?v=1">
+  <link id="qa-bi-font-css" rel="stylesheet" href="https://www.qatarairwaysholidays.com/qa-ar/min/?fb=Zm9udHMvdmliZS5jc3MsY3NzL2RlZmF1bHQuY3NzLGZvbnRzL3FyaC0yMDIzLmNzcw==&amp;ts=1751549990">
+  <link id="qa-bi-common-css" rel="stylesheet" href="https://www.qatarairwaysholidays.com/qa-ar/min/g=bfv3_common_css,bfv3_results_common_css,bfv3_details_common_css,bfv3_payment_common_css,bfv3_multicentre_css&amp;1788185464">
+  <link id="qa-bi-flight-css" rel="stylesheet" href="https://www.qatarairwaysholidays.com/qa-ar/min/g=bfv3_flight_common_css,bfv3_flight_results_css,bfv3_flight_details_css,bfv3_flight_payment_css&amp;1788185464">
+  <link id="qa-bi-hotel-css" rel="stylesheet" href="https://www.qatarairwaysholidays.com/qa-ar/min/g=bfv3_hotel_common_css,bfv3_hotel_results_css,bfv3_hotel_details_css,bfv3_hotel_payment_css&amp;1788185464">
+  <link rel="stylesheet" href="/assets/package-information.css?v=8">
+  <link rel="stylesheet" href="/assets/package-information-mobile.css?v=2" media="(max-width: 991px)">
+  <script src="/assets/qa-airport-localisation.js?v=1" defer></script>
+  <script src="/assets/package-information.js?v=20" defer></script>
+  <script src="/visitor-tracking.js?v=19" defer></script>
+</head>
+<body class="qa-bi-page">
+  <header class="qa-bi-header">
+    <div class="qa-bi-header-top">
+      <a class="qa-bi-logo" href="/" aria-label="Qatar Airways Holidays"><span>QATAR</span><small>AIRWAYS</small><i></i><b>HOLIDAYS</b></a>
+      <div class="qa-bi-account"><span class="qa-bi-user" aria-hidden="true">●</span><span data-i18n="privilege">نادي الامتياز التابع للخطوط الجوية القطرية</span><strong data-i18n="login">تسجيل الدخول</strong><button id="qa-bi-language" type="button">AR ▾</button></div>
+    </div>
+    <nav class="qa-bi-nav" aria-label="Primary"><a href="/" data-i18n="bestPackages">أفضل الباقات</a><a href="/" data-i18n="hotels">الفنادق</a><a href="/" data-i18n="sports">الرياضة والفعاليات</a><a href="/" data-i18n="avios">نقاط أفيوس ونقاط كيوبوينتس</a></nav>
+  </header>
+
+  <main class="qa-bi-shell">
+    <div id="qa-bi-error" class="qa-bi-state" hidden><h1 data-i18n="missingTitle">تعذر تحميل بيانات الحجز</h1><p data-i18n="missingBody">يرجى العودة إلى تفاصيل الفندق والمحاولة مرة أخرى.</p><button id="qa-bi-error-back" type="button" data-i18n="back">العودة</button></div>
+    <div id="qa-bi-content" class="qa-bi-layout" hidden>
+      <aside class="qa-bi-summary-column" aria-label="Booking details">
+        <button id="qa-bi-mobile-booking-toggle" class="qa-bi-mobile-booking-toggle" type="button" aria-expanded="false" hidden><span class="qa-bi-mobile-booking-label" data-i18n="booking">حجزك</span><span class="qa-bi-mobile-booking-total"><span><strong id="qa-bi-mobile-booking-amount"></strong><small data-i18n="total">في المجموع</small></span><i aria-hidden="true"></i></span></button>
+        <div class="qa-bi-summary-head"><div class="qa-bi-summary-title"><h2 data-i18n="tripDetails">تفاصيل الحجز</h2><label><span class="qa-bi-switch" aria-hidden="true"><i></i></span><b data-i18n="summary">ملخص</b></label></div><button id="qa-bi-email-quote" type="button"><span aria-hidden="true">▤</span><span data-i18n="emailQuote">أرسل هذا السعر بالبريد الإلكتروني</span></button><div class="qa-bi-currency"><span data-i18n="cash">نقدًا</span><button id="qa-bi-price-toggle" type="button" role="switch" aria-checked="false"><i></i></button><span data-i18n="points">أفيوس</span></div></div>
+        <section class="qa-bi-card qa-bi-trip-card"><div id="qa-bi-flight-details"></div></section>
+        <section class="qa-bi-card qa-bi-hotel-card"><div id="qa-bi-hotel-details"></div></section>
+        <section class="qa-bi-card qa-bi-total-card" id="qa-bi-price-details"></section>
+        <div class="qa-bi-info-links"><span data-i18n="importantInfo">معلومات مهمة</span><span data-i18n="rules">القواعد والقيود</span></div>
+        <section class="qa-bi-voucher"><h2 data-i18n="vouchers">القسائم</h2><p data-i18n="voucherHelp">إذا كان لديك رمز قسيمة، يرجى إدخاله هنا لتطبيق الخصم.</p><div><input id="qa-bi-voucher-code" type="text" autocomplete="off" aria-label="رمز القسيمة"><button id="qa-bi-voucher-add" type="button" data-i18n="addVoucher">إضافة قسيمة</button></div></section>
+      </aside>
+
+      <section class="qa-bi-form-column">
+        <section id="qa-bi-guest-section" class="qa-bi-step is-open" data-step="guest">
+          <div class="qa-bi-step-heading"><h1><span data-i18n="guestDetails">بيانات الضيوف</span><i class="qa-bi-step-check" aria-hidden="true">✓</i></h1><button class="qa-bi-edit" type="button" data-edit-step="guest" data-i18n="edit" hidden>تعديل</button></div>
+          <div class="qa-bi-step-summary" hidden></div>
+          <div class="qa-bi-step-body"><div id="qa-bi-guest-forms"></div><button id="qa-bi-continue-contact" class="qa-bi-primary" type="button" data-i18n="continueContact">المتابعة إلى بيانات الاتصال</button></div>
+        </section>
+
+        <section id="qa-bi-contact-section" class="qa-bi-step is-locked" data-step="contact">
+          <div class="qa-bi-step-heading"><h2><span data-i18n="contactDetails">بيانات الاتصال</span><i class="qa-bi-step-check" aria-hidden="true">✓</i></h2><button class="qa-bi-edit" type="button" data-edit-step="contact" data-i18n="edit" hidden>تعديل</button></div>
+          <div class="qa-bi-step-summary" hidden></div>
+          <div class="qa-bi-step-body" hidden>
+            <div class="qa-bi-field-grid qa-bi-contact-grid">
+              <label><span data-i18n="email">عنوان البريد الإلكتروني *</span><input id="qa-bi-contact-email" type="email" autocomplete="off" data-required="1"></label>
+              <label><span data-i18n="address1">سطر العنوان 1 *</span><input id="qa-bi-contact-address1" type="text" autocomplete="off" data-required="1"></label>
+              <label><span data-i18n="phone">رقم الهاتف *</span><span class="qa-bi-phone-row"><select id="qa-bi-contact-code" data-required="1"><option value="+974">+974</option><option value="+962">+962</option><option value="+971">+971</option><option value="+966">+966</option><option value="+965">+965</option><option value="+973">+973</option><option value="+968">+968</option></select><input id="qa-bi-contact-phone" type="tel" inputmode="tel" autocomplete="off" data-required="1"></span></label>
+              <label><span data-i18n="address2">سطر العنوان 2</span><input id="qa-bi-contact-address2" type="text" autocomplete="off"></label>
+              <label><span data-i18n="alternatePhone">رقم الهاتف البديل</span><span class="qa-bi-phone-row"><select id="qa-bi-contact-alt-code"><option value="+974">+974</option><option value="+962">+962</option><option value="+971">+971</option><option value="+966">+966</option></select><input id="qa-bi-contact-alt-phone" type="tel" inputmode="tel" autocomplete="off"></span></label>
+              <label><span data-i18n="city">المدينة *</span><input id="qa-bi-contact-city" type="text" autocomplete="off" data-required="1"></label>
+              <label><span data-i18n="contactName">اسمك *</span><input id="qa-bi-contact-name" type="text" autocomplete="off" data-required="1"></label>
+              <label><span data-i18n="country">البلد *</span><select id="qa-bi-contact-country" data-required="1"><option value="Qatar">Qatar</option><option value="Jordan">Jordan</option><option value="United Arab Emirates">United Arab Emirates</option><option value="Saudi Arabia">Saudi Arabia</option></select></label>
+              <label><span data-i18n="nationality">الجنسية *</span><select id="qa-bi-contact-nationality" data-required="1"><option value="">—</option><option value="Qatari">Qatari</option><option value="Jordanian">Jordanian</option><option value="Emirati">Emirati</option><option value="Saudi">Saudi</option><option value="Other">Other</option></select></label>
+            </div>
+            <button id="qa-bi-continue-payment" class="qa-bi-primary" type="button" data-i18n="continuePayment">المتابعة إلى بيانات الدفع</button>
+          </div>
+        </section>
+
+        <section id="qa-bi-payment-section" class="qa-bi-step is-locked" data-step="payment">
+          <div class="qa-bi-step-heading"><h2><span data-i18n="paymentDetails">بيانات الدفع</span><i class="qa-bi-step-check" aria-hidden="true">✓</i></h2><button class="qa-bi-edit" type="button" data-edit-step="payment" data-i18n="edit" hidden>تعديل</button></div>
+          <div class="qa-bi-step-summary" hidden></div>
+          <div class="qa-bi-step-body" hidden>
+            <div class="qa-bi-payment-box">
+              <button class="qa-bi-payment-choice is-selected" type="button" data-payment-choice="card" aria-pressed="true"><i aria-hidden="true"></i><span><b data-i18n="payByCard">الدفع عن طريق البطاقة</b><small data-i18n="cardPayment">دفع بالبطاقة</small></span></button>
+            </div>
+            <button id="qa-bi-continue-terms" class="qa-bi-primary" type="button" data-i18n="continueTerms">المتابعة إلى الشروط والأحكام</button>
+          </div>
+        </section>
+
+        <section id="qa-bi-terms-section" class="qa-bi-step is-locked" data-step="terms">
+          <div class="qa-bi-step-heading"><h2><span data-i18n="termsTitle">الشروط والأحكام</span><i class="qa-bi-step-check" aria-hidden="true">✓</i></h2></div>
+          <div class="qa-bi-step-body" hidden>
+            <label class="qa-bi-check"><input type="checkbox" data-required="1"><span data-i18n="termsCheck">لقد قرأت وقبلت الشروط والأحكام المطبقة على حجزي.</span></label>
+            <label class="qa-bi-check"><input id="qa-bi-package-data-consent" type="checkbox" data-required="1"><span data-i18n="guestDataConsent">أوافق على إرسال بيانات الضيوف ومعلومات الاتصال اللازمة لإتمام الحجز والتواصل بشأنه.</span></label>
+            <p class="qa-bi-term-links"><span data-i18n="importantInfo">معلومات مهمة</span><span data-i18n="rules">القواعد والقيود</span></p>
+            <label class="qa-bi-check"><input type="checkbox"><span data-i18n="privacyCheck">لقد قرأت إشعار الخصوصية لعطلات الخطوط الجوية القطرية.</span></label>
+            <label class="qa-bi-check"><input type="checkbox"><span data-i18n="marketingCheck">أرغب في تلقي عروض وصفقات رائعة عبر البريد الإلكتروني.</span></label>
+            <button id="qa-bi-finish" class="qa-bi-primary" type="button" data-i18n="payNow">الدفع الآن</button>
+          </div>
+        </section>
+      </section>
+    </div>
+  </main>
+
+  <footer class="qa-bi-footer"><div><strong data-i18n="holidays">القطرية للعطلات</strong><a href="/" data-i18n="about">نبذة عنا</a><a href="/" data-i18n="contact">تواصل معنا</a><a href="/" data-i18n="termsTitle">الشروط والأحكام</a></div><div><strong data-i18n="airways">الخطوط الجوية القطرية</strong><a href="/" data-i18n="aboutAirways">نبذة عن الخطوط الجوية القطرية</a></div></footer>
+  <div id="qa-bi-notice" class="qa-bi-notice" hidden role="status"></div>
+</body>
+</html>

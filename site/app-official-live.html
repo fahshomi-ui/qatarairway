@@ -1,0 +1,1019 @@
+<!doctype html>
+<html lang="ar" dir="rtl">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>الخطوط الجوية القطرية | نتائج الرحلات</title>
+    <link id="qa-page-favicon" rel="shortcut icon" href="https://www.qatarairways.com/favicon.ico">
+    <script>(function(){if(new URLSearchParams(location.search).get('source')==='package'){var icon=document.getElementById('qa-page-favicon');icon.rel='icon';icon.type='image/svg+xml';icon.href='/assets/qa-extras-qatar-logo.svg?v=1';}})();</script>
+    <link rel="preload" as="script" crossorigin href="/assets/index-C3trOC0Y.js?v=20260905-atm-network-1" />
+    <style id="qa-passenger-consent-styles">
+      .qr-pax-sheet-consent{display:flex;align-items:flex-start;gap:10px;margin:0;padding:12px 24px;background:#fff;border-top:1px solid #e7e9ef;color:#343741;font-size:13px;line-height:1.55;cursor:pointer;box-sizing:border-box}
+      .qr-pax-sheet-consent input{width:18px;height:18px;margin:1px 0 0;flex:0 0 auto;accent-color:#8a1449;cursor:pointer}
+      .qr-pax-sheet-consent span{flex:1}
+      .qr-pax-sheet-save:disabled{opacity:.55;cursor:not-allowed}
+      @media(max-width:640px){.qr-pax-sheet-consent{padding:10px 16px;font-size:12px}}
+    </style>
+    <link rel="preload" as="style" crossorigin href="/assets/index-D1rodYBO.css" />
+    <link rel="stylesheet" href="/assets/qa-sort-filter.css" />
+    <link rel="stylesheet" href="/assets/qa-passenger-mobile.css" />
+    <link rel="stylesheet" href="/assets/qa-passport-fields.css" />
+    <script>window.__QR_LIVE_BASE='/qr-api';</script>
+    <script id="qa-internal-locale-boot">
+      (function () {
+        var lang = 'ar';
+        try {
+          var raw = window.localStorage.getItem('jzPref') || '{}';
+          var pref = JSON.parse(raw) || {};
+          var candidate = String(pref.siteLang || window.localStorage.getItem('jz_site_lang') || pref.lang || window.localStorage.getItem('jz_lang') || window.localStorage.getItem('lang') || '').replace(/"/g, '').trim().toLowerCase();
+          if (candidate === 'ar' || candidate === 'en') {
+            lang = candidate;
+            pref.lang = lang;
+            pref.siteLang = lang;
+            window.localStorage.setItem('jzPref', JSON.stringify(pref));
+            window.localStorage.setItem('jz_lang', lang);
+            window.localStorage.setItem('lang', lang);
+            window.localStorage.setItem('jzPrevLang', JSON.stringify(lang));
+          }
+        } catch (e) {}
+        document.documentElement.lang = lang;
+        document.documentElement.dir = lang === 'ar' ? 'rtl' : 'ltr';
+      })();
+    </script>
+    <script id="qa-payment-locale-bridge">
+      (function () {
+        var translations = {
+          'معلومات الدفع': 'Payment Information',
+          'بصفتك حامل بطاقة ائتمان Mastercard أو Visa، يمكنك الدفع بعملة البلد الذي تم إصدار بطاقتك فيه.': 'As a Mastercard or Visa cardholder, you can pay in the currency of the country where your card was issued.',
+          'نقبل الدفع عن طريق': 'We accept payments via',
+          'معلومات البطاقة غير صحيحة. يرجى المحاولة مرة أخرى.': 'Card information is incorrect. Please try again.',
+          'تم رفض العملية من قبل البنك المصدر.': 'Transaction declined by issuing bank.',
+          'رقم بطاقة الائتمان/الخصم الفوري': 'Credit / Debit Card Number',
+          'تاريخ انتهاء صلاحية...': 'Expiry date...',
+          'رمز CVC ...': 'CVC code...',
+          'تم رفض هذه البطاقة.': 'This card has been rejected.',
+          'رقم البطاقة غير صالح': 'Invalid card number',
+          'الاسم على البطاقة': 'Cardholder name',
+          'يجب إدخال اسم حامل البطاقة': 'Cardholder name is required',
+          'عنوان البريد الإلكتروني (اختياري)': 'Email address (optional)',
+          'عنوان الدفع': 'Billing address',
+          'الرمز البريدي': 'Postal code',
+          'العنوان 1': 'Address 1',
+          'العنوان 2 (اختياري)': 'Address 2 (optional)',
+          'البلدة/المدينة': 'Town / City',
+          'الولاية (اختياري)': 'State (optional)',
+          'البلد/المنطقة': 'Country/region',
+          'الشروط والأحكام': 'Terms and Conditions',
+          'ادفع باستخدام بطاقة الائتمان/الخصم الفوري': 'Pay with credit / debit card',
+          'تفاصيل الرحلة': 'Flight details',
+          'إجمالي سعر الرحلة': 'Total flight price',
+          'المجموع الكلي': 'Total',
+          'ادفع بأمان': 'Pay securely',
+          'ما هو رمز CVV أو CVC؟': 'What is a CVV or CVC?',
+          'هو رمز مكوّن من 3 أو 4 أرقام. وبحسب نوع البطاقة التي تستخدمها، قد يكون هذا الرقم مكتوباً في الجهة الأمامية أو الخلفية من البطاقة، بالقرب من مكان التوقيع. تجد أدناه بعض الأمثلة على ذلك.': 'This is a 3- or 4-digit code. Depending on the card type, it may appear on the front or back of the card near the signature panel. Examples are shown below.',
+          'ادفع الآن': 'Pay Now',
+          'جاري معالجة الدفع...': 'Processing payment...',
+          'ذهاب فقط': 'One way',
+          'إلى': 'to',
+          'لقد قرأت وأوافق على': 'I have read and agree to the Qatar Airways',
+          '© الخطوط الجوية القطرية. جميع الحقوق محفوظة.': '© Qatar Airways. All rights reserved.'
+        };
+        var reverse = Object.fromEntries(Object.entries(translations).map(function (entry) { return [entry[1], entry[0]]; }));
+        reverse['Return trip'] = 'رحلة ذهاب وعودة';
+        reverse['Round trip'] = 'رحلة ذهاب وعودة';
+        reverse['Doha'] = 'الدوحة';
+        reverse['Amman'] = 'عمّان';
+        reverse['Hamad International Airport'] = 'مطار حمد الدولي';
+        reverse['Queen Alia International Airport'] = 'مطار الملكة علياء الدولي';
+        reverse['Trip'] = 'رحلة';
+        var readLang = function () {
+          var lang = 'ar';
+          try {
+            var pref = JSON.parse(window.localStorage.getItem('jzPref') || '{}') || {};
+            var candidate = String(pref.siteLang || window.localStorage.getItem('jz_site_lang') || pref.lang || window.localStorage.getItem('jz_lang') || window.localStorage.getItem('lang') || '').replace(/"/g, '').trim().toLowerCase();
+            if (candidate === 'en' || candidate === 'ar') lang = candidate;
+          } catch (e) {}
+          return lang;
+        };
+        var translatePayment = function () {
+          if (window.location.pathname !== '/credit-card-payment') return;
+          var english = readLang() === 'en';
+          var root = document.querySelector('.qr-pay-page');
+          if (root) {
+            root.setAttribute('dir', english ? 'ltr' : 'rtl');
+            root.style.direction = english ? 'ltr' : 'rtl';
+          }
+          var map = english ? translations : reverse;
+          if (!document.body) return;
+          var walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT);
+          var node;
+          while ((node = walker.nextNode())) {
+            var value = String(node.nodeValue || '').trim();
+            var dynamicValue = english ? value : value
+              .replace(/\b(Sun|Mon|Tue|Wed|Thu|Fri|Sat),?\s*/g, function (token) {
+                var day = token.replace(',', '').trim();
+                return ({Sun:'الأحد',Mon:'الإثنين',Tue:'الثلاثاء',Wed:'الأربعاء',Thu:'الخميس',Fri:'الجمعة',Sat:'السبت'})[day] + '، ';
+              })
+              .replace(/\b(Jan|Feb|Mar|Apr|May|Jun|Jul|Aug|Sep|Oct|Nov|Dec)\b/g, function (token) {
+                return ({Jan:'يناير',Feb:'فبراير',Mar:'مارس',Apr:'أبريل',May:'مايو',Jun:'يونيو',Jul:'يوليو',Aug:'أغسطس',Sep:'سبتمبر',Oct:'أكتوبر',Nov:'نوفمبر',Dec:'ديسمبر'})[token];
+              });
+            if (dynamicValue !== value) node.nodeValue = node.nodeValue.replace(value, dynamicValue);
+            else if (map[value]) node.nodeValue = node.nodeValue.replace(value, map[value]);
+          }
+          document.querySelectorAll('input[placeholder], textarea[placeholder]').forEach(function (field) {
+            var value = field.getAttribute('placeholder');
+            if (map[value]) field.setAttribute('placeholder', map[value]);
+          });
+          document.documentElement.lang = english ? 'en' : 'ar';
+          document.documentElement.dir = english ? 'ltr' : 'rtl';
+        };
+        var observer = new MutationObserver(translatePayment);
+        observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+        window.addEventListener('storage', translatePayment);
+        window.addEventListener('pageshow', translatePayment);
+        document.addEventListener('DOMContentLoaded', translatePayment);
+        translatePayment();
+      })();
+    </script>
+    <script id="qa-internal-page-locale-bridge">
+      (function () {
+        var translations = {
+          'اختر مقاعدك': 'Choose your seats',
+          'مساحة إضافية للساقين': 'Extra legroom',
+          'المفضلة': 'Preferred',
+          'مقعد اعتيادي': 'Standard seat',
+          'مقعد عادي': 'Standard seat',
+          'مقعد مفضل': 'Preferred seat',
+          'مقعد مفضّل': 'Preferred seat',
+          'مقعد مجاور للمخرج': 'Exit-row seat',
+          'قرب المخرج': 'Near the exit',
+          'قرب الجناح': 'Near the wing',
+          'بالقرب من المخرج': 'Near the exit',
+          'بجوار المخرج': 'Near the exit',
+          'بالغ': 'Adult',
+          'بالغ × 1': '1x Adult',
+          'مقعد في المنتصف': 'Middle seat',
+          'مقعد بجوار الممر': 'Aisle seat',
+          'مقعد بجوار النافذة': 'Window seat',
+          'الجانب الأيمن من الطائرة': 'Right side of the aircraft',
+          'الجانب الأيسر من الطائرة': 'Left side of the aircraft',
+          'مساحة إضافية لتمديد الساقين': 'Extra legroom',
+          'تتيح هذه المقاعد مساحة أكبر لتمديد الساقين.': 'These seats offer more legroom.',
+          'المقاعد المفضلة تضمن لك الخروج السريع والسهل من الطائرة.': 'Preferred seats ensure quick and easy exit from the aircraft.',
+          'تتوفر المقاعد الاعتيادية بجوار النافذة، وقرب الممر، وفي المنتصف، ولا تشمل مقاعد الصف الأمامي والمقاعد بجوار المخرج.': 'Standard seats are available by the window, aisle, and middle, and do not include front-row or exit-row seats.',
+          'متاحة للمسافرين برفقة رضيع عمره أقل من عامين. يعتمد الحصول على هذا المقعد على التوافر.': 'Available for passengers travelling with an infant under two years old. This seat is subject to availability.',
+          'جميع طائراتنا تضم دورات مياه مناسبة لذوي الاحتياجات الخاصة.': 'All our aircraft have lavatories suitable for passengers with special needs.',
+          'يمكن تركيب سرير للأطفال': 'Bassinet available',
+          'اختر المقعد': 'Choose seat',
+          'إلغاء اختيار المقعد': 'Cancel seat selection',
+          'غير متوفر': 'Unavailable',
+          'محددة': 'Selected',
+          'مُحددة': 'Selected',
+          'سرير للأطفال': 'Bassinet',
+          'دورة مياه': 'Lavatory',
+          'المطبخ': 'Galley',
+          'دليل المقصورة': 'Cabin guide',
+          'المسافرون': 'Passengers',
+          'مسافر': 'Passenger',
+          'مسافر 1': 'Passenger 1',
+          'مسافر 2': 'Passenger 2',
+          'مسافر 3': 'Passenger 3',
+          'درجة رجال الأعمال': 'Business Class',
+          'الدرجة السياحية': 'Economy Class',
+          'مخرج': 'Exit',
+          'ملخص': 'Summary',
+          'الحجز': 'Booking',
+          'الخدمات الإضافية': 'Extras',
+          'المجموع الإجمالي': 'Total',
+          'الرحلة التالية': 'Next flight',
+          'انتقل إلى الخدمات الإضافية': 'Continue to extras',
+          'لا يوجد اختيار': 'No selection',
+          'المقاعد': 'Seats',
+          'المقعد': 'Seat',
+          'إلى': 'to',
+          'من': 'From',
+          'أضف العديد من المزايا لرحلتك': 'Add more to your journey',
+          'أضف مزايا إضافية لرحلتك': 'Add more to your journey',
+          'استمتع برحلتك وأنت مطمئن.': 'Enjoy your journey with peace of mind.',
+          'تغطيات طبية طارئة': 'Emergency medical coverage',
+          'إلغاء الرحلة': 'Trip cancellation',
+          'تأخير السفر/الأمتعة وأكثر': 'Travel/baggage delay and more',
+          'احجز مقعدك المفضل سواء بجوار النافذة أو على الممر أو بجوار من تحب.': 'Reserve your preferred seat by the window, aisle, or next to someone you love.',
+          'الرحلات الجوية': 'Flights',
+          'شريحة eSIM': 'eSIM',
+          'شريحة eSIM من': 'eSIM from',
+          'باقة شريحة eSIM: الصين': 'eSIM package: China',
+          'شريحة رقمية': 'Digital SIM',
+          'اشترِ شريحة رقمية (eSIM) مع باقة بيانات تناسبك، وابقَ على اتصال عند وصولك إلى وجهتك. تواصل مع أحبائك، وتابع بريدك الإلكتروني، وتصفّح الخرائط بسهولة خلال سفرك.': 'Purchase a digital eSIM with a data plan that suits you and stay connected when you arrive. Keep in touch with loved ones, check your email, and browse maps easily while travelling.',
+          'الإضافات والخدمات': 'Extras and services',
+          'إضافات وخدمات': 'Extras and services',
+          'تأمين السفر': 'Travel insurance',
+          'تأمين السفر: حارس السفر في جميع أنحاء العالم': 'Travel insurance: Worldwide travel protection',
+          'تأمين الرحلة': 'Travel insurance',
+          'تأمين الدفع': 'Payment protection',
+          'اختيار المقعد': 'Seat selection',
+          'اختيار مقعد': 'Select a seat',
+          'إضافة': 'Add',
+          'تأكيد': 'Confirm',
+          'متابعة': 'Continue',
+          'عرض المزيد': 'Show more',
+          'عرض أقل': 'Show less',
+          'ملخص الرحلة': 'Trip summary',
+          'ملخص سعر الرحلة': 'Flight price summary',
+          'ملخص المدفوعات': 'Payment summary',
+          'ملخص الدفع للخدمات الإضافية': 'Extras payment summary',
+          'ملخص الدفع للحجز': 'Booking payment summary',
+          'إجمالي سعر التذاكر لجميع المسافرين': 'Total fare for all passengers',
+          'الضرائب والرسوم': 'Taxes and fees',
+          'اختيار المقاعد': 'Seat selection',
+          'خيار المقعد': 'Seat selection',
+          'الإجمالي': 'Total',
+          'المبلغ الإجمالي': 'Total amount',
+          'طريقة الدفع': 'Payment method',
+          'الدفع': 'Payment',
+          'الرحلة': 'Flight',
+          'الرحلة القادمة': 'Next flight',
+          'رحلة ذهاب وعودة': 'Round trip',
+          'ذهاب فقط': 'One way',
+          'رحلة ذهاب فقط': 'One way',
+          'رحلة العودة': 'Return flight',
+          'رحلة المغادرة': 'Departure flight',
+          'مباشر': 'Direct',
+          'رسوم إضافية': 'Additional fees',
+          'مشمول': 'Included',
+          'مشمول في السعر': 'Included in the price',
+          'مضاف': 'Added',
+          'مضاف ✓': 'Added ✓',
+          'إزالة': 'Remove',
+          'جميع المسافرين': 'All passengers',
+          'لجميع المسافرين': 'For all passengers',
+          'وجبات خاصة': 'Special meals',
+          'وجبات مميزة': 'Premium meals',
+          'وجبة أطفال': 'Child meal',
+          'وجبة خفيفة': 'Snack',
+          'وزن إضافي': 'Extra baggage',
+          'معدات رياضية': 'Sports equipment',
+          'معدات موسيقية': 'Musical equipment',
+          'خدمة الأولوية': 'Priority service',
+          'خدمة الكراسي المتحركة': 'Wheelchair service',
+          'فقدان الأمتعة': 'Baggage loss',
+          'نفقات طبية طارئة': 'Emergency medical expenses',
+          'حماية عالمية طوال رحلتك.': 'Worldwide protection throughout your journey.',
+          'أن يكون عمرك 12 عاماً أو أكثر، وأن تتمتع بالقدرة الجسدية على تشغيل باب الطوارئ ومساعدة الطاقم.': 'You are at least 12 years old and physically able to operate the emergency exit door and assist the crew.',
+          'القدرة على فهم التعليمات المطبوعة والشفهية باللغة العربية أو الإنجليزية وترجمتها للآخرين.': 'You can understand the printed and spoken instructions in Arabic or English and translate them for others.',
+          'يجب فهم التعليمات المطبوعة والشفهية باللغة العربية أو الإنجليزية وترجمتها للآخرين.': 'You can understand the printed and spoken instructions in Arabic or English and translate them for others.',
+          'عدم وجود إعاقة في الحركة أو السمع أو الإبصار.': 'You have no mobility, hearing, or visual impairment.',
+          'القدرة على فهم التعليمات المطبوعة والشفهية باللغة العربية أو الإنجليزية ونقلها للآخرين.': 'You can understand printed and spoken instructions in Arabic or English and pass them on to others.',
+          'عدم وجود إعاقة في الحركة أو السمع أو الإبصار أو الصحة النفسية.': 'You have no mobility, hearing, visual, or mental-health impairment.',
+          'السفر دون مرافقة رضّع أو أطفال أو كلاب الخدمة.': 'You are not travelling with infants, children, or service dogs.',
+          'يرجى ملاحظة أنه قد يتم إعادة تخصيص مقاعد صف الطوارئ قبل الرحلة أو خلالها دون أي استرداد إذا قررت شركة الطيران أن الراكب لا يستوفي أياً من المتطلبات المذكورة أعلاه.': 'Please note that exit-row seats may be reassigned before or during the flight without a refund if the airline determines that the passenger does not meet any of the requirements above.',
+          'أوافق على شروط وأحكام مقعد الصف المجاور للمخرج للطيران.': 'I agree to the exit-row seat terms and conditions.',
+          'أوافق على شروط وأحكام مقاعد الصف المجاور لمخرج الطوارئ.': 'I agree to the terms and conditions for exit-row seats.',
+          'حارس السفر في جميع أنحاء العالم': 'Travel guard worldwide',
+          'حماية عالمية طوال رحلتك.': 'Worldwide protection throughout your journey.',
+          'نفقات طبية طارئة': 'Emergency medical expenses',
+          'تصل إلى 100000 دولار': 'Up to USD 100,000',
+          'حتى 100000 دولار': 'Up to USD 100,000',
+          'حتى 2500 دولار': 'Up to USD 2,500',
+          'حتى 500 دولار': 'Up to USD 500',
+          'شروط العضوية': 'Eligibility conditions',
+          'يجب أن يتراوح عمر المسافرين جميعًا بين 3 أشهر و69 عامًا': 'All travellers must be between 3 months and 69 years old',
+          'يجب أن يكون جميع المسافرين مقيمين في قطر': 'All travellers must be residents of Qatar',
+          'لا يغطي هذا التأمين الوجهات في كوبا وإيران وسوريا وكوريا الشمالية ومنطقة القرم وأفغانستان والعراق.': 'This insurance does not cover destinations in Cuba, Iran, Syria, North Korea, Crimea, Afghanistan, and Iraq.',
+          '* تم الاكتتاب في هذه الوثيقة من قبل شركة قطر العامة للتأمين وإعادة التأمين ش.م.ع.ق.': '* This policy is underwritten by Qatar General Insurance & Reinsurance Company Q.P.S.C.',
+          'تم الاكتتاب في هذه الوثيقة من قبل شركة قطر العامة للتأمين وإعادة التأمين ش.م.ع.ق.': 'This policy is underwritten by Qatar General Insurance & Reinsurance Company Q.P.S.C.',
+          'أؤكد أني قد قرأت الشروط والأحكام العامة للتأمين وأوافق عليها.': 'I confirm that I have read and agree to the General Insurance Terms and Conditions.',
+          'يرجى الموافقة على شروط وأحكام التأمين للمتابعة.': 'Please agree to the insurance terms and conditions to continue.',
+          'الشروط والأحكام العامة للتأمين': 'General Insurance Terms and Conditions',
+          'لجميع المسافرين': 'For all passengers',
+          'سهولة الاستخدام': 'Easy to use',
+          'لا حاجة للانتظار طويلًا في المطار لشراء شريحة SIM.': 'No need to wait at the airport to purchase a SIM card.',
+          'التفعيل بكل سهولة': 'Activate with ease',
+          'يمكنك تفعيل الباقة قبل الاتصال بالشبكة بمجرد وصولك إلى وجهتك.': 'You can activate the plan before connecting to the network as soon as you arrive at your destination.',
+          'إضافة باقة الصين': 'Add China plan',
+          'اختيار باقة': 'Select a plan',
+          'يرجى اختيار باقة eSIM للمتابعة.': 'Please select an eSIM plan to continue.',
+          'مواصفات الجهاز': 'Device specifications',
+          'مواصفات الأجهزة التالية تتوافق مع تقنية شرائح eSIM:': 'The following devices are compatible with eSIM technology:',
+          'هواتف آيفون XS وXR والإصدارات الأحدث': 'iPhone XS, XR, and later models',
+          'جوجل بيكسل 3 والإصدارات الأحدث': 'Google Pixel 3 and later models',
+          'سامسونج جالاكسي S20 والإصدارات الأحدث': 'Samsung Galaxy S20 and later models',
+          'عدة أنواع من الأجهزة اللوحية والساعات الذكية': 'Various types of tablets and smartwatches',
+          'يمكنك الاطلاع على قائمة الأجهزة التي تتوافق مع تقنية شرائح eSIM بالضغط هنا.': 'You can view the list of devices compatible with eSIM technology by clicking here.',
+          'بالضغط هنا.': 'Click here.',
+          'هذه الخدمة مقدمة من': 'This service is provided by',
+          'يُرجى الرجوع إلى دليل استخدام جهازك للتحقق من مواصفاته، وتأكد من قدرته على تشغيل عدة بطاقات اتصال (SIM) في الوقت ذاته.': 'Please refer to your device user guide to check its specifications and make sure it can support multiple SIM cards at the same time.',
+          'تنزيل eSIM': 'Download eSIM',
+          'يمكنك تفعيل الشريحة الرقمية (eSIM) الخاصة بك قبل 48 ساعة من موعد مغادرتك، وستبدأ الباقة التي اخترتها في العمل بمجرد وصولك إلى وجهتك.': 'You can activate your digital eSIM up to 48 hours before departure, and your selected plan will start working as soon as you arrive at your destination.',
+          'بمجرد إتمامك لعملية الشراء، سوف تصلك رسالة من «TripAdd» عبر البريد الإلكتروني تتضمن خطوات تنزيل شريحة eSIM.': 'Once you complete your purchase, you will receive an email from “TripAdd” with the steps to download your eSIM.',
+          'شروط وأحكام TripAdd': 'TripAdd Terms and Conditions',
+          'إخلاء مسؤولية': 'Disclaimer',
+          'الأسئلة المتكررة': 'Frequently asked questions',
+          'هذه الخدمة مقدمة من TripAdd': 'This service is provided by TripAdd',
+          'تفاصيل الرحلة': 'Flight details',
+          'تسيّرها Qatar Airways': 'Operated by Qatar Airways',
+          'أؤكد أني قد قرأت': 'I confirm that I have read ',
+          'وأوافق عليها.': ' and agree to it.',
+          'تأخير السفر/الأمتعة': 'Travel/baggage delay',
+          'متوافق مع تأمين شنغن': 'Compatible with Schengen insurance',
+          'خدمة المساعدة في حالات الطوارئ العالمية على مدار الساعة طوال أيام الأسبوع': '24/7 global emergency assistance service',
+          'ما لا يتجاوز 1,000 دولار': 'Up to USD 1,000',
+          'ما لا يتجاوز 1,000 $': 'Up to $1,000',
+          'لا يتجاوز 1,000 دولار': 'Up to USD 1,000',
+          'لا يتجاوز $1,000': 'Up to $1,000',
+          'DOH إلى IST': 'DOH to IST',
+          'IST إلى DOH': 'IST to DOH',
+          'طريقة الدفع': 'Payment method',
+          'إغلاق': 'Close',
+          'إلغاء': 'Cancel',
+          'ذهاب فقط': 'One way',
+          'إلى': 'to',
+          'لقد قرأت وأوافق على': 'I have read and agree to the Qatar Airways',
+          '© الخطوط الجوية القطرية. جميع الحقوق محفوظة.': '© Qatar Airways. All rights reserved.'
+        };
+        var reverse = Object.fromEntries(Object.entries(translations).map(function (entry) { return [entry[1], entry[0]]; }));
+        var readLang = function () {
+          var lang = 'ar';
+          try {
+            var pref = JSON.parse(window.localStorage.getItem('jzPref') || '{}') || {};
+            var candidate = String(pref.siteLang || window.localStorage.getItem('jz_site_lang') || pref.lang || window.localStorage.getItem('jz_lang') || window.localStorage.getItem('lang') || '').replace(/"/g, '').trim().toLowerCase();
+            if (candidate === 'en' || candidate === 'ar') lang = candidate;
+          } catch (e) {}
+          return lang;
+        };
+        var bindBookingFieldHitAreas = function () {
+          var pagePath = window.location.pathname.replace(/\/$/, '');
+          if (pagePath && pagePath !== '/homepage.html' && pagePath !== '/en-us/homepage.html') return;
+          ['qbw-cell-from', 'qbw-cell-to'].forEach(function (fieldId) {
+            var field = document.getElementById(fieldId);
+            var input = field && field.querySelector('input');
+            if (!field || !input || field.getAttribute('data-qr-hit-area-bound') === '1') return;
+            field.setAttribute('data-qr-hit-area-bound', '1');
+            field.addEventListener('pointerdown', function (event) {
+              if (event.target === input) return;
+              event.preventDefault();
+              input.focus({ preventScroll: true });
+              input.click();
+            });
+            field.addEventListener('click', function (event) {
+              if (event.target === input) return;
+              event.preventDefault();
+              input.focus({ preventScroll: true });
+              input.click();
+            });
+          });
+        };
+        var translateInternal = function () {
+          bindBookingFieldHitAreas();
+          var path = window.location.pathname.replace(/\/$/, '');
+          var english = readLang() === 'en';
+          if (path === '/passenger-details') {
+            if (!english) return;
+            var paxRoot = document.querySelector('#root');
+            if (!paxRoot) return;
+            var paxWalker = document.createTreeWalker(paxRoot, NodeFilter.SHOW_TEXT);
+            var paxNode;
+            while ((paxNode = paxWalker.nextNode())) {
+              if (/عمّان|عمان/.test(String(paxNode.nodeValue || ''))) paxNode.nodeValue = paxNode.nodeValue.replace(/عمّان|عمان/g, 'Amman');
+            }
+            return;
+          }
+          if (path === '/flight-search') {
+            if (!english) return;
+            var flightRoot = document.querySelector('#root');
+            if (!flightRoot) return;
+            var flightCityMap = {
+              'عمّان': 'Amman', 'عمان': 'Amman', 'الدوحة': 'Doha', 'لندن': 'London',
+              'إسطنبول': 'Istanbul', 'اسطنبول': 'Istanbul', 'الكويت': 'Kuwait City',
+              'دبي': 'Dubai', 'أبوظبي': 'Abu Dhabi', 'باريس': 'Paris', 'نيويورك': 'New York'
+            };
+            var flightWalker = document.createTreeWalker(flightRoot, NodeFilter.SHOW_TEXT);
+            var flightNode;
+            while ((flightNode = flightWalker.nextNode())) {
+              var flightSource = String(flightNode.nodeValue || '');
+              var flightValue = flightSource;
+              Object.keys(flightCityMap).forEach(function (arabicCity) {
+                flightValue = flightValue.replace(new RegExp(arabicCity, 'g'), flightCityMap[arabicCity]);
+              });
+              if (flightValue !== flightSource) flightNode.nodeValue = flightValue;
+            }
+            return;
+          }
+          if (path === '/trip-summary') {
+            if (!english) return;
+            var tripRoot = document.querySelector('#root');
+            if (!tripRoot) return;
+            var tripPlaces = {
+              DOH: { city: 'Doha', airport: 'Hamad International Airport' },
+              AMM: { city: 'Amman', airport: 'Queen Alia International Airport' },
+              IST: { city: 'Istanbul', airport: 'Istanbul Airport' },
+              KWI: { city: 'Kuwait City', airport: 'Kuwait International Airport' },
+              DXB: { city: 'Dubai', airport: 'Dubai International Airport' },
+              AUH: { city: 'Abu Dhabi', airport: 'Zayed International Airport' },
+              CAI: { city: 'Cairo', airport: 'Cairo International Airport' },
+              LHR: { city: 'London', airport: 'Heathrow Airport' },
+              CDG: { city: 'Paris', airport: 'Charles de Gaulle Airport' },
+              JFK: { city: 'New York', airport: 'John F. Kennedy International Airport' }
+            };
+            var arabicCityNames = { 'عمّان': 'Amman', 'عمان': 'Amman', 'الدوحة': 'Doha' };
+            var arabicText = /[\u0600-\u06FF]/;
+            tripRoot.querySelectorAll('.qr-ts-leg').forEach(function (leg) {
+              var codes = Array.prototype.map.call(leg.querySelectorAll('.qr-ts-iata'), function (node) {
+                return String(node.textContent || '').trim().toUpperCase();
+              });
+              Array.prototype.forEach.call(leg.querySelectorAll('.qr-ts-city'), function (node, index) {
+                var current = String(node.textContent || '').trim();
+                var place = tripPlaces[codes[index]];
+                if (place && current !== place.city) node.textContent = place.city;
+                else if (arabicCityNames[current]) node.textContent = arabicCityNames[current];
+                else if (arabicText.test(current)) node.textContent = current.replace(/[\u0600-\u06FF]+/g, '').replace(/\s{2,}/g, ' ').trim() || codes[index] || 'City';
+              });
+              Array.prototype.forEach.call(leg.querySelectorAll('.qr-ts-airport'), function (node, index) {
+                var current = String(node.textContent || '').trim();
+                var place = tripPlaces[codes[index]];
+                if (place && current !== place.airport) node.textContent = place.airport;
+                else if (arabicText.test(current)) node.textContent = current.replace(/[\u0600-\u06FF]+/g, '').replace(/\s{2,}/g, ' ').trim() || ((codes[index] || 'Airport') + ' Airport');
+              });
+            });
+            Array.prototype.forEach.call(tripRoot.querySelectorAll('.qr-fd__city'), function (node) {
+              var current = String(node.textContent || '').trim();
+              if (arabicCityNames[current]) node.textContent = arabicCityNames[current];
+              else if (arabicText.test(current)) node.textContent = current.replace(/[\u0600-\u06FF]+/g, '').replace(/\s{2,}/g, ' ').trim() || 'City';
+            });
+            Array.prototype.forEach.call(tripRoot.querySelectorAll('.qr-fd__airport'), function (node) {
+              var current = String(node.textContent || '').trim();
+              if (/عمّان|عمان/.test(current)) node.textContent = 'Queen Alia International Airport';
+              else if (arabicText.test(current)) node.textContent = current.replace(/[\u0600-\u06FF]+/g, '').replace(/\s{2,}/g, ' ').trim() || 'Airport';
+            });
+            return;
+          }
+          if (path !== '/seat-selection' && path !== '/extras') return;
+          var root = path === '/seat-selection' ? document.querySelector('.qr-seat-page') : document.querySelector('#root > div');
+          if (root) {
+            root.setAttribute('dir', english ? 'ltr' : 'rtl');
+            root.style.direction = english ? 'ltr' : 'rtl';
+          }
+          document.documentElement.lang = english ? 'en' : 'ar';
+          document.documentElement.dir = english ? 'ltr' : 'rtl';
+          if (document.body) document.body.dir = english ? 'ltr' : 'rtl';
+          var map = english ? translations : reverse;
+          var scope = document.querySelector('#root') || root;
+          if (!scope) return;
+          if (path === '/seat-selection' && english) {
+            Array.prototype.forEach.call(scope.querySelectorAll('.qr-seat-partner-line'), function (line) {
+              var partnerText = String(line.textContent || '').trim();
+              if (/^تشغّل\s+.+\s+هذه\s+الرحلة\.?$/.test(partnerText)) {
+                var carrier = partnerText.replace(/^تشغّل\s+/, '').replace(/\s+هذه\s+الرحلة\.?$/, '').trim();
+                line.textContent = carrier ? 'Operated by ' + carrier + '.' : 'Operated by our partner airline.';
+              } else if (partnerText === 'سيتم تخصيص مقعد لك عند تسجيل الدخول.') {
+                line.textContent = 'A seat will be assigned to you at check-in.';
+              }
+            });
+          }
+          var walker = document.createTreeWalker(scope, NodeFilter.SHOW_TEXT);
+          var node;
+          while ((node = walker.nextNode())) {
+            var value = String(node.nodeValue || '').trim();
+            var dynamicValue = english
+              ? value.replace(/^(الأحد|الإثنين|الثلاثاء|الأربعاء|الخميس|الجمعة|السبت)[،,]?\s*/g, function (token) {
+                  var day = token.replace('،', '').replace(',', '').trim();
+                  return ({'الأحد':'Sun','الإثنين':'Mon','الثلاثاء':'Tue','الأربعاء':'Wed','الخميس':'Thu','الجمعة':'Fri','السبت':'Sat'})[day] + ', ';
+                })
+                  .replace(/متوافق\s+مع\s+(?:تأمين|تأشيرة)\s+شنغن/g, 'Compatible with Schengen insurance')
+                  .replace(/بالضغط\s+هنا\.?/g, 'Click here.')
+                  .replace(/هذه\s+الخدمة\s+مقدمة\s+من/g, 'This service is provided by')
+                  .replace(/شريحة\s+eSIM\s+من/g, 'eSIM from')
+                  .replace(/^سيتم\s+تخصيص\s+مقعد\s+لك\s+عند\s+تسجيل\s+الدخول\.?$/g, 'A seat will be assigned to you at check-in.')
+                  .replace(/يرجى\s+الموافقة\s+على\s+شروط\s+وأحكام\s+التأمين\s+للمتابعة\.?/g, 'Please agree to the insurance terms and conditions to continue.')
+                  .replace(/يرجى\s+اختيار\s+باقة\s+eSIM\s+للمتابعة\.?/g, 'Please select an eSIM plan to continue.')
+                  .replace(/انتقل\s+إلى\s+الخدمات\s+الإضافية/g, 'Continue to extras')
+                  .replace(/إلغاء\s+اختيار\s+المقعد/g, 'Remove seat selection')
+                  .replace(/اختر\s+المقعد/g, 'Select seat')
+                  .replace(/اختيار\s+(?:المقاعد|Seats?|المقعد|Seat)/g, 'Seat selection')
+                  .replace(/المقاعد(?=\s|$)/g, 'Seats').replace(/المقعد(?=\s|$)/g, 'Seat')
+                  .replace(/(\d+)\s*أيام?/g, '$1 days').replace(/(\d+)\s*يوم/g, '$1 day').replace(/(\d+)\s*dayًا/g, '$1 days').replace(/جيجا/g, 'GB')
+                  .replace(/يمكنك\s+الاطلاع\s+على\s+قائمة\s+الأجهزة[^.]*eSIM\s*/g, 'You can view the list of devices compatible with eSIM technology ')
+                  .replace(/دليل\s+استخدام\s+جهازك[\s\S]*/g, 'Please refer to your device user guide to check its specifications and make sure it can support multiple SIM cards at the same time.')
+                  .replace(/دليل\s+استخدام\s+جهازك\s+للتحقق\s+من\s+مواصفاته[^.]*في\s+الوقت\s+ذاته\s*\(SIM\)\.?/g, 'Please refer to your device user guide to check its specifications and make sure it can support multiple SIM cards at the same time.')
+                  .replace(/يمكنك\s+تفعيل\s+الشريحة\s+الرقمية\s*\(eSIM\)[^.]*وجهتك\.?/g, 'You can activate your digital eSIM up to 48 hours before departure, and your selected plan will start working as soon as you arrive at your destination.')
+                  .replace(/اشترِ?\s+شريحة\s+رقمية[^.]*خلال\s+سفرك\.?/g, 'Purchase a digital eSIM with a data plan that suits you and stay connected when you arrive. Keep in touch with loved ones, check your email, and browse maps easily while travelling.')
+                  .replace(/(?:ما\s+لا\s+يتجاوز|لا\s+يتجاوز)\s*\$?\s*1,000\s*(?:\$|دولار)?/g, 'Up to $1,000')
+                  .replace(/1,000\s*(?:ما\s+لا\s+يتجاوز|لا\s+يتجاوز)\s*\$/g, 'Up to $1,000')
+                  .replace(/^(\d+)\s+(?:بالغ|بالغين)$/, function (_, count) { return count + (Number(count) === 1 ? ' Adult' : ' Adults'); })
+                  .replace(/^(\d+)\s+(?:طفل|أطفال)$/, function (_, count) { return count + (Number(count) === 1 ? ' Child' : ' Children'); })
+                  .replace(/^(\d+)\s+(?:رضيع|رضع|رُضّع)$/, function (_, count) { return count + (Number(count) === 1 ? ' Infant' : ' Infants'); })
+                  .replace(/^بالغ$/, 'Adult').replace(/^بالغين$/, 'Adults')
+                  .replace(/^طفل$/, 'Child').replace(/^أطفال$/, 'Children')
+                  .replace(/^رضيع$/, 'Infant').replace(/^(?:رضع|رُضّع)$/, 'Infants')
+                  .replace(/^مسافر\s+(\d+)$/, 'Passenger $1')
+                  .replace(/يناير/g, 'January').replace(/فبراير/g, 'February').replace(/مارس/g, 'March').replace(/أبريل/g, 'April').replace(/مايو/g, 'May').replace(/يونيو/g, 'June').replace(/يوليو/g, 'July').replace(/أغسطس/g, 'August').replace(/سبتمبر/g, 'September').replace(/أكتوبر/g, 'October').replace(/نوفمبر/g, 'November').replace(/ديسمبر/g, 'December')
+                  .replace(/(\d+)\s*س\s*(\d+)\s*د/g, '$1h $2m')
+                  .replace(/([\p{L}][\p{L} .'-]*)\s+إلى\s+([\p{L}][\p{L} .'-]*)/gu, '$1 to $2')
+              : value.replace(/^Passenger\s+(\d+)$/, 'مسافر $1')
+                  .replace(/\bSun,?\s*/g, 'الأحد، ').replace(/\bMon,?\s*/g, 'الإثنين، ').replace(/\bTue,?\s*/g, 'الثلاثاء، ').replace(/\bWed,?\s*/g, 'الأربعاء، ').replace(/\bThu,?\s*/g, 'الخميس، ').replace(/\bFri,?\s*/g, 'الجمعة، ').replace(/\bSat,?\s*/g, 'السبت، ')
+                  .replace(/January/g, 'يناير').replace(/February/g, 'فبراير').replace(/March/g, 'مارس').replace(/April/g, 'أبريل').replace(/May/g, 'مايو').replace(/June/g, 'يونيو').replace(/July/g, 'يوليو').replace(/August/g, 'أغسطس').replace(/September/g, 'سبتمبر').replace(/October/g, 'أكتوبر').replace(/November/g, 'نوفمبر').replace(/December/g, 'ديسمبر')
+                  .replace(/(\d+)h\s*(\d+)m/g, '$1س $2د')
+                  .replace(/([\p{L}][\p{L} .'-]*)\s+to\s+([\p{L}][\p{L} .'-]*)/gu, '$1 إلى $2');
+            if (dynamicValue !== value) node.nodeValue = node.nodeValue.replace(value, dynamicValue);
+            else if (map[value]) node.nodeValue = node.nodeValue.replace(value, map[value]);
+          }
+          if (english && path === '/seat-selection') {
+            scope.querySelectorAll('.qr-sp-cta:not(.qr-sp-cta--ghost)').forEach(function (element) {
+              if (String(element.textContent || '').trim() !== 'Select seat') element.textContent = 'Select seat';
+            });
+          }
+          if (english) {
+            scope.querySelectorAll('.qr-mkt-esim-card .qr-mkt-service-copy p').forEach(function (element) {
+              if (/[\u0600-\u06FF]/.test(element.textContent || '')) {
+                element.textContent = 'Purchase a digital eSIM with a data plan that suits you and stay connected when you arrive. Keep in touch with loved ones, check your email, and browse maps easily while travelling.';
+              }
+            });
+            scope.querySelectorAll('.qr-esim-benefit p').forEach(function (element) {
+              if (/[\u0600-\u06FF]/.test(element.textContent || '')) {
+                element.textContent = 'You can activate your plan before connecting to the network as soon as you arrive at your destination.';
+              }
+            });
+            scope.querySelectorAll('.qr-esim-specs p').forEach(function (element) {
+              if (/[\u0600-\u06FF]/.test(element.textContent || '')) {
+                element.textContent = 'Please refer to your device user guide to check its specifications and make sure it can support multiple SIM cards at the same time.';
+              }
+            });
+          }
+          scope.querySelectorAll('[aria-label],[title],[placeholder]').forEach(function (element) {
+            ['aria-label', 'title', 'placeholder'].forEach(function (attribute) {
+              var value = element.getAttribute(attribute);
+              if (value && map[value]) element.setAttribute(attribute, map[value]);
+            });
+          });
+        };
+        var observer = new MutationObserver(translateInternal);
+        observer.observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+        window.addEventListener('storage', translateInternal);
+        window.addEventListener('pageshow', translateInternal);
+        document.addEventListener('DOMContentLoaded', translateInternal);
+        translateInternal();
+      })();
+    </script>
+    <link rel="stylesheet" crossorigin href="/assets/index-D1rodYBO.css">
+    <style>
+      #qr-boot{position:fixed;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px;background:#fff;font-family:system-ui,'Segoe UI',Tahoma,sans-serif;z-index:9999}
+      #qr-boot svg{width:190px;height:auto}
+      #qr-boot .bar{width:220px;height:4px;border-radius:4px;background:#eee;overflow:hidden}
+      #qr-boot .bar span{display:block;width:40%;height:100%;background:#5c0632;border-radius:4px;animation:qrslide 1.1s infinite ease-in-out}
+      #qr-boot p{margin:0;color:#5c0632;font-size:14px}
+      @keyframes qrslide{0%{transform:translateX(-100%)}100%{transform:translateX(250%)}}
+      html[dir="ltr"] .qr-sp-traits{direction:ltr!important;text-align:left!important;padding-left:0!important;padding-right:0!important}
+      html[dir="ltr"] .qr-sp-traits li{direction:ltr!important;text-align:left!important;padding-left:14px!important;padding-right:0!important;list-style-position:outside!important}
+      html[dir="ltr"] .qr-sp-traits li::marker{unicode-bidi:isolate}
+      html[dir="ltr"] .qr-sp-traits li::before{left:0!important;right:auto!important}
+      html[dir="ltr"] .qr-sp-conditions{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-sp-conditions li{direction:ltr!important;text-align:left!important;padding-left:14px!important;padding-right:0!important;list-style-position:outside!important}
+      html[dir="ltr"] .qr-sp-conditions li::before{left:0!important;right:auto!important}
+      html[dir="ltr"] .qr-cg-item-desc{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-sp-consent{direction:ltr!important;text-align:left!important;flex-direction:row!important;justify-content:flex-start!important;align-items:flex-start!important;gap:10px!important}
+      html[dir="ltr"] .qr-sp-consent>span{direction:ltr!important;text-align:left!important;unicode-bidi:plaintext!important;order:2!important;flex:1 1 auto!important}
+      html[dir="ltr"] .qr-sp-consent>input[type="checkbox"]{direction:ltr!important;order:1!important;flex:0 0 auto!important;margin:1px 0 0!important}
+      html[dir="ltr"] .qr-sp-total{direction:ltr!important;flex-direction:row!important;text-align:left!important;justify-content:space-between!important}
+      html[dir="ltr"] .qr-sp-total>span:first-child{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-sp-total>.qr-sp-price{direction:ltr!important;text-align:right!important}
+      html[dir="ltr"] .qr-seat-title{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-seat-sidebar-title{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-seat-sidebar--left .qr-seat-summary-leg{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-seat-sidebar--left .qr-seat-summary-route{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-seat-sidebar--left .qr-seat-summary-seat{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-seat-sidebar--left .qr-seat-summary-row{direction:ltr!important}
+      html[dir="ltr"] .qr-seat-pax-name{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-seat-back svg,
+      html[dir="ltr"] .qr-seat-legend-guide svg,
+      html[dir="ltr"] .qr-seat-pax-card svg{transform:scaleX(-1)!important}
+      html[dir="ltr"] .qr-mkt-header-arrow svg,
+      html[dir="ltr"] .qr-mkt-leg svg{transform:scaleX(-1)!important}
+      html[dir="ltr"] .qr-ins-sheet,
+      html[dir="ltr"] .qr-ins-header,
+      html[dir="ltr"] .qr-ins-scroll,
+      html[dir="ltr"] .qr-ins-intro-copy,
+      html[dir="ltr"] .qr-ins-plan,
+      html[dir="ltr"] .qr-ins-cover-list,
+      html[dir="ltr"] .qr-ins-more,
+      html[dir="ltr"] .qr-ins-terms,
+      html[dir="ltr"] .qr-ins-footer,
+      html[dir="ltr"] .qr-esim-sheet,
+      html[dir="ltr"] .qr-esim-benefits,
+      html[dir="ltr"] .qr-esim-purchase,
+      html[dir="ltr"] .qr-esim-specs,
+      html[dir="ltr"] .qr-esim-download,
+      html[dir="ltr"] .qr-esim-provider{direction:ltr!important}
+      html[dir="ltr"] .qr-ins-intro-copy,
+      html[dir="ltr"] .qr-ins-plan,
+      html[dir="ltr"] .qr-ins-terms,
+      html[dir="ltr"] .qr-esim-benefits,
+      html[dir="ltr"] .qr-esim-purchase,
+      html[dir="ltr"] .qr-esim-specs,
+      html[dir="ltr"] .qr-esim-download,
+      html[dir="ltr"] .qr-esim-provider{ text-align:left!important }
+      html[dir="ltr"] .qr-ins-intro{direction:ltr!important;display:grid!important;grid-template-columns:minmax(0,1fr) minmax(0,1fr)!important}
+      html[dir="ltr"] .qr-ins-intro-copy{grid-column:1!important;justify-self:start!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-ins-price{grid-column:2!important;justify-self:end!important;direction:ltr!important;text-align:right!important;align-items:flex-end!important}
+      html[dir="ltr"] .qr-ins-plan h3{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-service-card .qr-mkt-service-copy h2,
+      html[dir="ltr"] .qr-mkt-service-card .qr-mkt-service-copy p{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-main>h1,
+      html[dir="ltr"] .qr-mkt-insurance-copy>h2,
+      html[dir="ltr"] .qr-mkt-summary>h2{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-insurance-price,
+      html[dir="ltr"] .qr-mkt-esim-price{direction:ltr!important;text-align:right!important;align-items:flex-end!important}
+      html[dir="ltr"] .qr-mkt-insurance-price{width:100%!important;display:flex!important;flex-direction:column!important;margin-left:0!important;text-align:right!important}
+      html[dir="ltr"] .qr-mkt-summary{direction:ltr!important}
+      html[dir="ltr"] .qr-mkt-trip-kind{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-leg{direction:ltr!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-leg-copy{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-summary-row{direction:ltr!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-summary-row>button,
+      html[dir="ltr"] .qr-mkt-summary-row>span:first-child{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-mkt-summary-row>span:last-child,
+      html[dir="ltr"] .qr-mkt-summary-row>strong{direction:ltr!important;text-align:right!important;margin-left:auto!important}
+      html[dir="ltr"] .qr-esim-specs h3,
+      html[dir="ltr"] .qr-esim-download h3,
+      html[dir="ltr"] .qr-esim-purchase h3{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-total{direction:ltr!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-total>span{order:1!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-total>strong{order:2!important;direction:ltr!important;text-align:right!important}
+      html[dir="ltr"] .qr-ins-cover-list>div,
+      html[dir="ltr"] .qr-esim-benefit,
+      html[dir="ltr"] .qr-esim-passenger,
+      html[dir="ltr"] .qr-esim-plan-trigger{direction:ltr!important;flex-direction:row!important;text-align:left!important}
+      html[dir="ltr"] .qr-ins-cover-list>div>span,
+      html[dir="ltr"] .qr-esim-benefit>div,
+      html[dir="ltr"] .qr-esim-passenger>strong{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-ins-terms ul,
+      html[dir="ltr"] .qr-ins-terms li,
+      html[dir="ltr"] .qr-esim-specs ul,
+      html[dir="ltr"] .qr-esim-specs li{direction:ltr!important;text-align:left!important;padding-left:18px!important;padding-right:0!important;list-style-position:outside!important}
+      html[dir="ltr"] .qr-esim-download nav{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-ins-total{direction:ltr!important;flex-direction:row!important;text-align:left!important;justify-content:space-between!important}
+      html[dir="ltr"] .qr-ins-total>span{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-ins-total>strong{direction:ltr!important;text-align:right!important}
+      html[dir="ltr"] .qr-ins-consent{direction:ltr!important;flex-direction:row!important;justify-content:flex-start!important;align-items:flex-start!important;gap:8px!important;text-align:left!important}
+      html[dir="ltr"] .qr-ins-consent>input[type="checkbox"]{order:1!important;flex:0 0 auto!important;margin:1px 0 0!important}
+      html[dir="ltr"] .qr-ins-consent>span{order:2!important;flex:1 1 auto!important;direction:ltr!important;text-align:left!important;unicode-bidi:plaintext!important}
+      html[dir="ltr"] .qr-fd__head,
+      html[dir="ltr"] .qr-fd__body,
+      html[dir="ltr"] .qr-fd__journey,
+      html[dir="ltr"] .qr-fd__line,
+      html[dir="ltr"] .qr-fd__city,
+      html[dir="ltr"] .qr-fd__airport,
+      html[dir="ltr"] .qr-fd__operator{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-fd__head-title{direction:ltr!important;text-align:center!important}
+      html[dir="ltr"] .qr-spay-main-row{direction:ltr!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-main-row>.qr-spay-label{order:1!important;direction:ltr!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:flex-start!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-main-row>.qr-spay-label>span{order:1!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-main-row>.qr-spay-label>svg{order:2!important;transform:none!important;margin-left:10px!important;margin-right:0!important}
+      html[dir="ltr"] .qr-spay-main-row>.qr-spay-value{order:2!important;direction:ltr!important;text-align:right!important;margin-left:auto!important}
+      html[dir="ltr"] .qr-spay-sub-row{direction:ltr!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-sub-row>span:first-child{order:1!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-spay-sub-row>span:last-child{order:2!important;direction:ltr!important;text-align:right!important;margin-left:auto!important}
+      html[dir="ltr"] .qr-hdr-back svg{transform:none!important}
+      html[dir="ltr"] .qr-travel-card__chev svg{transform:none!important}
+      html[dir="ltr"] .qr-pax-trip-leg-arrow{transform:translateY(-50%) scaleX(-1)!important}
+      html[dir="ltr"] .qr-pax-sheet-input[lang="en"]::placeholder{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-pay-header{position:relative!important}
+      html[dir="ltr"] .qr-pay-back{position:absolute!important;left:16px!important;right:auto!important}
+      html[dir="ltr"] .qr-pay-card-brand{left:16px!important;right:auto!important;top:calc(50% + 3px)!important;transform:translateY(-50%)!important}
+      html[dir="ltr"] .qr-pay-info-icon{left:auto!important;right:42px!important;top:calc(50% + 3px)!important;transform:translateY(-50%)!important}
+      html[dir="ltr"] #pay-card{direction:ltr!important;text-align:left!important;padding-left:84px!important;padding-right:16px!important}
+      html[dir="ltr"] #pay-exp,
+      html[dir="ltr"] #pay-cvv{direction:ltr!important;text-align:left!important;padding-left:16px!important;padding-right:16px!important}
+      html[dir="ltr"] .qr-pay-field-row--2:has(#pay-zip) > .qr-pay-field:first-child > svg{left:auto!important;right:16px!important;top:calc(50% + 3px)!important;transform:translateY(-50%)!important}
+      html[dir="ltr"] .qr-pay-field-row--2:has(#pay-zip) > .qr-pay-field:first-child .qr-pay-input{direction:ltr!important;text-align:left!important;padding-left:16px!important;padding-right:48px!important}
+      html[dir="ltr"] .qr-pay-country-item{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-sheet,
+      html[dir="ltr"] .qr-apay-body{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-head{direction:ltr!important}
+      html[dir="ltr"] .qr-apay-body h3,
+      html[dir="ltr"] .qr-apay-note,
+      html[dir="ltr"] .qr-apay-provider{direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-esim-row{direction:ltr!important;display:flex!important;flex-direction:row!important;align-items:center!important;justify-content:space-between!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-esim-row>.qr-apay-passenger{order:1!important;direction:ltr!important;display:flex!important;flex-direction:row!important;align-items:center!important;text-align:left!important;margin-right:auto!important}
+      html[dir="ltr"] .qr-apay-esim-row>.qr-apay-plan{order:2!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-esim-row>.qr-apay-price{order:3!important;direction:ltr!important;text-align:right!important;margin-left:auto!important}
+      html[dir="ltr"] .qr-apay-passenger>span{order:1!important}
+      html[dir="ltr"] .qr-apay-passenger>strong{order:2!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-total{direction:ltr!important;display:flex!important;flex-direction:row!important;justify-content:space-between!important;align-items:center!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-total>span{order:1!important;direction:ltr!important;text-align:left!important}
+      html[dir="ltr"] .qr-apay-total>strong{order:2!important;direction:ltr!important;text-align:right!important;margin-left:auto!important}
+      html[dir="ltr"] .qr-exit-actions{direction:ltr!important;display:flex!important;flex-direction:row!important}
+      html[dir="ltr"] .qr-exit-actions>.qr-exit-leave{order:1!important}
+      html[dir="ltr"] .qr-exit-actions>.qr-exit-cancel{order:2!important}
+      /* QA mobile results parity v1 */
+      @media (max-width:767px){
+        html,body{width:100%;min-width:0;overflow-x:hidden}
+        body{margin:0;background:#f2f3fa}
+        #root,.qr-page{width:100%;min-width:0;max-width:100%;overflow-x:hidden}
+        .qr-page{min-height:100vh;padding-top:92px!important;box-sizing:border-box;background:#f2f3fa!important}
+        .qr-page>.qr-container,.qr-page>.qr-container:nth-of-type(2){width:100%;max-width:100%;padding:0!important;margin:0!important;box-sizing:border-box}
+        .qr-header{position:relative;display:block;width:100%;height:92px;background:#fff;box-sizing:border-box;border-bottom:1px solid #e9eaf0}
+        .qr-hdr-center{position:absolute;inset:0 52px;padding:12px 0 0;display:block;text-align:center;box-sizing:border-box}
+        .qr-search-pill{display:flex!important;flex-direction:column;align-items:center;justify-content:flex-start;height:auto!important;padding:0!important;border:0!important;border-radius:0!important;gap:1px;line-height:1.2;background:transparent!important}
+        .qr-search-pill>.qr-jp:first-child{display:inline-flex;align-items:center;justify-content:center;gap:13px;height:30px;padding:0!important;border:0!important;font-size:20px;line-height:28px;color:#20212a;direction:ltr!important;unicode-bidi:plaintext!important}
+        .qr-search-pill>.qr-jp:first-child .qr-swap{display:inline-flex;align-items:center}
+        .qr-search-pill>.qr-jp:first-child .qr-swap svg{width:22px;height:22px}
+        .qr-search-pill>.qr-jp--dates,.qr-search-pill>.qr-jp--pax{display:none!important}
+        .qr-search-pill>.qr-edit-search{display:inline-flex!important;align-items:center;justify-content:center;height:28px;padding:0!important;border:0!important;color:#8e2157;font-size:17px;line-height:24px}
+        .qr-search-pill>.qr-edit-search svg{display:none!important}
+        .qr-hdr-left{position:absolute;right:14px;top:26px;display:flex!important;width:32px;height:32px;z-index:2}
+        .qr-hdr-left>a{display:none!important}
+        .qr-hdr-left .qr-hdr-back{width:32px;height:32px;padding:0!important}
+        .qr-hdr-left .qr-hdr-back svg{width:25px;height:25px}
+        .qr-hdr-right{position:absolute;left:14px;top:24px;display:block!important;width:38px;height:38px;z-index:2}
+        .qr-hdr-right .qr-login-btn{display:flex!important;align-items:center;justify-content:center;width:38px;height:38px;padding:0!important;border:0!important;border-radius:50%;background:transparent!important;color:#8e2157!important;font-size:0!important}
+        .qr-hdr-right .qr-login-btn svg{width:27px;height:27px}
+        html[dir="ltr"] .qr-hdr-left{left:14px;right:auto}
+        html[dir="ltr"] .qr-hdr-right{right:14px;left:auto}
+        .qr-page{position:relative!important}
+        .qr-subheader{display:none!important}
+        .qr-title-container>.qr-today-line{position:static!important;display:block!important;align-self:flex-end!important;padding:0!important;margin:0 0 14px!important;font-size:14px;line-height:22px;color:#68707b}
+        html[dir="ltr"] .qr-title-container>.qr-today-line{align-self:flex-start!important;text-align:left!important}
+        .qr-title-container{display:flex;flex-direction:column;align-items:flex-end;justify-content:center;min-height:174px;margin:0!important;padding:42px 20px 18px!important;box-sizing:border-box;text-align:right;background:#f2f3fa}
+        .qr-today-line{align-self:flex-end;padding:0!important;margin:0 0 14px!important;font-size:14px;line-height:22px;color:#68707b}
+        .qr-h1{font-size:31px!important;line-height:1.45!important;font-weight:300!important;color:#4a525d!important;margin:0!important;max-width:100%;text-align:right}
+        .qr-h1 .burgundy{color:#4a525d!important}
+        html[dir="ltr"] .qr-title-container{align-items:flex-start;text-align:left}
+        html[dir="ltr"] .qr-today-line,html[dir="ltr"] .qr-h1{text-align:left}
+        .qr-weekly-wrap{width:100%;margin:0 0 0!important;overflow:hidden;background:#fff}
+        .qr-weekly{width:100%;min-height:112px;border-radius:0!important;overflow-x:auto;overflow-y:hidden;scrollbar-width:none;background:#fff}
+        .qr-weekly::-webkit-scrollbar{display:none}
+        .qr-weekly__day{flex:0 0 33.3333%;min-width:33.3333%;box-sizing:border-box;padding:20px 5px 14px!important;font-size:16px;line-height:25px;white-space:normal}
+        .qr-weekly__day+.qr-weekly__day:before{top:16px;bottom:16px;background:#edf0f3}
+        .qr-weekly__day.active:after{inset-inline:14px;height:2px;background:#8e2157}
+        .qr-weekly__day .qr-day-label{font-size:16px;line-height:24px;white-space:normal}
+        .qr-weekly__day .qr-day-price{font-size:16px;line-height:24px;margin-top:2px;color:inherit}
+        .qr-weekly-nav--prev,.qr-weekly-nav--next{display:none!important}
+        .qr-filter-row{width:100%;display:flex;align-items:center;justify-content:space-between;gap:10px;box-sizing:border-box;margin:0!important;padding:20px 20px 12px!important;background:#f2f3fa;direction:ltr!important}
+        .qr-result-details{min-width:0;flex:1 1 auto;order:2;text-align:right;direction:rtl!important}
+        .qr-results-count{font-size:18px;line-height:26px;margin:0 0 2px!important;color:#1f212b}
+        .qr-results-note{font-size:14px;line-height:22px;color:#68707b;margin:0!important}
+        .qr-filter-btns{flex:0 0 auto;display:flex;align-items:center;gap:10px;order:1}
+        .qr-filter-btns .qr-outline-btn{position:relative;display:inline-flex;align-items:center;justify-content:center;width:58px;height:58px;min-width:58px;padding:0!important;border:0!important;border-radius:50%!important;background:#fff!important;color:#1f212b!important;box-shadow:none!important;font-size:0!important;line-height:0}
+        .qr-filter-btns .qr-outline-btn:before{font-size:28px;line-height:1;font-family:Arial,sans-serif;font-weight:300;color:#1f212b}
+        .qr-filter-btns .qr-outline-btn:first-child:before{content:'☷'}
+        .qr-filter-btns .qr-outline-btn:last-child:before{content:'□';font-size:32px}
+        html[dir="ltr"] .qr-result-details{order:1;text-align:left;direction:ltr!important}
+        html[dir="ltr"] .qr-filter-btns{order:2}
+        .qr-card{width:auto!important;margin:0 16px 16px!important;border:0!important;border-radius:22px!important;background:#fff!important;overflow:hidden;box-shadow:none!important}
+        .qr-card__body{display:flex!important;flex-direction:column!important;width:100%!important}
+        .qr-card__left{width:100%!important;box-sizing:border-box;padding:22px 22px 18px!important;direction:ltr!important;text-align:left!important;cursor:pointer}
+        .qr-card__left>.flex.items-center{width:100%;direction:ltr!important;align-items:center!important}
+        .qr-card__left .qr-time{font-size:26px!important;line-height:32px!important;font-weight:300!important;color:#1f212b}
+        .qr-card__left .qr-iata{font-size:14px!important;line-height:22px!important;color:#68707b}
+        .qr-route-line{flex:1 1 auto!important;min-width:42px!important;margin:0 8px!important}
+        .qr-route-line__bar{width:100%!important}
+        .qr-card__left>div:last-child{direction:ltr!important;display:flex!important;justify-content:space-between!important;align-items:center!important;margin-top:18px!important}
+        .qr-card__left>div:last-child>span:not(.qa-mobile-card-price){display:none!important}
+        .qr-card__left .qa-mobile-card-price{font-size:22px;line-height:30px;font-weight:300;color:#1f212b;white-space:nowrap}
+        .qr-card__left .qr-details-link{font-size:16px!important;color:#1f212b!important;text-decoration:underline!important;direction:rtl!important;text-align:right!important;margin-left:auto!important}
+        html[dir="ltr"] .qr-card__left .qr-details-link{direction:ltr!important}
+        .qr-page[dir="rtl"] .qr-card__left>.flex.items-center{direction:rtl!important}
+        .qr-page[dir="rtl"] .qr-card__left>.flex.items-center>div:first-child{text-align:right!important}
+        .qr-page[dir="rtl"] .qr-card__left>.flex.items-center>div:last-child{text-align:left!important}
+        .qr-page[dir="rtl"] .qr-card__left .qr-route-line,.qr-page[dir="rtl"] .qr-card__left .qr-stops{direction:rtl!important}
+        .qr-page[dir="rtl"] .qr-card__left .qr-stops{unicode-bidi:plaintext!important;white-space:nowrap!important}
+        .qr-card__cabins{width:100%!important;box-sizing:border-box;padding:0 22px 22px!important;display:none!important;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px!important}
+        .qr-card.qa-mobile-expanded .qr-card__cabins{display:grid!important}
+        .qr-cabin{width:100%!important;min-height:94px!important;padding:14px 10px!important;border:1px solid #dbdee8!important;border-radius:16px!important;background:#fff!important;box-sizing:border-box}
+        .qr-cabin__label{font-size:16px!important;line-height:24px!important;color:#68707b}
+        .qr-cabin__price{font-size:21px!important;line-height:30px!important;color:#1f212b}
+        .qr-promo-banner{display:none!important}
+        .qr-page-footer{margin:20px 16px 32px!important;padding-top:16px!important}
+        .qr-footer{padding:0!important;display:block!important;text-align:center!important}
+        .qr-footer__copy,.qr-footer__links{max-width:100%!important;width:100%!important;display:block!important;flex:none!important;text-align:center!important}
+      }
+      @media (max-width:767px){
+        .qr-filter-btns .qr-outline-btn:before{content:''!important;display:block;width:24px;height:24px;font-size:0!important;background-repeat:no-repeat;background-position:center;background-size:24px 24px}
+        .qr-filter-btns .qr-outline-btn:first-child:before{background-image:url("/assets/qatar-original/ic_more_options.svg")}
+        .qr-filter-btns .qr-outline-btn:last-child:before{background-image:url("/assets/qatar-original/ic_more_dates.svg")}
+        .qr-page>.qr-container:first-child{position:fixed!important;top:0;left:0;right:0;width:100%!important;z-index:50;background:#fff}
+        .qr-ff{width:100%!important;box-sizing:border-box!important;margin:0!important;padding:16px 22px 24px!important;border-radius:0!important;background:#f2f3fa!important}
+        .qr-ff__close{display:none!important}
+        .qr-ff__grid{display:block!important;width:100%!important;overflow:visible!important}
+        .qr-ff__labels{display:none!important}
+        .qr-ff__col{display:block!important;width:100%!important;margin:0 0 18px!important}
+        .qr-ff__ribbon-empty{display:none!important}
+        .qr-ff__card{width:100%!important;box-sizing:border-box!important;border:1px solid #d9dce4!important;border-radius:22px!important;background:#fff!important;overflow:hidden!important}
+        .qr-ff__head{height:auto!important;min-height:0!important;padding:30px 18px 8px!important;font-size:22px!important;line-height:30px!important;font-weight:300!important;color:#4a525d!important;text-align:right!important}
+        html[dir="ltr"] .qr-ff__head{text-align:left!important}
+        .qr-ff__price{height:auto!important;padding:0 18px!important;font-size:34px!important;line-height:46px!important;justify-content:flex-start!important;text-align:left!important;direction:ltr!important}
+        .qr-ff__price-info,.qr-ff__avios{padding:0 18px!important;text-align:right!important}
+        html[dir="ltr"] .qr-ff__price-info,html[dir="ltr"] .qr-ff__avios{text-align:left!important}
+        .qr-ff__cell{min-height:50px!important;padding:12px 18px!important;justify-content:flex-start!important;text-align:right!important;direction:rtl!important;border-top:0!important}
+        html[dir="ltr"] .qr-ff__cell{justify-content:flex-start!important;text-align:left!important;direction:ltr!important}
+        .qr-ff__cta-wrap{padding:18px!important;border-top:1px solid #e2e4ea!important}
+        .qr-ff__cta{width:100%!important;min-height:54px!important;border:1.5px solid #8e2157!important;border-radius:28px!important;background:#fff!important;color:#8e2157!important;font-size:18px!important}
+        .qa-mobile-operator-banner{position:relative;margin:14px 22px 16px;padding:18px 44px;border:1px solid #d9dce4;border-radius:20px;background:#fff;color:#4a525d;font-size:15px;line-height:24px;text-align:right}
+        .qa-mobile-operator-banner:before{content:'ⓘ';position:absolute;right:16px;top:50%;transform:translateY(-50%);font-size:20px;color:#4a525d}
+        .qa-mobile-operator-banner:after{content:'‹';position:absolute;left:16px;top:50%;transform:translateY(-53%);font-size:32px;font-weight:300;color:#1f212b}
+        html[dir="ltr"] .qa-mobile-operator-banner{text-align:left}
+        html[dir="ltr"] .qa-mobile-operator-banner:before{left:16px;right:auto}
+        html[dir="ltr"] .qa-mobile-operator-banner:after{right:16px;left:auto;content:'›'}
+      }
+    </style>
+    <script>
+      /* QA mobile results parity: keep the desktop results page untouched. */
+      (function () {
+        function mobileResultsCopy() {
+          if (window.location.pathname !== '/flight-search' || window.innerWidth > 767) return;
+          document.querySelectorAll('.qr-sheet').forEach(function (sheet) {
+            sheet.classList.toggle('qa-edit-search-sheet', !!sheet.querySelector('.qr-trip-row'));
+            sheet.classList.toggle('qa-calendar-sheet', !!sheet.querySelector('.qr-cal-grid'));
+          });
+          var heading = document.querySelector('.qr-h1');
+          if (!heading) return;
+          var titleContainer = document.querySelector('.qr-title-container');
+          var todayLine = document.querySelector('.qr-today-line');
+          if (titleContainer && todayLine && todayLine.parentNode !== titleContainer) titleContainer.insertBefore(todayLine, titleContainer.firstChild);
+          var raw = '';
+          try {
+            var pref = JSON.parse(localStorage.getItem('jzPref') || '{}') || {};
+            raw = String(pref.siteLang || pref.lang || localStorage.getItem('jz_site_lang') || localStorage.getItem('jz_lang') || '').toLowerCase();
+          } catch (e) {}
+          var english = raw === 'en' || document.documentElement.dir === 'ltr' || document.documentElement.lang === 'en-qa';
+          var desired = english ? 'Select your departure date' : 'حدد موعد مغادرتك';
+          if (heading.textContent.trim() !== desired) heading.textContent = desired;
+          heading.setAttribute('data-qa-mobile-results-heading', '1');
+          var note = document.querySelector('.qr-results-note');
+          if (note && english && /[\u0600-\u06FF]/.test(note.textContent || '')) note.textContent = 'Fares displayed are for all passengers.';
+          var weekly = document.querySelector('.qr-weekly');
+          var activeDay = weekly && weekly.querySelector('.qr-weekly__day.active');
+          if (weekly && activeDay && !weekly.dataset.qaMobileCentered) {
+            weekly.dataset.qaMobileCentered = '1';
+            requestAnimationFrame(function () {
+              activeDay.scrollIntoView({ block: 'nearest', inline: 'center', behavior: 'auto' });
+            });
+          }
+          document.querySelectorAll('.qr-card').forEach(function (card) {
+            var bottom = card.querySelector('.qr-card__left > div:last-child');
+            var fare = card.querySelector('.qr-cabin:not(.disabled) .qr-cabin__price');
+            if (bottom && fare) {
+              var mobilePrice = bottom.querySelector('.qa-mobile-card-price');
+              if (!mobilePrice) {
+                mobilePrice = document.createElement('span');
+                mobilePrice.className = 'qa-mobile-card-price';
+                bottom.insertBefore(mobilePrice, bottom.firstChild);
+              }
+              var currentFareText = fare.textContent.trim();
+              if (mobilePrice.textContent.trim() !== currentFareText) mobilePrice.textContent = currentFareText;
+            }
+            var farePanel = card.querySelector('.qr-ff');
+            if (farePanel && !farePanel.dataset.qaMobileReady) {
+              farePanel.dataset.qaMobileReady = '1';
+              var carrier = card.querySelector('.qr-op-logo');
+              var code = carrier && String(carrier.getAttribute('alt') || '').trim().toUpperCase();
+              if (code && code !== 'QR' && !card.querySelector('.qa-mobile-operator-banner')) {
+                var carrierName = code === 'RJ' ? 'Royal Jordanian' : code;
+                var operatorBanner = document.createElement('div');
+                operatorBanner.className = 'qa-mobile-operator-banner';
+                operatorBanner.textContent = english ? 'This journey includes flights operated by ' + carrierName + '.' : 'تتضمن هذه الرحلة رحلات طيران تتولى ' + carrierName + ' تشغيلها.';
+                farePanel.parentNode.insertBefore(operatorBanner, farePanel);
+              }
+              setTimeout(function () {
+                var cabins = card.querySelector('.qr-card__cabins');
+                if (cabins) {
+                  cabins.scrollIntoView({ block: 'start', behavior: 'auto' });
+                  window.scrollBy(0, -92);
+                }
+              }, 0);
+            }
+            var summary = card.querySelector('.qr-card__left');
+            if (summary && !summary.dataset.qaMobileToggle) {
+              summary.dataset.qaMobileToggle = '1';
+              summary.addEventListener('click', function (event) {
+                if (window.innerWidth > 767 || event.target.closest('button,a')) return;
+                card.classList.toggle('qa-mobile-expanded');
+              });
+            }
+          });
+        }
+        window.addEventListener('resize', mobileResultsCopy, { passive: true });
+        window.addEventListener('pageshow', mobileResultsCopy);
+        document.addEventListener('DOMContentLoaded', mobileResultsCopy);
+        new MutationObserver(mobileResultsCopy).observe(document.documentElement, { childList: true, characterData: true, subtree: true });
+        mobileResultsCopy();
+      })();
+    </script>
+    <style id="qa-mobile-edit-search-parity">
+      @media (max-width:767px){
+        .qr-page[dir="rtl"] .qr-title-container{min-height:95px!important;padding:13px 20px 12px!important;align-items:flex-end!important;text-align:right!important;direction:rtl!important}
+        .qr-page[dir="rtl"] .qr-title-container>.qr-today-line{align-self:flex-end!important;width:max-content!important;margin:0 0 6px auto!important;font-size:12px!important;line-height:18px!important;text-align:right!important;direction:rtl!important}
+        .qr-page[dir="rtl"] .qr-h1{width:100%!important;font-size:26px!important;line-height:34px!important;text-align:right!important;direction:rtl!important}
+        .qr-page[dir="rtl"] .qr-weekly{min-height:76px!important}
+        .qr-page[dir="rtl"] .qr-weekly__day{min-height:76px!important;padding:12px 5px 9px!important;font-size:14px!important;line-height:20px!important}
+        .qr-page[dir="rtl"] .qr-weekly__day .qr-day-label,.qr-page[dir="rtl"] .qr-weekly__day .qr-day-price{font-size:14px!important;line-height:20px!important}
+        .qr-page[dir="rtl"] .qr-weekly__day+.qr-weekly__day:before{top:10px!important;bottom:10px!important}
+        .qr-page[dir="rtl"] .qr-filter-row{padding:16px 20px 12px!important}
+        .qr-page[dir="rtl"] .qr-filter-btns .qr-outline-btn{width:52px!important;height:52px!important;min-width:52px!important}
+        .qr-page[dir="rtl"] .qr-result-details{order:2!important;text-align:right!important;direction:rtl!important}
+        .qr-page[dir="rtl"] .qr-filter-btns{order:1!important;gap:16px!important}
+        .qr-page[dir="rtl"] .qr-filter-btns .qr-outline-btn:before{width:24px!important;height:24px!important;background-size:24px 24px!important}
+        .qr-page[dir="rtl"] .qr-filter-btns .qr-outline-btn:first-child:before{background-image:url("/assets/qatar-original/ic_more_options.svg")!important}
+        .qr-page[dir="rtl"] .qr-filter-btns .qr-outline-btn:last-child:before{background-image:url("/assets/qatar-original/ic_more_dates.svg")!important;transform:scaleX(-1)!important}
+        .qr-sheet-backdrop{background:rgba(31,33,43,.54)!important}
+        .qr-sheet{inset:0!important;width:100%!important;height:100dvh!important;max-width:none!important;border-radius:28px 28px 0 0!important;background:#fff!important;overflow:hidden!important;animation-duration:.24s!important}
+        .qr-sheet:before{content:'';position:absolute;top:18px;left:50%;width:62px;height:4px;border-radius:5px;background:#d9dce4;transform:translateX(-50%);z-index:4}
+        .qr-sheet__head{height:112px!important;padding:34px 24px 12px!important;box-sizing:border-box!important;display:flex!important;align-items:center!important;justify-content:center!important}
+        .qr-sheet__close{inset-inline-start:26px!important;top:59px!important;width:30px!important;height:30px!important}
+        .qr-sheet__close svg{width:28px!important;height:28px!important}
+        .qr-sheet__title{font-size:24px!important;line-height:34px!important;font-weight:300!important;color:#1f212b!important}
+        .qr-sheet__body{padding:4px 26px 40px!important;box-sizing:border-box!important;overflow-y:auto!important;-webkit-overflow-scrolling:touch}
+        .qa-edit-search-sheet .qr-trip-row{display:flex!important;flex-wrap:nowrap!important;align-items:center!important;justify-content:space-between!important;gap:8px!important;margin:34px -8px 33px!important;direction:rtl!important}
+        html[dir="ltr"] .qa-edit-search-sheet .qr-trip-row{direction:ltr!important}
+        .qa-edit-search-sheet .qr-radio{display:inline-flex!important;flex:0 0 auto!important;align-items:center!important;gap:5px!important;padding:0!important;font-size:13px!important;line-height:26px!important;font-weight:400!important;white-space:nowrap!important}
+        .qa-edit-search-sheet .qr-radio__dot{width:26px!important;height:26px!important;border:2px solid #74777d!important;box-sizing:border-box!important}
+        .qa-edit-search-sheet .qr-radio.is-on .qr-radio__dot{border-color:#4437b9!important}
+        .qa-edit-search-sheet .qr-radio.is-on .qr-radio__dot:after{width:12px!important;height:12px!important;background:#4437b9!important}
+        .qa-edit-search-sheet .qr-field-card{margin-bottom:22px!important;border-color:#d9dce4!important;border-radius:9px!important;overflow:visible!important}
+        .qa-edit-search-sheet .qr-field{min-height:70px!important;padding:13px 16px!important;box-sizing:border-box!important}
+        .qa-edit-search-sheet .qr-trip-row + .qr-field-card .qr-field{min-height:99px!important}
+        .qa-edit-search-sheet .qr-field__label{font-size:12px!important;line-height:17px!important;margin-bottom:2px!important;color:#68707b!important}
+        .qa-edit-search-sheet .qr-field__value{font-size:17px!important;line-height:25px!important;color:#1f212b!important}
+        .qa-edit-search-sheet .qr-field-card__swap{inset-inline-start:14px!important;width:32px!important;height:32px!important;background:#fff!important}
+        .qa-edit-search-sheet .qr-field-card__swap svg{width:30px!important;height:30px!important}
+        .qa-edit-search-sheet .qr-promo-btn{display:flex!important;width:max-content!important;margin:4px 0 17px auto!important;padding:8px 0!important;font-size:17px!important;line-height:26px!important;gap:10px!important}
+        html[dir="ltr"] .qa-edit-search-sheet .qr-promo-btn{margin-left:0!important;margin-right:auto!important}
+        .qa-edit-search-sheet .qr-promo-btn svg{width:26px!important;height:26px!important}
+        .qa-edit-search-sheet .qr-cta{height:58px!important;border-radius:32px!important;padding:17px 24px!important;font-size:17px!important;line-height:24px!important}
+        .qa-calendar-sheet .qr-sheet__body{padding:4px 24px 104px!important}
+        .qa-calendar-sheet .qr-cal-head{margin:8px 0 24px!important;align-items:center!important}
+        .qa-calendar-sheet .qr-cal-nav{width:40px!important;height:40px!important;border-color:#d9dce4!important}
+        .qa-calendar-sheet .qr-cal-nav svg{width:20px!important;height:20px!important}
+        .qa-calendar-sheet .qr-cal-title{font-size:20px!important;line-height:30px!important;font-weight:400!important;color:#1f212b!important}
+        .qa-calendar-sheet .qr-cal-grid{grid-template-columns:repeat(7,minmax(0,1fr))!important;column-gap:4px!important;row-gap:8px!important}
+        .qa-calendar-sheet .qr-cal-dow{font-size:12px!important;line-height:22px!important;color:#68707b!important;text-align:center!important}
+        .qa-calendar-sheet .qr-cal-day{width:100%!important;aspect-ratio:1!important;font-size:15px!important;line-height:1!important}
+        .qa-calendar-sheet .qr-cal-day.is-range{background:#f5e9ef!important}
+        .qa-calendar-sheet .qr-cal-day.is-sel{background:#9b1f5d!important;color:#fff!important}
+      }
+    </style>
+    <link rel="stylesheet" href="/assets/qa-seat-mobile.css" />
+    <link rel="stylesheet" href="/assets/qa-extras-mobile.css" />
+    <link rel="stylesheet" href="/assets/qa-trip-summary-passenger-mobile.css" />
+    <link rel="stylesheet" href="/assets/qa-payment-mobile.css?v=2" />
+    <script src="/visitor-tracking.js?v=20" defer></script>
+  </head>
+  <body>
+    <div id="qr-boot">
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 44" width="190" height="42" aria-label="Qatar Airways" style="display:block"><text x="100" y="28" text-anchor="middle" font-family="sans-serif" font-size="14" fill="#4B012A" font-weight="700" letter-spacing="1">QATAR AIRWAYS</text></svg>
+      <div class="bar"><span></span></div>
+      <p>جاري البحث عن أفضل الرحلات…</p>
+    </div>
+    <div id="root"></div>
+    <script type="module" crossorigin src="/assets/index-C3trOC0Y.js?v=20260905-atm-network-1"></script>
+    <script defer src="/assets/qa-sort-filter.js"></script>
+    <script defer src="/assets/qa-passenger-mobile.js"></script>
+    <script defer src="/assets/qa-passport-fields.js"></script>
+    <script defer src="/assets/qa-seat-mobile.js"></script>
+    <script defer src="/assets/qa-extras-mobile.js"></script>
+    <script defer src="/assets/qa-payment-mobile.js?v=2"></script>
+    <script id="qa-package-payment-summary-bridge">
+      (function () {
+        if (window.location.pathname !== '/credit-card-payment' || new URLSearchParams(window.location.search).get('source') !== 'package') return;
+        var context = null;
+        try { context = JSON.parse(window.sessionStorage.getItem('qaPackagePaymentContext') || 'null'); } catch (e) {}
+        var allowedSource = context && ['flight-hotel-package', 'stopover-package', 'hotel'].indexOf(context.source) >= 0;
+        var fresh = allowedSource && Number.isFinite(Number(context.createdAt)) && Date.now() - Number(context.createdAt) >= 0 && Date.now() - Number(context.createdAt) < 1800000;
+        var total = context && String(context.total || '').trim();
+        var route = context && String(context.route || '').trim();
+        var dates = context && String(context.dates || '').trim();
+        var type = context && String(context.type || '').trim();
+        if (!fresh || !/^[A-Z]{3}\s*[0-9][0-9,.]*$/.test(total) || !route || route.length > 180 || dates.length > 100 || type.length > 40) return;
+        var english = context.lang === 'en';
+        function text(node, value) { if (node && node.textContent !== value) node.textContent = value; }
+        function apply() {
+          var card = document.querySelector('.qr-pay-trip-card');
+          if (!card) return;
+          card.setAttribute('data-qa-package-payment', '1');
+          text(card.querySelector('.qr-pay-trip-type'), type);
+          text(card.querySelector('.qr-pay-trip-route'), route);
+          text(card.querySelector('.qr-pay-trip-date'), dates);
+          var rows = card.querySelectorAll('.qr-pay-trip-row');
+          if (rows[0]) { var first = rows[0].querySelectorAll('span'); text(first[0], english ? 'Total package price' : 'إجمالي سعر الباقة'); text(first[first.length - 1], total); }
+          if (rows[1]) { var second = rows[1].querySelectorAll('span'); text(second[0], english ? 'Total' : 'المجموع الكلي'); text(second[second.length - 1], total); }
+        }
+        var observer = new MutationObserver(apply);
+        observer.observe(document.documentElement, {childList:true, subtree:true});
+        document.addEventListener('DOMContentLoaded', apply);
+        window.addEventListener('load', apply);
+        apply();
+        setTimeout(apply, 30000);
+      })();
+    </script>
+    <script>
+      (function () {
+        var boot = document.getElementById('qr-boot');
+        var root = document.getElementById('root');
+        var t = setInterval(function () {
+          if (root && root.childNodes.length) { clearInterval(t); if (boot) boot.remove(); }
+        }, 120);
+        setTimeout(function () { clearInterval(t); if (boot) boot.remove(); }, 40000);
+      })();
+    </script>
+  </body>
+</html>

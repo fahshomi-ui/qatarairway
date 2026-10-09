@@ -1,0 +1,55 @@
+@media (max-width:991px){
+  html,body{max-width:100%;overflow-x:hidden}
+  body.mobile #qa-pd-official-header #sso_login_cc{display:none!important}
+  body.mobile #qa-pd-official-header #menu-wrap{
+    position:fixed!important;
+    inset:0!important;
+    display:flex!important;
+    width:100vw!important;
+    max-width:100vw!important;
+    height:0!important;
+    max-height:0!important;
+    margin:0!important;
+    opacity:0!important;
+    visibility:hidden!important;
+    overflow:hidden!important;
+    pointer-events:none!important;
+    z-index:6002!important;
+  }
+  body.mobile #qa-pd-official-header #menu-wrap #menu-row{
+    width:100%!important;
+    max-width:100%!important;
+    height:100%!important;
+    margin:0!important;
+    transform:translateX(-100%)!important;
+    transition:transform .25s cubic-bezier(.23,1,.32,1)!important;
+  }
+  html[dir="rtl"] body.mobile #qa-pd-official-header #menu-wrap #menu-row{transform:translateX(100%)!important}
+  body.mobile #qa-pd-official-header #menu-wrap.qa-pr-mobile-menu-open{
+    height:100vh!important;
+    max-height:100vh!important;
+    opacity:1!important;
+    visibility:visible!important;
+    pointer-events:auto!important;
+  }
+  body.mobile #qa-pd-official-header #menu-wrap.qa-pr-mobile-menu-open #menu-row{transform:none!important}
+  body.qa-pr-mobile-menu-visible{overflow:hidden!important}
+  .qa-pd-page #nbf_page,.qa-pd-page #nbf_page_container,.qa-pd-page #qa-pd-content,.qa-pd-page #qa-pd-official{display:block!important;width:100%!important;max-width:100%!important;min-width:0!important;margin-inline:0!important;box-sizing:border-box!important}
+  .qa-pd-page #qa-pd-official>.bf_flow_details,.qa-pd-page #qa-pd-official .bf_flow_details{display:block!important;width:calc(100% - 16px)!important;max-width:none!important;min-width:0!important;margin:8px auto 32px!important;box-sizing:border-box!important;overflow:visible!important}
+  .qa-pd-page #qa-pd-official .bf_lfctr{display:grid!important;grid-template-columns:minmax(0,1fr)!important;gap:16px!important;width:100%!important;min-width:0!important}
+  .qa-pd-page #qa-pd-official .bf_detailedhotel{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important}
+  .qa-pd-page #qa-pd-official .bf_tabs{position:static!important;inset:auto!important;display:grid!important;grid-template-columns:repeat(3,minmax(0,1fr))!important;width:100%!important;min-width:0!important;max-width:100%!important;margin:0!important;transform:none!important;box-sizing:border-box!important;overflow:hidden!important}
+  .qa-pd-page #qa-pd-official .bf_tabs>.bf_tab{position:static!important;float:none!important;width:auto!important;min-width:0!important;max-width:none!important;transform:none!important;box-sizing:border-box!important}
+  .qa-pd-page #qa-pd-official .bf_tabs_tabpane{width:100%!important;min-width:0!important;max-width:100%!important;box-sizing:border-box!important}
+  .qa-pd-page #qa-pd-official .bf_detailssidebar{display:block!important;width:100%!important;min-width:0!important;max-width:100%!important}
+  .qa-pd-page #qa-pd-official .bf_detailssidebar .bf_static_map_image.qa-pd-mobile-map-hidden{display:none!important}
+  .qa-pd-page #qa-pd-official .bf_static_map{display:block!important;width:100%!important;height:auto!important;min-height:0!important;margin:0 0 16px!important;padding:0!important;border:0!important;background:transparent!important;overflow:visible!important}
+  .qa-pd-page #qa-pd-official .bf_static_map_modal_link{display:flex!important;width:100%!important;min-height:48px!important;margin:0!important;padding:0 16px!important;border:1px solid #e66625!important;border-radius:3px!important;background:#fff!important;color:#6f123f!important;box-sizing:border-box!important;text-decoration:none!important}
+  .qa-pd-page #qa-pd-official .qa-pd-gallery-ready{height:380px!important}
+  .qa-pd-page #qa-pd-official .rwd_hide_onmobilelarge{display:none!important}
+  .qa-pd-map-modal{inset:0!important;border-radius:0!important}
+  .qa-pd-map-close{top:12px!important;inset-inline-end:12px!important}
+}
+@media (max-width:600px){
+  .qa-pd-page #qa-pd-official .qa-pd-gallery-ready{height:280px!important}
+}

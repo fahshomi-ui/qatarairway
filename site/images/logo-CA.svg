@@ -1,0 +1,9 @@
+<svg id="ic_payment_mastercard" xmlns="http://www.w3.org/2000/svg" width="48" height="32" viewBox="0 0 48 32">
+  <rect id="Rectangle_3376" data-name="Rectangle 3376" width="48" height="32" rx="4" fill="#2c2c2c"/>
+  <g id="Group_9113" data-name="Group 9113" transform="translate(8 6.111)">
+    <rect id="Rectangle_3378" data-name="Rectangle 3378" width="8.653" height="15.55" transform="translate(11.674 2.114)" fill="#ff5f00"/>
+    <path id="Path_9694" data-name="Path 9694" d="M349.934,279.889a9.872,9.872,0,0,1,3.777-7.775,9.889,9.889,0,1,0,0,15.55A9.872,9.872,0,0,1,349.934,279.889Z" transform="translate(-337.711 -269.999)" fill="#eb001b"/>
+    <path id="Path_9695" data-name="Path 9695" d="M411.958,279.889a9.889,9.889,0,0,1-16,7.775,9.89,9.89,0,0,0,0-15.55,9.889,9.889,0,0,1,16,7.775Z" transform="translate(-379.958 -270)" fill="#f79e1b"/>
+    <path id="Path_9696" data-name="Path 9696" d="M450.245,327.294v-.318h.128v-.065h-.327v.065h.128v.318Zm.635,0v-.384h-.1l-.115.264-.115-.264h-.1v.384h.071V327l.108.25h.073l.108-.25v.29Z" transform="translate(-419.188 -311.277)" fill="#f79e1b"/>
+  </g>
+</svg>

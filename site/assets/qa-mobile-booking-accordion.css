@@ -1,0 +1,485 @@
+@media (max-width: 991px) {
+  #qa-static-bw > .qbw-body[hidden] {
+    display: none !important;
+  }
+
+  #qa-static-bw.qa-mobile-flight-closed > .qbw-tabs {
+    margin-bottom: 14px !important;
+    border-radius: 16px !important;
+    box-shadow: 0 4px 12px rgba(31, 33, 43, .12) !important;
+  }
+
+  #qa-static-bw.qa-mobile-flight-closed > .qbw-tabs .qbw-tab.active {
+    color: #1f212b !important;
+  }
+
+  #qa-static-bw.qa-mobile-flight-closed > .qbw-tabs .qbw-tab.active svg {
+    stroke: #1f212b !important;
+  }
+
+  #qa-static-bw.qa-mobile-flight-closed > .qbw-tabs .qbw-tab.active::before {
+    transform: translateY(-35%) rotate(225deg) !important;
+  }
+
+  html[dir="ltr"] #qa-static-bw.qa-mobile-flight-closed > .qbw-tabs .qbw-tab.active::before,
+  body.newhome-en #qa-static-bw.qa-mobile-flight-closed > .qbw-tabs .qbw-tab.active::before {
+    transform: translateY(-35%) rotate(315deg) !important;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop.qa-so-mobile-accordion {
+    display: block !important;
+    width: 100%;
+    margin: 14px 0 0;
+    padding: 0;
+    overflow: visible;
+    background: transparent;
+  }
+
+  #qa-static-bw > .qa-stopover-desktop.qa-so-mobile-accordion[hidden] {
+    display: none !important;
+  }
+
+  #qa-static-bw .qa-mobile-booking-card {
+    width: 100%;
+    margin: 0 0 14px;
+    overflow: visible;
+    border: 0;
+    border-radius: 12px;
+    background: #fff;
+    box-shadow: 0 4px 12px rgba(31, 33, 43, .12);
+  }
+
+  #qa-static-bw .qa-mobile-booking-header {
+    margin: 0;
+    padding: 0;
+  }
+
+  #qa-static-bw .qa-mobile-booking-toggle {
+    display: flex;
+    width: 100%;
+    min-height: 56px;
+    align-items: center;
+    gap: 14px;
+    padding: 0 18px;
+    border: 0;
+    border-radius: 12px;
+    background: #fff;
+    color: #1f212b;
+    font: 400 14px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+    text-align: start;
+    cursor: pointer;
+  }
+
+  #qa-static-bw .qa-mobile-booking-toggle.is-open {
+    border-radius: 12px 12px 0 0;
+  }
+
+  #qa-static-bw .qa-mobile-booking-toggle:focus-visible {
+    outline: 2px solid #5c0931;
+    outline-offset: -2px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-icon,
+  #qa-static-bw .qa-mobile-booking-chevron {
+    display: inline-flex;
+    width: 24px;
+    height: 24px;
+    flex: 0 0 24px;
+    align-items: center;
+    justify-content: center;
+  }
+
+  #qa-static-bw .qa-mobile-booking-icon svg,
+  #qa-static-bw .qa-mobile-booking-chevron {
+    width: 24px;
+    height: 24px;
+    fill: none;
+    stroke: #1f212b;
+    stroke-width: 1.45;
+    stroke-linecap: round;
+    stroke-linejoin: round;
+  }
+
+  #qa-static-bw .qa-mobile-booking-title {
+    min-width: 0;
+    flex: 1 1 auto;
+  }
+
+  #qa-static-bw .qa-mobile-booking-chevron {
+    width: 18px;
+    height: 18px;
+    flex-basis: 18px;
+    transition: transform 180ms cubic-bezier(.23, 1, .32, 1);
+  }
+
+  #qa-static-bw .qa-mobile-booking-toggle.is-open .qa-mobile-booking-chevron {
+    transform: rotate(180deg);
+  }
+
+  #qa-static-bw .qa-mobile-booking-content {
+    position: relative;
+    padding: 0 20px 24px;
+    border-top: 1px solid #f2f3fa;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-pane {
+    padding-top: 20px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-subtabs {
+    min-height: 46px;
+    margin: 0 0 18px;
+    overflow-x: auto;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-subtabs button {
+    min-width: 50%;
+    flex: 1 0 auto;
+    padding: 10px 8px;
+    font-size: 13px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-trip {
+    min-height: 0;
+    flex-wrap: wrap;
+    gap: 12px 18px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-trip label,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-stop-leg label {
+    gap: 7px;
+    font-size: 12px;
+    white-space: normal;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-trip label > span,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-stop-leg label > span {
+    width: 20px;
+    height: 20px;
+    flex-basis: 20px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-blurb {
+    padding: 20px 0;
+    font-size: 13px;
+    line-height: 21px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-row-wrap,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-row-wrap.is-second,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-hotel-row.is-truncated,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-mobile-booking-content .qa-so-row-wrap.is-second,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-mobile-booking-content .qa-so-row-wrap.is-second,
+  #qa-static-bw > .qa-stopover-desktop[dir="ltr"] .qa-mobile-booking-content .qa-so-hotel-row.is-truncated,
+  #qa-static-bw > .qa-stopover-desktop[dir="rtl"] .qa-mobile-booking-content .qa-so-hotel-row.is-truncated {
+    width: 100%;
+    margin: 0 0 18px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-journey,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-hotel-row {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 14px;
+    border: 0;
+    background: transparent;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-route {
+    display: flex;
+    position: relative;
+    width: 100%;
+    flex: none;
+    flex-direction: column;
+    overflow: visible;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-route .qa-so-airport {
+    width: 100%;
+    height: 64px;
+    flex: none;
+    padding: 10px 16px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-route .qa-so-airport + .qa-so-swap-wrap + .qa-so-airport {
+    border-top: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-swap-wrap {
+    position: absolute;
+    z-index: 4;
+    top: 64px;
+    inset-inline-end: 12px;
+    width: 32px;
+    min-width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 0;
+    transform: translateY(-50%);
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-swap {
+    width: 32px;
+    height: 32px;
+    border: 1px solid #dbdee8;
+    border-radius: 50%;
+    background: #fff;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-swap svg {
+    width: 22px;
+    height: 22px;
+    transform: rotate(90deg);
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-calendar-field,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-calendar-field.is-single {
+    width: 100%;
+    min-width: 0;
+    height: 68px;
+    flex: none;
+    overflow: hidden;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-date-cell {
+    height: 66px;
+    padding: 8px 10px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-guest {
+    width: 100%;
+    min-width: 0;
+    min-height: 62px;
+    flex: none;
+    grid-template-columns: minmax(0, 1fr) 132px;
+    overflow: visible;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-guest-trigger,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-cabin-trigger {
+    height: 60px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-guest-pop,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-cabin-pop {
+    inset-inline-start: 0;
+    inset-inline-end: 0;
+    width: 100%;
+    min-width: 0;
+    max-height: 70vh;
+    padding: 20px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-cabin-pop {
+    padding: 0;
+  }
+
+  #qa-static-bw #qa-mobile-booking-stopover .qa-so-journey > .qa-so-guest.has-cabin,
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest > .qa-so-guest.has-cabin {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    min-height: 0;
+    height: auto;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-rows: 44px 44px;
+    gap: 12px;
+    padding: 0;
+    overflow: visible;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+  }
+
+  #qa-static-bw #qa-mobile-booking-stopover .qa-so-journey > .qa-so-guest.has-cabin > .qa-so-guest-trigger,
+  #qa-static-bw #qa-mobile-booking-stopover .qa-so-journey > .qa-so-guest.has-cabin > .qa-so-cabin-trigger,
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest > .qa-so-guest.has-cabin > .qa-so-guest-trigger,
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest > .qa-so-guest.has-cabin > .qa-so-cabin-trigger {
+    width: 100%;
+    min-width: 0;
+    height: 44px;
+    padding: 2px 42px 1px 14px;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+  }
+
+  #qa-static-bw #qa-mobile-booking-stopover .qa-so-journey > .qa-so-guest.has-cabin > .qa-so-guest-trigger::after,
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest > .qa-so-guest.has-cabin > .qa-so-guest-trigger::after {
+    content: "";
+    position: absolute;
+    top: 50%;
+    inset-inline-end: 18px;
+    width: 7px;
+    height: 7px;
+    border-right: 1.5px solid #9099a2;
+    border-bottom: 1.5px solid #9099a2;
+    transform: translateY(-70%) rotate(45deg);
+    transition: transform .2s ease;
+  }
+
+  #qa-static-bw #qa-mobile-booking-stopover .qa-so-journey > .qa-so-guest.has-cabin.is-open > .qa-so-guest-trigger::after,
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest > .qa-so-guest.has-cabin.is-open > .qa-so-guest-trigger::after {
+    transform: translateY(-30%) rotate(225deg);
+  }
+
+  #qa-static-bw #qa-mobile-booking-stopover .qa-so-journey > .qa-so-guest.has-cabin > .qa-so-cabin-trigger > svg,
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest > .qa-so-guest.has-cabin > .qa-so-cabin-trigger > svg {
+    stroke: #9099a2;
+  }
+
+  #qa-static-bw #qa-mobile-booking-packages .qa-so-flight-hotel-guest {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-airport-menu,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-hotel-menu {
+    inset-inline-start: 0;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-hotel-row > .qa-so-airport {
+    width: 100%;
+    height: 64px;
+    flex: none;
+    padding: 10px 16px;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-stop-controls {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    gap: 20px;
+    margin-top: 20px;
+    padding: 20px 0;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-stop-leg,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-days {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-actions {
+    display: flex;
+    min-height: 0;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 18px;
+    margin-top: 18px;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-promo,
+  #qa-static-bw .qa-mobile-booking-content .qa-so-search {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #qa-static-bw .qa-mobile-booking-content .qa-so-search {
+    min-height: 58px;
+    border-radius: 30px;
+  }
+
+  #qa-static-bw .qa-so-mobile-accordion > .qa-so-calendar-pop {
+    position: fixed;
+    z-index: 10000;
+    inset: 12px;
+    width: auto;
+    max-height: calc(100vh - 24px);
+    overflow: auto;
+  }
+
+  #qa-static-bw .qa-so-mobile-accordion > .qa-so-calendar-pop .qa-so-calendar-months {
+    grid-template-columns: 1fr;
+  }
+
+  #qa-static-bw .qa-so-mobile-accordion > .qa-so-calendar-pop .qa-so-calendar-month + .qa-so-calendar-month {
+    display: none;
+  }
+
+  #qa-static-bw .qa-mobile-manage-tabs {
+    display: flex;
+    min-height: 46px;
+    align-items: stretch;
+    margin: 20px 0 22px;
+    border-bottom: 1px solid #dbdee8;
+  }
+
+  #qa-static-bw .qa-mobile-manage-tabs button {
+    position: relative;
+    min-width: 50%;
+    flex: 1 1 50%;
+    padding: 10px 8px;
+    border: 0;
+    border-bottom: 2px solid transparent;
+    background: transparent;
+    color: #1f212b;
+    font: 400 14px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-mobile-manage-tabs button.is-active {
+    border-bottom-color: #8e2157;
+    color: #8e2157;
+  }
+
+  #qa-static-bw .qa-mobile-manage-form {
+    display: grid;
+    gap: 16px;
+  }
+
+  #qa-static-bw .qa-mobile-manage-form label {
+    display: block;
+  }
+
+  #qa-static-bw .qa-mobile-manage-form label > span {
+    display: block;
+    margin: 0 0 7px;
+    color: #4a525d;
+    font: 400 13px/20px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-mobile-manage-form input {
+    width: 100%;
+    height: 52px;
+    padding: 10px 14px;
+    border: 1px solid #dbdee8;
+    border-radius: 8px;
+    background: #fff;
+    color: #1f212b;
+    font: 400 16px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-mobile-manage-form input.is-invalid {
+    border-color: #cc4726;
+  }
+
+  #qa-static-bw .qa-mobile-manage-form > button {
+    width: 100%;
+    min-height: 48px;
+    padding: 12px 20px;
+    border: 0;
+    border-radius: 26px;
+    background: #8e2157;
+    color: #fff;
+    font: 500 15px/22px "Almarai", "Graphik Web", Arial, sans-serif;
+  }
+
+  #qa-static-bw .qa-mobile-manage-error {
+    margin: 0;
+    color: #b3261e;
+    font-size: 12px;
+    line-height: 18px;
+  }
+}

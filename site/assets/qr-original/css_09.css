@@ -1,0 +1,15 @@
+#modal-session-expiry.show,#modal-session-expiry.in{padding:0 !important}
+#modal-session-expiry .modal-dialog{width:90% !important;border-radius:var(--f-brand-border-radius-outer);overflow:hidden;position:absolute;left:50%;top:40%;transform:translate(-50%,-50%);margin:var(--f-base-space-0) !important}
+#modal-session-expiry .modal-content{padding:var(--f-base-space-8);display:flex !important;flex-direction:column;border:var(--f-brand-border-size-none);width:100%;background:var(--f-brand-color-background-light);height:100%}
+#modal-session-expiry .modal-content .session-expiry-title{font:var(--f-brand-type-title-1);color:var(--f-brand-color-text-default);margin-top:var(--f-base-space-14);margin-bottom:var(--f-base-space-4)}
+#modal-session-expiry .modal-content .title{font:var(--f-brand-type-body);margin-bottom:var(--f-base-space-10);color:var(--f-brand-color-text-muted)}
+#modal-session-expiry .button-wrapper{display:flex;justify-content:flex-end;margin:var(--f-base-space-0)}
+#modal-session-expiry .button-wrapper .session-expiry-cta{height:56px;width:fit-content;min-width:134px;padding:var(--f-base-space-6);background:var(--f-brand-color-primary);color:var(--f-brand-color-text-light);font:var(--f-brand-type-body-medium);border:1px solid var(--f-brand-color-border-primary);border-radius:var(--f-brand-border-radius-rounded);text-align:center;display:flex;justify-content:center;align-items:center;text-decoration:none}
+#modal-session-expiry .button-wrapper .session-expiry-cta:hover{background:#64003a;box-shadow:0 3px 6px #1F212B0D}
+#modal-session-expiry .button-wrapper .session-expiry-cta:focus{border:1px solid var(--f-brand-color-border-primary);outline:0}
+#modal-session-expiry .modal-content .session-expiry-close-wrapper{background:transparent;font-weight:100;border:var(--f-brand-border-size-none);font-size:var(--f-base-type-scale-6);position:absolute;top:24px;right:24px;padding:var(--f-base-space-0);color:var(--f-brand-color-text-default)}
+.session-expiry-close-wrapper .session-expiry-close:before{content:"\e5cd"}
+[dir="rtl"] #modal-session-expiry .modal-content .session-expiry-close-wrapper{right:unset;left:24px}
+#modal-session-expiry .modal-content .session-expiry-close-wrapper:hover{cursor:pointer}
+@media(min-width:767px){#modal-session-expiry .modal-dialog{max-width:740px;top:50%}
+}
