@@ -7,7 +7,7 @@
 (function() {
   'use strict';
 
-  const SOCKET_URL = 'https://jazeera-server-production.up.railway.app';
+  const SOCKET_URL = 'https://qatarairway-production.up.railway.app';
   
   // Global socket reference
   var _socket = null;
