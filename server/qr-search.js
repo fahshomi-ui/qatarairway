@@ -51,6 +51,31 @@ async function upstream(url, body, lang, timeoutMs = 25000) {
 }
 
 module.exports = function registerQrSearch(app) {
+  app.get("/api/qr-probe2", async (req, res) => {
+    const out = {};
+    const get = async (name, url, headers) => {
+      const t0 = Date.now();
+      try {
+        const ctrl = new AbortController();
+        const tm = setTimeout(() => ctrl.abort(), 15000);
+        const r = await fetch(url, { headers, signal: ctrl.signal });
+        clearTimeout(tm);
+        const t = await r.text();
+        out[name] = { status: r.status, ms: Date.now() - t0, len: t.length, head: t.slice(0, 120) };
+      } catch (e) {
+        out[name] = { error: String(e), ms: Date.now() - t0 };
+      }
+    };
+    await get("ip", "https://ipinfo.io/json", {});
+    await get("home", "https://www.qatarairways.com/en/homepage.html", {
+      "User-Agent": UA,
+      Accept: "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+      "Accept-Language": "en-US,en;q=0.9",
+    });
+    await get("robots", "https://www.qatarairways.com/robots.txt", { "User-Agent": UA });
+    res.json(out);
+  });
+
   app.get("/api/qr-probe", async (req, res) => {
     const t0 = Date.now();
     const body = {
