@@ -18,7 +18,7 @@
   document.body.className='lang-'+lang+'-QA dir-'+(lang==='ar'?'rtl':'ltr')+' pb bfv3 cascade-dates qa-pd-page';
   document.title=(lang==='ar'?'تفاصيل الاختيار':'Selection details')+' | Qatar Airways Holidays';
 
-  function setHref(id,href){var node=document.getElementById(id);if(node)node.href=href;}
+  function qaProxyCss(h){try{var u=new URL(h);if(/qatarairwaysholidays\.com$/i.test(u.hostname)&&/\.php$|\/min\//i.test(u.pathname))return (window.__QR_LIVE_BASE||'/qr-api')+'/api/packages/asset?u='+encodeURIComponent(u.pathname+u.search);}catch(e){}return h;} function setHref(id,href){var node=document.getElementById(id);if(node)node.href=qaProxyCss(href);}
   var languageMenuHTMLPromise=null;
   function internalResultsPath(){return location.hostname==='127.0.0.1'||location.hostname==='localhost'?'/package-results.html':'/packages-results';}
   function currentSearchId(){try{var stored=JSON.parse(sessionStorage.getItem('qaPackageSearch')||'null');return stored&&String(stored.searchId||'')||'';}catch(_){return '';}}

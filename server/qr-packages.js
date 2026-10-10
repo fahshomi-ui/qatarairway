@@ -118,13 +118,57 @@ async function createSession(product, lang) {
   await ctx.route("**/*", (route) => {
     const req = route.request();
     const t = req.resourceType();
-    if (t === "image" || t === "media" || t === "font") return route.abort();
+    if (process.env.QH_NO_BLOCK !== "1" && (t === "image" || t === "media" || t === "font")) return route.abort();
     let host = "";
     try {
       host = new URL(req.url()).hostname;
     } catch (e) {}
-    if (BLOCK_HOSTS.test(host)) return route.abort();
+    if (process.env.QH_NO_BLOCK !== "1" && BLOCK_HOSTS.test(host)) return route.abort();
     return route.continue();
+  });
+  // The official qa-ar pages define plural helpers (tr_nbf_*) with 6 Arabic plural forms but
+  // only 3 strings, so e.g. "4 tours" throws and the tour/stopover results never render.
+  // Wrap them so a missing form falls back to the last available string.
+  await ctx.addInitScript(() => {
+    const fixOne = (k) => {
+      const f = window[k];
+      if (typeof f !== "function" || f.__qhFixed) return;
+      const src = String(f);
+      const m = src.match(/var a=(\[[\s\S]*?\]);/);
+      const pm = src.match(/^function\s*\(([^)]*)\)/);
+      let arr = null;
+      try {
+        arr = m && JSON.parse(m[1]);
+      } catch (e) {}
+      const names = pm ? pm[1].split(",").map((x) => x.trim()).filter(Boolean) : [];
+      const g = function () {
+        try {
+          return f.apply(this, arguments);
+        } catch (e) {
+          if (!arr || !arr.length) throw e;
+          let out = String(arr[arr.length - 1]);
+          names.forEach((n, i) => {
+            const v = arguments[i] === undefined ? (n === "$num" ? 0 : "") : arguments[i];
+            out = out.split(n).join(String(v));
+          });
+          return out;
+        }
+      };
+      g.__qhFixed = true;
+      try {
+        window[k] = g;
+      } catch (e) {}
+    };
+    const run = () => {
+      try {
+        Object.keys(window).forEach((k) => {
+          if (k.indexOf("tr_") === 0) fixOne(k);
+        });
+      } catch (e) {}
+    };
+    document.addEventListener("DOMContentLoaded", run);
+    window.addEventListener("load", run);
+    setInterval(run, 500);
   });
   const page = await ctx.newPage();
   const s = {
@@ -207,6 +251,15 @@ const SNAPSHOT = (opts) => {
     }
   };
   const looksPath = (v) => typeof v === "string" && v && !/^(data:|blob:|javascript:|#|mailto:|tel:)/i.test(v) && !/[\s(){};]/.test(v);
+  // dynamic official resources (image.php, min/...) are Cloudflare-challenged for visitors: proxy them
+  const absImg = (v) => {
+    const u = abs(v);
+    try {
+      const x = new URL(u);
+      if (opts.proxyBase && /qatarairwaysholidays\.com$/i.test(x.hostname) && /\.php$|\/min\/|\/images\//i.test(x.pathname)) return opts.proxyBase + "/api/packages/asset?u=" + encodeURIComponent(x.pathname + x.search);
+    } catch (e) {}
+    return u;
+  };
   function detailsHref(u) {
     const m = String(u).match(/\/details\/([0-9a-f-]{20,})\/([0-9a-f-]{20,})/i);
     if (!m) return null;
@@ -219,12 +272,12 @@ const SNAPSHOT = (opts) => {
     });
     root.querySelectorAll("[src]").forEach((n) => {
       const v = n.getAttribute("src");
-      if (looksPath(v)) n.setAttribute("src", abs(v));
+      if (looksPath(v)) n.setAttribute("src", absImg(v));
     });
     ["data-src", "data-onload", "data-lazy", "data-bg", "data-original", "poster"].forEach((a) =>
       root.querySelectorAll("[" + a + "]").forEach((n) => {
         const v = n.getAttribute(a);
-        if (looksPath(v) && /[\/.]/.test(v)) n.setAttribute(a, abs(v));
+        if (looksPath(v) && /[\/.]/.test(v)) n.setAttribute(a, absImg(v));
       })
     );
     root.querySelectorAll("[srcset]").forEach((n) => {
@@ -235,7 +288,7 @@ const SNAPSHOT = (opts) => {
           .split(",")
           .map((p) => {
             const parts = p.trim().split(/\s+/);
-            if (parts[0]) parts[0] = abs(parts[0]);
+            if (parts[0]) parts[0] = absImg(parts[0]);
             return parts.join(" ");
           })
           .join(", ")
@@ -244,7 +297,7 @@ const SNAPSHOT = (opts) => {
     root.querySelectorAll('[style*="url("]').forEach((n) => {
       n.setAttribute(
         "style",
-        n.getAttribute("style").replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, u) => (/^(data:|https?:)/i.test(u) ? m : 'url("' + abs(u) + '")'))
+        n.getAttribute("style").replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, u) => (/^data:/i.test(u) ? m : 'url("' + absImg(u) + '")'))
       );
     });
     root.querySelectorAll("a[href]").forEach((a) => {
@@ -279,6 +332,8 @@ const SNAPSHOT = (opts) => {
   out.isDetails = !!(flow && /bf_flow_details/.test(flow.className));
   out.isPayment = /payment\.php/i.test(location.pathname) || !!(flow && /bf_paymentpagectr/.test(flow.className));
   out.slidebox = !!Array.from(document.querySelectorAll(".bf_slidebox.show,.bf_slidebox.open")).find((n) => n.offsetParent !== null || n.getBoundingClientRect().width > 0);
+  out.cssLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href).filter(Boolean);
+  out.inlineSig = Array.from(document.querySelectorAll("style")).length + ":" + Array.from(document.querySelectorAll("style")).reduce((a, n) => a + Math.round((n.textContent || "").length / 50000), 0);
   if (opts.mode === "results" && flow && resultsNode) {
     const fc = clean(flow.cloneNode(true));
     const rc = fc.querySelector(".bf_results");
@@ -388,10 +443,11 @@ const SNAPSHOT = (opts) => {
 };
 
 async function snapshot(s, mode, extra) {
-  return s.page.evaluate(SNAPSHOT, Object.assign({ mode, token: s.token, product: s.product, lang: s.lang }, extra || {}));
+  return s.page.evaluate(SNAPSHOT, Object.assign({ mode, token: s.token, product: s.product, lang: s.lang, proxyBase: PROXY_BASE }, extra || {}));
 }
 
-function resultsPayload(s, snap, extra) {
+async function resultsPayload(s, snap, extra) {
+  const cssText = await cssTextFor(s, snap).catch(() => "");
   return Object.assign(
     {
       token: s.token,
@@ -399,7 +455,7 @@ function resultsPayload(s, snap, extra) {
       stage: "results",
       resultStage: snap.resultStage,
       html: snap.html,
-      shell: { headerHtml: snap.headerHtml, flowHtml: snap.flowHtml },
+      shell: { headerHtml: snap.headerHtml, flowHtml: snap.flowHtml, cssText },
       filters: snap.filters,
       count: snap.count,
       page: snap.page,
@@ -519,6 +575,104 @@ async function clickSel(s, selector) {
 function cssStr(v) {
   return String(v).replace(/["\\]/g, "");
 }
+
+// ---------------------------------------------------------------- official CSS / blocked assets
+// Cloudflare challenges the dynamic resources (min/ bundles, style.php, image.php) when the
+// visitor's browser requests them directly, so the server builds the stylesheet inside the
+// cleared session and serves it (and the dynamic images) through /qr-api.
+const PROXY_BASE = process.env.QH_PROXY_BASE || "/qr-api";
+const cssStore = new Map(); // key -> {gz, raw, at}
+const cssBuilding = new Map();
+const assetStore = new Map(); // path -> {buf, type, at}
+let assetBytes = 0;
+
+function proxyAssetUrl(absUrl) {
+  try {
+    const u = new URL(absUrl);
+    if (!/qatarairwaysholidays\.com$/i.test(u.hostname)) return absUrl;
+    if (!/\.php$|\/min\/|\/images\//i.test(u.pathname)) return absUrl;
+    return PROXY_BASE + "/api/packages/asset?u=" + encodeURIComponent(u.pathname + u.search);
+  } catch (e) {
+    return absUrl;
+  }
+}
+
+const BUILD_CSS = async () => {
+  const fix = (css, base) =>
+    css.replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, u) => {
+      u = u.trim();
+      if (/^(data:|#|about:)/i.test(u) || /%22/i.test(u)) return m;
+      try {
+        return 'url("' + new URL(u, base).href + '")';
+      } catch (e) {
+        return m;
+      }
+    });
+  const parts = [];
+  for (const n of Array.from(document.querySelectorAll('link[rel="stylesheet"], style'))) {
+    if (n.tagName === "STYLE") {
+      parts.push(fix(n.textContent || "", document.baseURI));
+      continue;
+    }
+    const h = n.href;
+    if (!h) continue;
+    try {
+      const r = await fetch(h, { credentials: "include" });
+      if (!r.ok) continue;
+      const t = await r.text();
+      if (/^\s*<(!doctype|html)/i.test(t.slice(0, 200))) continue;
+      parts.push("/* " + h.split("?")[0].slice(-70) + " */\n" + fix(t, h));
+    } catch (e) {}
+  }
+  return parts.join("\n");
+};
+
+async function cssTextFor(s, snap) {
+  const links = snap.cssLinks || [];
+  if (!links.length) return "";
+  const key = crypto.createHash("sha1").update(s.lang + "|" + links.join("|") + "|" + (snap.inlineSig || "")).digest("hex").slice(0, 16);
+  if (!cssStore.has(key)) {
+    if (!cssBuilding.has(key)) {
+      cssBuilding.set(
+        key,
+        (async () => {
+          const t0 = Date.now();
+          let css = await s.page.evaluate(BUILD_CSS);
+          css = css.replace(/url\("(https:\/\/www\.qatarairwaysholidays\.com\/[^"]+)"\)/gi, (m, u) => 'url("' + proxyAssetUrl(u) + '")');
+          const zlib = require("zlib");
+          cssStore.set(key, { raw: css, gz: zlib.gzipSync(css), at: Date.now() });
+          while (cssStore.size > 30) cssStore.delete(cssStore.keys().next().value);
+          log("css built", key, Math.round(css.length / 1024) + "KB", Date.now() - t0 + "ms");
+        })().finally(() => cssBuilding.delete(key))
+      );
+    }
+    try {
+      await cssBuilding.get(key);
+    } catch (e) {
+      log("css build failed", e.message);
+      return "";
+    }
+  }
+  return '@import url("' + PROXY_BASE + "/api/packages/css/" + key + '.css");';
+}
+
+function livePage() {
+  let best = null;
+  for (const s of sessions.values()) {
+    try {
+      if (!s.page.isClosed() && s.page.url().startsWith(HOL) && (!best || s.lastUsed > best.lastUsed)) best = s;
+    } catch (e) {}
+  }
+  return best && best.page;
+}
+
+const FETCH_ASSET = async (u) => {
+  const r = await fetch(u, { credentials: "include" });
+  const b = new Uint8Array(await r.arrayBuffer());
+  let str = "";
+  for (let i = 0; i < b.length; i += 0x8000) str += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
+  return { status: r.status, type: r.headers.get("content-type") || "", b64: btoa(str) };
+};
 
 // ---------------------------------------------------------------- actions
 async function startSearch(payload) {
@@ -998,6 +1152,67 @@ module.exports = function registerQrPackages(app) {
     return hotelSelectStatus(s);
   });
   route("/api/packages/summary", async (body, req) => summary(need(req)));
+
+  // official stylesheet built inside the cleared session (see cssTextFor)
+  app.get(paths("/api/packages/css/:key.css"), (req, res) => {
+    const c = cssStore.get(String(req.params.key || ""));
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    if (!c) return res.status(404).type("text/css").send("/* expired */");
+    res.setHeader("Content-Type", "text/css; charset=utf-8");
+    res.setHeader("Cache-Control", "public, max-age=21600");
+    res.setHeader("Vary", "Accept-Encoding");
+    if (/\bgzip\b/.test(String(req.headers["accept-encoding"] || ""))) {
+      res.setHeader("Content-Encoding", "gzip");
+      return res.end(c.gz);
+    }
+    return res.end(c.raw);
+  });
+
+  // dynamic official images (image.php ...) fetched through a live cleared session
+  app.get(paths("/api/packages/asset"), async (req, res) => {
+    const u = String(req.query.u || "");
+    res.setHeader("Access-Control-Allow-Origin", "*");
+    if (!/^\/[^/]/.test(u) || u.length > 600 || !/\.php|\/min\/|\/images\//i.test(u)) return res.sendStatus(400);
+    const hit = assetStore.get(u);
+    const send = (a) => {
+      res.setHeader("Content-Type", a.type || "application/octet-stream");
+      res.setHeader("Cache-Control", "public, max-age=86400");
+      res.end(a.buf);
+    };
+    if (hit) return send(hit);
+    const page = livePage();
+    if (!page) return res.sendStatus(503);
+    try {
+      const r = await page.evaluate(FETCH_ASSET, HOL + u);
+      if (r.status !== 200 || /text\/html/i.test(r.type)) return res.sendStatus(r.status === 200 ? 502 : r.status);
+      let buf = Buffer.from(r.b64, "base64");
+      if (/text\/css/i.test(r.type)) {
+        // make url() references work from the visitor's domain
+        const base = HOL + u;
+        const css = buf.toString("utf8").replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, ref) => {
+          ref = ref.trim();
+          if (/^(data:|#|about:)/i.test(ref) || /%22/i.test(ref)) return m;
+          try {
+            return 'url("' + proxyAssetUrl(new URL(ref, base).href) + '")';
+          } catch (e) {
+            return m;
+          }
+        });
+        buf = Buffer.from(css, "utf8");
+      }
+      const a = { buf, type: r.type, at: Date.now() };
+      assetStore.set(u, a);
+      assetBytes += a.buf.length;
+      while (assetBytes > 40 * 1024 * 1024 && assetStore.size) {
+        const k = assetStore.keys().next().value;
+        assetBytes -= assetStore.get(k).buf.length;
+        assetStore.delete(k);
+      }
+      return send(a);
+    } catch (e) {
+      return res.sendStatus(502);
+    }
+  });
 
   app.get("/api/packages/_status", cors, (req, res) => {
     // local-only DOM inspection (never enabled in production)

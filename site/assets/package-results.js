@@ -41,7 +41,7 @@
   document.body.className = 'lang-' + lang + '-QA dir-' + (lang === 'ar' ? 'rtl' : 'ltr') + ' pb bfv3 cascade-dates';
   document.title = (lang === 'ar' ? 'نتائج البحث' : 'Search results') + ' | Qatar Airways Holidays';
 
-  function setHref(id,href){ var node=document.getElementById(id); if(node) node.href=href; }
+  function qaProxyCss(h){try{var u=new URL(h);if(/qatarairwaysholidays\.com$/i.test(u.hostname)&&/\.php$|\/min\//i.test(u.pathname))return (window.__QR_LIVE_BASE||'/qr-api')+'/api/packages/asset?u='+encodeURIComponent(u.pathname+u.search);}catch(e){}return h;} function setHref(id,href){ var node=document.getElementById(id); if(node) node.href=qaProxyCss(href); }
   var languageMenuHTMLPromise=null;
   function internalResultsPath(){return location.pathname.indexOf('package-results.html')>=0?'/package-results.html':'/packages-results';}
   function switchLanguage(target){target=target==='ar'?'ar':'en';if(requestPayload){requestPayload.lang=target;requestPayload.returnPath=target==='ar'?'/ar-qa/homepage.html':'/en-qa/homepage.html';sessionStorage.setItem('qaPackageSearch',JSON.stringify(requestPayload));}sessionStorage.removeItem('qaPackageStage');sessionStorage.removeItem('qaPackageResultToken');location.href=location.origin+internalResultsPath()+'?product='+encodeURIComponent(product)+'&lang='+target;}

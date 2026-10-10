@@ -9,7 +9,7 @@
     en:{book:'Book',manage:'Manage booking',help:'Help',back:'Back',stepResults:'Results',stepDetails:'Details',stepSummary:'Summary',packages:'Packages / Stopover',title:'Selection summary',loading:'Loading your selection summary',error:'Unable to load the summary. Please return to the hotel results and try again.',ready:'Your selection is confirmed in the official Qatar Holidays session',body:'The package selection is complete and has reached the summary page on our site.',results:'Back to results',officialData:'Prices and availability from Qatar Airways Holidays'}
   }[lang];
   document.documentElement.lang=lang;document.documentElement.dir=lang==='ar'?'rtl':'ltr';document.body.className='qa-ps-page lang-'+lang+'-QA dir-'+(lang==='ar'?'rtl':'ltr')+' pb bfv3';document.title=copy.title+' | Qatar Airways';
-  function styleHref(id,path){var node=document.getElementById(id);if(node)node.href='https://www.qatarairwaysholidays.com/qa-'+lang+'/'+path;}
+  function qaProxyCss(h){try{var u=new URL(h);if(/qatarairwaysholidays\.com$/i.test(u.hostname)&&/\.php$|\/min\//i.test(u.pathname))return (window.__QR_LIVE_BASE||'/qr-api')+'/api/packages/asset?u='+encodeURIComponent(u.pathname+u.search);}catch(e){}return h;} function styleHref(id,path){var node=document.getElementById(id);if(node)node.href=qaProxyCss('https://www.qatarairwaysholidays.com/qa-'+lang+'/'+path);}
   var brand=lang==='ar'?'qrh_qaar':'qrh_qaen',stamp=lang==='ar'?'1788185464':'1788185464';
   styleHref('qa-ps-font-css','min/?fb=Zm9udHMvdmliZS5jc3MsY3NzL2RlZmF1bHQuY3NzLGZvbnRzL3FyaC0yMDIzLmNzcw==&ts='+(lang==='ar'?'1751549990':'1785516087'));
   styleHref('qa-ps-common-css','min/g=bfv3_common_css,bfv3_results_common_css,bfv3_details_common_css,bfv3_multicentre_css&'+stamp);

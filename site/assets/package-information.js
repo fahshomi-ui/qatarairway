@@ -15,7 +15,7 @@
   document.body.className='qa-bi-page lang-'+lang+'-QA dir-'+(lang==='ar'?'rtl':'ltr');
   document.title=copy.guestDetails+' | Qatar Airways Holidays';
 
-  function styleHref(id,path){var node=document.getElementById(id);if(node)node.href='https://www.qatarairwaysholidays.com/qa-'+lang+'/'+path;}
+  function qaProxyCss(h){try{var u=new URL(h);if(/qatarairwaysholidays\.com$/i.test(u.hostname)&&/\.php$|\/min\//i.test(u.pathname))return (window.__QR_LIVE_BASE||'/qr-api')+'/api/packages/asset?u='+encodeURIComponent(u.pathname+u.search);}catch(e){}return h;} function styleHref(id,path){var node=document.getElementById(id);if(node)node.href=qaProxyCss('https://www.qatarairwaysholidays.com/qa-'+lang+'/'+path);}
   styleHref('qa-bi-font-css','min/?fb=Zm9udHMvdmliZS5jc3MsY3NzL2RlZmF1bHQuY3NzLGZvbnRzL3FyaC0yMDIzLmNzcw==&ts='+(lang==='ar'?'1751549990':'1785516087'));
   styleHref('qa-bi-common-css','min/g=bfv3_common_css,bfv3_results_common_css,bfv3_details_common_css,bfv3_payment_common_css,bfv3_multicentre_css&1788185464');
   styleHref('qa-bi-flight-css','min/g=bfv3_flight_common_css,bfv3_flight_results_css,bfv3_flight_details_css,bfv3_flight_payment_css&1788185464');
