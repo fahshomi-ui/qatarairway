@@ -1,4 +1,4 @@
-/qr-api/* http://34.142.131.43:8791/:splat 200
+/qr-api/* https://qatarairway-production.up.railway.app/:splat 200
 /packages-results /package-results.html 200
 /packages-results/* /package-results.html 200
 /package-details /package-details.html 200
