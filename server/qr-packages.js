@@ -1183,7 +1183,9 @@ module.exports = function registerQrPackages(app) {
     const page = livePage();
     if (!page) return res.sendStatus(503);
     try {
-      const r = await page.evaluate(FETCH_ASSET, HOL + u);
+      let r = await page.evaluate(FETCH_ASSET, HOL + u);
+      // some images exist only under the English storefront
+      if (r.status === 404 && /^\/qa-ar\//.test(u)) r = await page.evaluate(FETCH_ASSET, HOL + u.replace(/^\/qa-ar\//, "/qa-en/"));
       if (r.status !== 200 || /text\/html/i.test(r.type)) return res.sendStatus(r.status === 200 ? 502 : r.status);
       let buf = Buffer.from(r.b64, "base64");
       if (/text\/css/i.test(r.type)) {
