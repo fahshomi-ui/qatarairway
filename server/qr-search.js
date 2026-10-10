@@ -72,6 +72,38 @@ const B = {
   lastOkAt: 0,
 };
 
+// Railway may override the Docker CMD (custom start command), so start a virtual
+// display ourselves when none is available.
+let xvfbStarted = false;
+async function ensureDisplay() {
+  if (process.env.QR_HEADLESS === "1" || process.env.DISPLAY || process.platform !== "linux") return;
+  if (xvfbStarted) return;
+  const fs = require("fs");
+  const bin = ["/usr/bin/Xvfb", "/usr/local/bin/Xvfb"].find((p) => fs.existsSync(p));
+  if (!bin) {
+    log("Xvfb not found; headful Chrome will fail");
+    return;
+  }
+  const { spawn } = require("child_process");
+  const disp = ":99";
+  try {
+    fs.unlinkSync("/tmp/.X99-lock");
+  } catch (e) {}
+  const proc = spawn(bin, [disp, "-screen", "0", "1366x900x24", "-nolisten", "tcp", "-ac"], {
+    stdio: "ignore",
+    detached: false,
+  });
+  proc.on("exit", (code) => {
+    log("Xvfb exited", code);
+    xvfbStarted = false;
+    if (process.env.DISPLAY === disp) delete process.env.DISPLAY;
+  });
+  xvfbStarted = true;
+  process.env.DISPLAY = disp;
+  await sleep(1500);
+  log("started Xvfb on", disp);
+}
+
 async function closeBrowser() {
   const b = B.browser;
   B.browser = null;
@@ -110,6 +142,7 @@ async function warm() {
   const pw = getPw();
   if (!pw) throw new Error("browser_unavailable");
   await closeBrowser();
+  await ensureDisplay();
   const t0 = Date.now();
   const browser = await pw.chromium.launch({
     headless: process.env.QR_HEADLESS === "1",
