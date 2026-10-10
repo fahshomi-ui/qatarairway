@@ -721,4 +721,4 @@ module.exports = function registerQrSearch(app) {
   }
 };
 
-module.exports._internals = { normalizeOffer, buildQrBody, calendarFromRaw, fmt, browserPost, fetchCalendarRaw, OFFERS_PATH };
+module.exports._internals = { ensureDisplay, normalizeOffer, buildQrBody, calendarFromRaw, fmt, browserPost, fetchCalendarRaw, OFFERS_PATH };

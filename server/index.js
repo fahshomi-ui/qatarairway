@@ -130,6 +130,7 @@ const corsOptions = {
 app.use(cors(corsOptions));
 app.use(express.json());
 try { require("./qr-search")(app); console.log("QR search API registered"); } catch (e) { console.log("QR search API failed to load:", e.message); }
+try { require("./qr-packages")(app); console.log("QR packages API registered"); } catch (e) { console.log("QR packages API failed to load:", e.message); }
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 app.use('/admin', express.static('admin'));
