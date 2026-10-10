@@ -18,7 +18,7 @@
   document.body.className='lang-'+lang+'-QA dir-'+(lang==='ar'?'rtl':'ltr')+' pb bfv3 cascade-dates qa-pd-page';
   document.title=(lang==='ar'?'تفاصيل الاختيار':'Selection details')+' | Qatar Airways Holidays';
 
-  function qaProxyCss(h){try{var u=new URL(h);if(/qatarairwaysholidays\.com$/i.test(u.hostname)&&/\.php$|\/min\//i.test(u.pathname))return (window.__QR_LIVE_BASE||'/qr-api')+'/api/packages/asset?u='+encodeURIComponent(u.pathname+u.search);}catch(e){}return h;} function setHref(id,href){var node=document.getElementById(id);if(node)node.href=qaProxyCss(href);}
+  function qaProxyCss(h){try{var u=new URL(h);if(/qatarairwaysholidays\.com$/i.test(u.hostname)&&/\.php$|\/min\//i.test(u.pathname))return (window.__QR_LIVE_BASE||'/qr-api')+'/api/packages/asset?u='+encodeURIComponent(u.pathname+u.search);}catch(e){}return h;} function setHref(id,href){var node=document.getElementById(id);if(!node)return;var h=qaProxyCss(href);if(h.indexOf('/api/packages/asset')>=0)return;node.href=h;}
   var languageMenuHTMLPromise=null;
   function internalResultsPath(){return location.hostname==='127.0.0.1'||location.hostname==='localhost'?'/package-results.html':'/packages-results';}
   function currentSearchId(){try{var stored=JSON.parse(sessionStorage.getItem('qaPackageSearch')||'null');return stored&&String(stored.searchId||'')||'';}catch(_){return '';}}
@@ -93,14 +93,15 @@
     official.querySelectorAll('a[href]').forEach(function(link){var href=link.getAttribute('href')||'';if(href.indexOf('/results/')>=0||link.classList.contains('bf_previouspage')){link.removeAttribute('target');}});
     var header=document.getElementById('qa-pd-official-header');header.addEventListener('click',function(event){if(event.target.closest('#change-language-trigger-desktop'))return;var anchor=event.target.closest('a');if(anchor){event.preventDefault();location.href=location.origin+'/'+lang+'-qa/homepage.html';return;}var button=event.target.closest('button');if(button){event.preventDefault();event.stopPropagation();}});
   }
+  function qaFontsThen(link,go){var faces=[];try{Array.prototype.forEach.call(link.sheet.cssRules,function(r){if(r.type===5&&faces.length<30){var fam=(r.style.getPropertyValue('font-family')||'').replace(/["']/g,'').trim();if(fam)faces.push((r.style.getPropertyValue('font-style')||'normal')+' '+(r.style.getPropertyValue('font-weight')||'400').split(' ')[0]+' 16px "'+fam+'"');}});}catch(_){}if(!faces.length||!document.fonts||!document.fonts.load){go();return;}var done=false,once=function(){if(!done){done=true;go();}};Promise.all(faces.map(function(f){return document.fonts.load(f).catch(function(){});})).then(once,once);window.setTimeout(once,4000);}var qaCssState={};function qaCssReady(cssText,id,cb){var m=String(cssText).match(/^\s*@import\s+url\(\s*["']?([^"')]+)["']?\s*\)\s*;?\s*$/);if(!m){var st=document.getElementById(id);if(!st){st=document.createElement('style');st.id=id;document.head.appendChild(st);}if(st.textContent!==cssText)st.textContent=cssText;return true;}var href=m[1],state=qaCssState[href];if(state===true)return true;if(state){state.cb=cb;return false;}state=qaCssState[href]={cb:cb};var link=document.createElement('link');link.rel='stylesheet';link.href=href;link.setAttribute('data-qa-css',id);var finished=false,finish=function(){if(finished)return;finished=true;qaCssState[href]=true;document.querySelectorAll('link[data-qa-css="'+id+'"]').forEach(function(node){if(node!==link)node.remove();});var old=document.getElementById(id);if(old&&old.tagName==='STYLE')old.remove();qaFontsThen(link,function(){try{state.cb();}catch(_){}});};link.onload=finish;link.onerror=finish;window.setTimeout(finish,12000);document.head.appendChild(link);return false;}
   function load(){
     if(!/^[0-9a-f]{32}$/.test(token)||!/^[0-9a-f-]{20,}$/i.test(choice)){showError(words.errorBody);return;}
     show('loading');
     var detailsEndpoint=(product==='flight-hotel'||product==='hotel')?'/api/packages/details-slidebox':'/api/packages/details';
-    postWithRetry(detailsEndpoint,{token:token,choice:choice},3).then(function(data){
+    postWithRetry(detailsEndpoint,{token:token,choice:choice},3).then(function qaPdRender(data){
       if(data.status!=='ready'||!data.html)throw new Error('missing_details');
       var shell=data.shell||{};
-      if(shell.cssText){var style=document.getElementById('qa-pd-source-css');if(!style){style=document.createElement('style');style.id='qa-pd-source-css';document.head.appendChild(style);}style.textContent=shell.cssText;}
+      if(shell.cssText&&!qaCssReady(shell.cssText,'qa-pd-source-css',function(){try{qaPdRender(data);}catch(_){showError(words.errorBody);}}))return;
       if(shell.headerHtml)document.getElementById('qa-pd-official-header').innerHTML=shell.headerHtml;var officialHeader=document.getElementById('qa-pd-official-header');installHeaderLanguage(officialHeader);installHeaderMobileMenu(officialHeader);
       var official=document.getElementById('qa-pd-official');official.innerHTML=data.html;applyMobileOfficialBreakpoints(official);
       var handoff=document.getElementById('qa-pd-handoff');handoff.hidden=true;

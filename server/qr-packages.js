@@ -395,7 +395,44 @@ const SNAPSHOT = (opts) => {
   if (opts.mode === "slidebox") {
     const boxes = Array.from(document.querySelectorAll(".bf_slidebox")).filter((n) => n.classList.contains("show") || n.classList.contains("open"));
     const box = boxes.reverse().find((n) => n.querySelector(".bf_slidebox_content"));
-    out.slideHtml = box ? clean(box.querySelector(".bf_slidebox_content").cloneNode(true)).innerHTML : "";
+    let routeSrc = "";
+    if (box) {
+      const own = Array.from(box.querySelectorAll("script")).map((n) => n.textContent || "").filter((t) => /getElementById\('routemap'\)/.test(t));
+      const all = Array.from(document.scripts).map((n) => n.textContent || "").filter((t) => /getElementById\('routemap'\)/.test(t));
+      routeSrc = own.pop() || all.pop() || "";
+    }
+    // official route map data (markers + polylines) for the client-side map
+    const route = { points: [], legs: [] };
+    if (routeSrc) {
+      const titles = {};
+      routeSrc.replace(/const marker(\d+)Options\s*=\s*\{\s*title:\s*"((?:[^"\\]|\\.)*)"/g, (m, i, t) => {
+        titles[i] = t.replace(/\\(.)/g, "$1");
+        return m;
+      });
+      const seen = {};
+      routeSrc.replace(/new BF_GoogleMap_Marker\('(\d+)',\s*(-?[\d.]+),\s*(-?[\d.]+)/g, (m, i, la, ln) => {
+        const k = la + "," + ln;
+        if (!seen[k]) {
+          seen[k] = 1;
+          route.points.push({ lat: Number(la), lng: Number(ln), title: titles[i] || "" });
+        }
+        return m;
+      });
+      const ll = "new google\\.maps\\.LatLng\\((-?[\\d.]+),\\s*(-?[\\d.]+)\\)";
+      const re = new RegExp("Polyline\\(\\{[^]*?path:\\s*\\[" + ll + ",\\s*" + ll + "\\]", "g");
+      let m;
+      while ((m = re.exec(routeSrc))) route.legs.push({ from: { lat: Number(m[1]), lng: Number(m[2]) }, to: { lat: Number(m[3]), lng: Number(m[4]) } });
+    }
+    out.route = route;
+    if (box) {
+      const c = box.querySelector(".bf_slidebox_content").cloneNode(true);
+      // the live Google map DOM cannot work outside the official page: leave an empty container
+      c.querySelectorAll("#routemap").forEach((n) => {
+        n.innerHTML = "";
+        n.removeAttribute("style");
+      });
+      out.slideHtml = clean(c).innerHTML;
+    } else out.slideHtml = "";
   }
   if (opts.mode === "basket") {
     let basket = document.querySelector(".bf_basketctr .bf_basket_visbilitycontainer") || document.querySelector(".bf_basketctr") || document.querySelector(".bf_basket");
@@ -891,7 +928,7 @@ async function detailsSlidebox(s, choice) {
     await page.evaluate(() => {
       document.querySelectorAll(".bf_slidebox.show .bf_slidebox_close, .bf_slidebox.show .js-bf_slideboxclose").forEach((b) => b.click());
     });
-    return { token: s.token, status: "ready", html: snap.slideHtml, map: {} };
+    return { token: s.token, status: "ready", html: snap.slideHtml, map: snap.route || {} };
   });
 }
 
