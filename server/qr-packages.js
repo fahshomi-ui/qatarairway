@@ -674,12 +674,42 @@ async function cssTextFor(s, snap) {
         key,
         (async () => {
           const t0 = Date.now();
-          let css = await s.page.evaluate(BUILD_CSS);
-          css = css.replace(/url\("(https:\/\/www\.qatarairwaysholidays\.com\/[^"]+)"\)/gi, (m, u) => 'url("' + proxyAssetUrl(u) + '")');
+          const src = await s.page.evaluate(BUILD_CSS);
+          const ABS = /url\("(https:\/\/www\.qatarairwaysholidays\.com\/[^"]+)"\)/gi;
+          const css = src.replace(ABS, (m, u) => 'url("' + proxyAssetUrl(u) + '")');
           const zlib = require("zlib");
-          cssStore.set(key, { raw: css, gz: zlib.gzipSync(css), at: Date.now() });
+          cssStore.set(key, { raw: css, gz: zlib.gzipSync(css), at: Date.now(), inlined: false });
           while (cssStore.size > 30) cssStore.delete(cssStore.keys().next().value);
           log("css built", key, Math.round(css.length / 1024) + "KB", Date.now() - t0 + "ms");
+          // in the background, embed the small dynamic images (switches, icons, sprites) so later
+          // visitors get a page that is complete on first paint without extra image requests
+          const dyn = new Set();
+          src.replace(ABS, (m, u) => {
+            if (proxyAssetUrl(u) !== u) dyn.add(u);
+            return m;
+          });
+          (async () => {
+            const list = Array.from(dyn).slice(0, 300);
+            for (let attempt = 0; attempt < 3; attempt += 1) {
+              const page = attempt === 0 ? s.page : livePage();
+              if (!page) break;
+              try {
+                const t1 = Date.now();
+                const got = await page.evaluate(FETCH_MANY, list);
+                const inl = {};
+                got.forEach((r) => {
+                  if (r && r.status === 200 && r.b64 && !/text\/html/i.test(r.type || "")) inl[r.u] = "data:" + (String(r.type).split(";")[0].trim() || "image/png") + ";base64," + r.b64;
+                });
+                const full = src.replace(ABS, (m, u) => 'url("' + (inl[u] || proxyAssetUrl(u)) + '")');
+                if (cssStore.has(key)) cssStore.set(key, { raw: full, gz: zlib.gzipSync(full), at: Date.now(), inlined: true });
+                log("css inlined", key, Object.keys(inl).length + "/" + dyn.size, Date.now() - t1 + "ms");
+                return;
+              } catch (e) {
+                log("css inline retry", attempt, String(e.message).slice(0, 80));
+                await sleep(5000);
+              }
+            }
+          })();
         })().finally(() => cssBuilding.delete(key))
       );
     }
@@ -709,6 +739,31 @@ const FETCH_ASSET = async (u) => {
   let str = "";
   for (let i = 0; i < b.length; i += 0x8000) str += String.fromCharCode.apply(null, b.subarray(i, i + 0x8000));
   return { status: r.status, type: r.headers.get("content-type") || "", b64: btoa(str) };
+};
+// fetch many small assets inside the cleared page (8 at a time); big files are left to the proxy
+const FETCH_MANY = async (list) => {
+  const out = [];
+  let i = 0;
+  const one = async (u) => {
+    try {
+      const r = await fetch(u, { credentials: "include" });
+      const b = new Uint8Array(await r.arrayBuffer());
+      if (b.length > 40000) return { u, status: r.status, big: true };
+      let str = "";
+      for (let j = 0; j < b.length; j += 0x8000) str += String.fromCharCode.apply(null, b.subarray(j, j + 0x8000));
+      return { u, status: r.status, type: r.headers.get("content-type") || "", b64: btoa(str) };
+    } catch (e) {
+      return { u, status: 0 };
+    }
+  };
+  const worker = async () => {
+    while (i < list.length) {
+      const k = i++;
+      out[k] = await one(list[k]);
+    }
+  };
+  await Promise.all(Array.from({ length: 8 }, worker));
+  return out;
 };
 
 // ---------------------------------------------------------------- actions
@@ -1196,7 +1251,8 @@ module.exports = function registerQrPackages(app) {
     res.setHeader("Access-Control-Allow-Origin", "*");
     if (!c) return res.status(404).type("text/css").send("/* expired */");
     res.setHeader("Content-Type", "text/css; charset=utf-8");
-    res.setHeader("Cache-Control", "public, max-age=21600");
+    // until the images are embedded, let browsers pick up the complete version on the next visit
+    res.setHeader("Cache-Control", c.inlined ? "public, max-age=21600" : "no-cache");
     res.setHeader("Vary", "Accept-Encoding");
     if (/\bgzip\b/.test(String(req.headers["accept-encoding"] || ""))) {
       res.setHeader("Content-Encoding", "gzip");
