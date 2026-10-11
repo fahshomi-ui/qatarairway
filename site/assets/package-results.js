@@ -94,7 +94,7 @@
     document.getElementById('qa-pr-content').hidden=name!=='content';
     document.getElementById('qa-pr-footer').hidden=name!=='content';
   }
-  function showError(message){if(retryTimer){clearTimeout(retryTimer);retryTimer=null;}document.getElementById('qa-pr-error-text').textContent=message||copy.errorBody;setState('error');}
+  function showError(message){if(retryTimer){clearTimeout(retryTimer);retryTimer=null;}var h=document.querySelector('#qa-pr-error h1');if(h)h.textContent=copy.errorTitle;var rb=document.getElementById('qa-pr-retry');if(rb)rb.hidden=false;var bk=document.getElementById('qa-pr-back');if(bk)bk.textContent=copy.back;document.getElementById('qa-pr-error-text').textContent=message||copy.errorBody;setState('error');}function qaShowNoResults(){if(retryTimer){clearTimeout(retryTimer);retryTimer=null;}var ar=lang==='ar';var h=document.querySelector('#qa-pr-error h1');if(h)h.textContent=ar?'لا توجد نتائج مطابقة':'No matching results';document.getElementById('qa-pr-error-text').textContent=ar?'للأسف، لم يتم العثور على باقات لهذا المسار أو هذه التواريخ. بعض المسارات لا تمر عبر الدوحة، وباقات التوقف تُحجز قبل السفر بثلاثة أيام على الأقل. جرّب تواريخ أو وجهة أخرى.':'Unfortunately, no packages were found for this route or these dates. Some routes do not connect via Doha, and stopovers must be booked at least 3 days before travel. Please try other dates or another destination.';var rb=document.getElementById('qa-pr-retry');if(rb)rb.hidden=true;var bk=document.getElementById('qa-pr-back');if(bk)bk.textContent=ar?'تعديل البحث':'Modify search';setState('error');}
   function safeJSON(response){return response.text().then(function(body){var data;try{data=JSON.parse(body);}catch(_){throw new Error('bad_response');}if(!response.ok||data.error)throw new Error(data.error||('http_'+response.status));return data;});}
   function post(path,payload){return fetch(API_BASE+path,{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(payload)}).then(safeJSON);}
   function imageLoads(url){return new Promise(function(resolve){if(!/^https:\/\/www\.qatarairwaysholidays\.com\//i.test(url||'')){resolve(false);return;}var image=new Image();var done=false;var finish=function(value){if(done)return;done=true;image.onload=null;image.onerror=null;resolve(value);};image.onload=function(){finish(true);};image.onerror=function(){finish(false);};image.src=url;window.setTimeout(function(){finish(false);},12000);});}
@@ -411,8 +411,8 @@
   function render(data){
     if(data.error){showError(copy.errorBody);return;}if(data.token)activeToken=data.token;
     if(data.status==='searching'){setState('loading');var p=document.querySelector('#qa-pr-loading p');if(p)p.textContent=copy.searching;retryTimer=setTimeout(function(){post('/api/packages/status',{token:activeToken}).then(render).catch(function(){showError(copy.errorBody);});},1800);return;}
-    if(data.status==='no_results'){showError(lang==='ar'?'لا توجد نتائج متاحة لهذا البحث حاليًا. عدّل التواريخ أو الوجهة وحاول مرة أخرى.':'No options are currently available for this search. Please change the dates or destination and try again.');return;}
-    if(data.status!=='ready'||!data.html){showError(copy.errorBody);return;}
+    if(data.status==='no_results'&&!data.html){qaShowNoResults();return;}
+    if((data.status!=='ready'&&data.status!=='no_results')||!data.html){showError(copy.errorBody);return;}
     latestData=data;activeSortMode=data.sortMode||activeSortMode;activePriceMode=data.priceMode||activePriceMode;activeCurrency=data.currency||activeCurrency;activeFilterState=data.filterState||{};activePriceFrom=data.priceFrom!=null?String(data.priceFrom):'';activePriceTo=data.priceTo!=null?String(data.priceTo):'';activeHotelName=data.hotelName!=null?String(data.hotelName):'';
     var shell=data.shell||{};
     if(shell.cssText&&!qaCssReady(shell.cssText,'qa-pr-source-css',function(){render(data);})){setState('loading');return;}

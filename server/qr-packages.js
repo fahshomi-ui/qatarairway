@@ -95,13 +95,43 @@ setInterval(() => {
   for (const s of sessions.values()) if (now - s.lastUsed > IDLE_MS) dropSession(s.token, "idle");
 }, 60000).unref();
 
+const HARD_MAX_SESSIONS = Number(process.env.QH_HARD_MAX_SESSIONS || MAX_SESSIONS + 3);
 async function makeRoom() {
   while (sessions.size >= MAX_SESSIONS) {
     let oldest = null;
     for (const s of sessions.values()) if (!oldest || s.lastUsed < oldest.lastUsed) oldest = s;
     if (!oldest) break;
+    // a visitor is still using every session: allow a few extra instead of breaking someone's booking
+    if (Date.now() - oldest.lastUsed < 3 * 60 * 1000 && sessions.size < HARD_MAX_SESSIONS) break;
     await dropSession(oldest.token, "evicted");
   }
+}
+// last searches (route/dates/outcome only) for diagnosing "no results" reports
+const recentSearches = [];
+function noteSearch(s, params, outcome) {
+  try {
+    const g = (k) => {
+      const f = params.find((x) => x[0] === k);
+      return f ? String(f[1]) : "";
+    };
+    recentSearches.unshift({
+      at: new Date().toISOString(),
+      product: s.product,
+      lang: s.lang,
+      from: g("iataFrom"),
+      to: g("iataTo"),
+      out: g("outboundDate"),
+      ret: g("returnDate") || (g("openjaw") ? "openjaw " + g("otherLegs[2][iataFrom]") + "-" + g("otherLegs[2][iataTo]") + " " + g("leg2_outboundDate") : g("oneway") === "1" ? "oneway" : ""),
+      leg: g("stopover"),
+      nights: g("stopover_nights"),
+      cabin: g("classOfService"),
+      pax: g("numPassengers") || g("numGuests[]"),
+      hotel: g("destination") || g("hotelDestination") || "",
+      outcome,
+      ms: Date.now() - s.createdAt,
+    });
+    recentSearches.length = Math.min(recentSearches.length, 25);
+  } catch (e) {}
 }
 
 function storefront(lang) {
@@ -541,13 +571,23 @@ async function waitStage(s, { timeout = 90000, sinceNav = 0, prevUrl = null } = 
   return { kind: "timeout", snap: last };
 }
 
+// "No matching results" exactly as the official page shows it (header, search bar, steps, message)
+async function noResultsResponse(s) {
+  try {
+    const snap = await snapshot(s, "results");
+    if (snap && snap.isResults && snap.html) return resultsPayload(s, snap, { status: "no_results" });
+  } catch (e) {
+    log("no_results snapshot failed", String(e.message).slice(0, 80));
+  }
+  return { token: s.token, status: "no_results", stage: "results" };
+}
 // Turn the current official stage into the API response.
 async function stageResponse(s, st) {
   if (st.kind === "results") {
     const snap = await snapshot(s, "results");
     return resultsPayload(s, snap);
   }
-  if (st.kind === "no_results") return { token: s.token, status: "no_results", stage: "results" };
+  if (st.kind === "no_results") return noResultsResponse(s);
   if (st.kind === "payment") return { token: s.token, status: "ready", stage: "payment" };
   if (st.kind === "extras") return { token: s.token, status: "ready", stage: "extras" };
   const e = new Error("stage_timeout");
@@ -802,10 +842,12 @@ async function startSearch(payload) {
       s.searchStage = st;
       if (s.status === "error") s.error = "search_timeout";
       log("search done", s.token.slice(0, 8), st.kind, st.snap && st.snap.items, Date.now() - s.createdAt + "ms");
+      noteSearch(s, params, st.kind + (st.snap && st.snap.items ? ":" + (st.snap.count || st.snap.items) : ""));
     } catch (e) {
       s.status = "error";
       s.error = String((e && e.message) || e);
       log("search failed", s.token.slice(0, 8), s.error);
+      noteSearch(s, params, "error:" + s.error.slice(0, 60));
     }
   });
   return s;
@@ -813,7 +855,7 @@ async function startSearch(payload) {
 
 async function statusResponse(s) {
   if (s.status === "searching") return { token: s.token, status: "searching" };
-  if (s.status === "no_results") return { token: s.token, status: "no_results", stage: "results" };
+  if (s.status === "no_results") return inSession(s, () => noResultsResponse(s));
   if (s.status === "error") throw Object.assign(new Error(s.error || "search_failed"), { http: 502 });
   return inSession(s, async () => {
     const st = await waitStage(s, { timeout: 30000 });
@@ -1337,6 +1379,7 @@ module.exports = function registerQrPackages(app) {
       browser: !!(BR.browser && BR.browser.isConnected()),
       launches: BR.launches,
       lastError: BR.lastError,
+      recent: recentSearches,
       sessions: Array.from(sessions.values()).map((s) => ({
         t: s.token.slice(0, 6),
         product: s.product,
