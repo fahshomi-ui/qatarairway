@@ -304,6 +304,12 @@ const SNAPSHOT = (opts) => {
       const v = n.getAttribute("src");
       if (looksPath(v)) n.setAttribute("src", absImg(v));
     });
+    // Official Google static maps key accepts requests without a referrer only.
+    root.querySelectorAll('img[src*="maps.googleapis.com/maps/api/staticmap"]').forEach((n) => {
+      n.setAttribute("referrerpolicy", "no-referrer");
+      n.setAttribute("data-qa-static", "1");
+      n.classList.add("qa-static-map");
+    });
     ["data-src", "data-onload", "data-lazy", "data-bg", "data-original", "poster"].forEach((a) =>
       root.querySelectorAll("[" + a + "]").forEach((n) => {
         const v = n.getAttribute(a);
@@ -325,9 +331,11 @@ const SNAPSHOT = (opts) => {
       );
     });
     root.querySelectorAll('[style*="url("]').forEach((n) => {
+      // official inline styles may use CSS escapes, e.g. url(hotelimg\2E php\3F img\3D ...)
+      const unCss = (u) => u.replace(/\\([0-9a-fA-F]{1,6})\s?/g, (m, h) => String.fromCodePoint(parseInt(h, 16))).replace(/\\(.)/g, "$1");
       n.setAttribute(
         "style",
-        n.getAttribute("style").replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, u) => (/^data:/i.test(u) ? m : 'url("' + absImg(u) + '")'))
+        n.getAttribute("style").replace(/url\(\s*(['"]?)([^'")]+)\1\s*\)/gi, (m, q, u) => (/^data:/i.test(u) ? m : 'url("' + absImg(unCss(u.trim())) + '")'))
       );
     });
     root.querySelectorAll("a[href]").forEach((a) => {
@@ -513,8 +521,38 @@ async function snapshot(s, mode, extra) {
   return s.page.evaluate(SNAPSHOT, Object.assign({ mode, token: s.token, product: s.product, lang: s.lang, proxyBase: PROXY_BASE }, extra || {}));
 }
 
+// Hotel coordinates + cheapest price per hotel, read from the official checkStatus data
+// (same data the official "View map" uses). Cached per official results URL.
+async function hotelMapPoints(s) {
+  try {
+    const key = new URL(s.page.url()).pathname;
+    if (s.mapPts && s.mapPts.key === key && s.mapPts.points.length) return s.mapPts.points;
+    const points = await s.page.evaluate(async () => {
+      const r = await fetch(location.pathname + "?i=0&m=checkStatus&preload=1", { credentials: "include" });
+      const j = JSON.parse(await r.text());
+      const best = {};
+      Object.keys((j && j.results) || {}).forEach((id) => {
+        const x = j.results[id] || {};
+        const ix = x.indexes || {};
+        const lat = Number(ix.lat), lon = Number(ix.lon);
+        if (!isFinite(lat) || !isFinite(lon) || (!lat && !lon)) return;
+        const cost = x.cost && Number(x.cost.c);
+        const h = x.hotelhash || id;
+        if (!best[h] || (cost && (!best[h].cost || cost < best[h].cost)))
+          best[h] = { id, name: String(ix.hotelname || x.hotelname || ""), lat, lon, rating: Number(ix.hotelrating) || 0, cost: cost || 0 };
+      });
+      return Object.values(best);
+    });
+    s.mapPts = { key, points: Array.isArray(points) ? points : [] };
+    return s.mapPts.points;
+  } catch (e) {
+    console.warn("[qr-packages] hotelMapPoints failed:", e && e.message);
+    return [];
+  }
+}
 async function resultsPayload(s, snap, extra) {
   const cssText = await cssTextFor(s, snap).catch(() => "");
+  const mapPoints = snap.resultStage === "hotel" ? await hotelMapPoints(s).catch(() => []) : undefined;
   return Object.assign(
     {
       token: s.token,
@@ -535,6 +573,7 @@ async function resultsPayload(s, snap, extra) {
       priceTo: snap.priceTo,
       hotelName: snap.hotelName,
       sortCosts: snap.sortCosts,
+      mapPoints,
     },
     extra || {}
   );
