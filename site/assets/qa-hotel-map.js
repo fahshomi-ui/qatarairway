@@ -149,6 +149,27 @@
       t.setAttribute('role', 'button');
       t.setAttribute('tabindex', '0');
     });
+    if (root.querySelector('.bf_static_map_image, .bf_static_map_modal_link')) warm();
+  }
+
+  // Open the tile-server connection and load Leaflet early so the map opens quickly when clicked.
+  var warmed = false;
+  function warm() {
+    if (warmed) return;
+    warmed = true;
+    ['https://server.arcgisonline.com', 'https://tile.openstreetmap.org'].forEach(function (origin) {
+      if (document.querySelector('link[rel="preconnect"][href="' + origin + '"]')) return;
+      var l = document.createElement('link');
+      l.rel = 'preconnect';
+      l.href = origin;
+      document.head.appendChild(l);
+      var d = document.createElement('link');
+      d.rel = 'dns-prefetch';
+      d.href = origin;
+      document.head.appendChild(d);
+    });
+    var later = window.requestIdleCallback || function (fn) { return setTimeout(fn, 1200); };
+    later(function () { loadLeaflet().catch(function () {}); });
   }
 
   function close() {
