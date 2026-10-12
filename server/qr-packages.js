@@ -108,6 +108,12 @@ async function makeRoom() {
 }
 // last searches (route/dates/outcome only) for diagnosing "no results" reports
 const recentSearches = [];
+// Last API operations (for diagnosis in /api/packages/_status).
+const recentOps = [];
+function noteOp(path, token, outcome, ms, extra) {
+  recentOps.unshift(Object.assign({ at: new Date().toISOString(), path: path.replace("/api/packages/", ""), t: String(token || "").slice(0, 6), outcome, ms }, extra || {}));
+  recentOps.length = Math.min(recentOps.length, 40);
+}
 function noteSearch(s, params, outcome) {
   try {
     const g = (k) => {
@@ -907,6 +913,10 @@ async function applyPage(s, body) {
     const page = s.page;
     let snap = await snapshot(s, "results");
     if (!snap.isResults) throw Object.assign(new Error("not_results"), { http: 409 });
+    // The visitor's page shows one stage (e.g. flights) but the official session may have moved on
+    // (e.g. after "Select" and the browser Back button). Never answer with another stage's results.
+    if (body.expectStage && snap.resultStage && body.expectStage !== snap.resultStage)
+      throw Object.assign(new Error("stage_changed"), { http: 409 });
     const sig = () =>
       page.evaluate(() => {
         const f = document.querySelector(".bf_flow");
@@ -1282,9 +1292,17 @@ module.exports = function registerQrPackages(app) {
         const out = await fn(req.body || {}, req);
         res.json(out);
         log(p, out && out.status, out && out.stage, Date.now() - t0 + "ms");
+        if (p !== "/api/packages/status" || (out && out.status !== "searching"))
+          noteOp(p, (req.body && req.body.token) || (out && out.token), (out && out.status) || "ok", Date.now() - t0, {
+            page: req.body && req.body.page,
+            filters: req.body && req.body.filters ? Object.keys(req.body.filters).length : undefined,
+            count: out && out.count,
+            stage: out && (out.resultStage || out.stage),
+          });
       } catch (e) {
         const code = e.http || 502;
         log(p, "error", e.message, Date.now() - t0 + "ms");
+        noteOp(p, req.body && req.body.token, "error", Date.now() - t0, { error: e.message, http: code, page: req.body && req.body.page });
         res.status(code).json({ error: e.message || "upstream_error" });
       }
     });
@@ -1419,6 +1437,7 @@ module.exports = function registerQrPackages(app) {
       launches: BR.launches,
       lastError: BR.lastError,
       recent: recentSearches,
+      ops: recentOps,
       sessions: Array.from(sessions.values()).map((s) => ({
         t: s.token.slice(0, 6),
         product: s.product,

@@ -292,14 +292,107 @@
     var card=trigger.closest('.bf_rsitem');if(!card)return;var existing=card.querySelector('.qa-pr-inline-hotel-rates');if(existing&&card.classList.contains('qa-pr-hotel-rates-open')){existing.remove();card.classList.remove('qa-pr-hotel-rates-open');trigger.classList.remove('bf_numrates--expanded','qa-pr-rates-error');trigger.setAttribute('aria-expanded','false');return;}if(existing)existing.remove();hotelRatesLoading.add(trigger);trigger.classList.add('qa-pr-rates-loading');trigger.setAttribute('aria-expanded','false');
     post('/api/packages/hotel-rates',{token:activeToken,choice:choice}).then(function(data){if(!data||data.status!=='ready'||!data.html)throw new Error('missing_hotel_rates');card.querySelectorAll('.qa-pr-inline-hotel-rates').forEach(function(node){node.remove();});var holder=document.createElement('div');holder.className='qa-pr-inline-hotel-rates';holder.setAttribute('data-hotel-choice',choice);holder.innerHTML=data.html;holder.querySelectorAll('a[href]').forEach(function(link){link.removeAttribute('href');link.removeAttribute('target');});holder.querySelectorAll('button').forEach(function(button){button.type='button';});holder.querySelectorAll('.js-bf_options').forEach(function(group){var selected=group.querySelector('.js-bf_option.bf_option--selected,.js-bf_option[data-checked="true"]')||group.querySelector('.js-bf_option'),input=selected&&selected.querySelector('.js-bf_optioninput');if(input&&/^[0-9a-f-]{36}$/i.test(input.value))group.setAttribute('data-selectedresult',input.value);});card.appendChild(holder);card.classList.add('qa-pr-hotel-rates-open');trigger.classList.add('bf_numrates--expanded');trigger.setAttribute('aria-expanded','true');restoreResultCards(holder);}).catch(function(){trigger.classList.add('qa-pr-rates-error');}).finally(function(){hotelRatesLoading.delete(trigger);trigger.classList.remove('qa-pr-rates-loading');});
   }
+  // Page / sort / filter changes. Clicks made while a request is running are queued (never dropped),
+  // failed requests are retried, and an expired or moved-on official session is rebuilt transparently.
+  var pendingPageRequest = null;
+  var unrenderedPageData = null;
+  var RAILWAY_BASE = 'https://qatarairway-production.up.railway.app';
+  var updatingTimer = null;
+  function qaPrWait(ms){return new Promise(function(resolve){setTimeout(resolve,ms);});}
+  function qaPrUpdating(mode,text){
+    var el=document.getElementById('qa-pr-updating');
+    if(!el){
+      if(!document.getElementById('qa-pr-updating-css')){var st=document.createElement('style');st.id='qa-pr-updating-css';st.textContent='#qa-pr-updating{position:fixed;left:50%;bottom:24px;transform:translateX(-50%);z-index:2147483000;background:#5c0632;color:#fff;border-radius:999px;padding:11px 20px;font-size:15px;line-height:1.3;display:flex;align-items:center;gap:10px;box-shadow:0 8px 28px rgba(0,0,0,.28);max-width:calc(100vw - 32px);font-family:inherit}#qa-pr-updating[hidden]{display:none}#qa-pr-updating i{flex:0 0 auto;width:16px;height:16px;border:2px solid rgba(255,255,255,.35);border-top-color:#fff;border-radius:50%;animation:qaPrSpin .8s linear infinite}#qa-pr-updating.qa-pr-updating-error{background:#b3261e}#qa-pr-updating.qa-pr-updating-error i{display:none}@keyframes qaPrSpin{to{transform:rotate(360deg)}}';document.head.appendChild(st);}
+      el=document.createElement('div');el.id='qa-pr-updating';el.setAttribute('role','status');el.setAttribute('aria-live','polite');el.hidden=true;el.innerHTML='<i></i><span></span>';document.body.appendChild(el);
+    }
+    if(updatingTimer){clearTimeout(updatingTimer);updatingTimer=null;}
+    if(mode==='hide'){el.hidden=true;return;}
+    el.classList.toggle('qa-pr-updating-error',mode==='error');
+    el.querySelector('span').textContent=text||(lang==='ar'?'جارٍ تحديث النتائج…':'Updating results…');
+    if(mode==='error'){el.hidden=false;updatingTimer=setTimeout(function(){el.hidden=true;},7000);return;}
+    if(mode==='now'){el.hidden=false;return;}
+    updatingTimer=setTimeout(function(){el.hidden=false;},350);
+  }
+  function postPage(payload,direct){
+    var ctl=typeof AbortController==='function'?new AbortController():null;
+    var timer=ctl?setTimeout(function(){try{ctl.abort();}catch(_){}},50000):null;
+    var base=direct?RAILWAY_BASE:API_BASE;
+    return fetch(base+'/api/packages/page',{method:'POST',headers:{'Content-Type':'application/json'},cache:'no-store',body:JSON.stringify(payload),signal:ctl?ctl.signal:undefined}).then(safeJSON).finally(function(){if(timer)clearTimeout(timer);});
+  }
+  function freshPackageSession(){
+    var searchPayload=Object.assign({},requestPayload);if(product==='stopover'||product==='flight-hotel')searchPayload.priceMode='t';
+    var started=Date.now();
+    function poll(data){
+      if(data&&data.token&&data.status==='searching'&&Date.now()-started<150000)return qaPrWait(1800).then(function(){return post('/api/packages/status',{token:data.token});}).then(poll);
+      if(!data||!data.token||data.status!=='ready')throw new Error('recover_failed');
+      return data;
+    }
+    return post('/api/packages/search',searchPayload).then(poll);
+  }
+  function renderPageData(data,hotelStage,localDuration,requested){
+    var content=document.getElementById('qa-pr-content'),results=content.querySelector('.bf_results');
+    if(hotelStage&&localDuration.length)data.filterState=Object.assign({},data.filterState||{},{duration:localDuration});
+    latestData=data;activeSortMode=data.sortMode||requested.sortMode;activePriceMode=data.priceMode||requested.priceMode;activeCurrency=data.currency||requested.currency;activeFilterState=data.filterState||requested.filters;activePriceFrom=data.priceFrom!=null?String(data.priceFrom):'';activePriceTo=data.priceTo!=null?String(data.priceTo):'';activeHotelName=data.hotelName!=null?String(data.hotelName):'';
+    if(results){results.innerHTML=data.html||'<div class="qa-pr-filter-empty">'+copy.noFiltered+'</div>';restoreResultCards(results);}
+    populateFilters(data.filters||{});buildPagination(data);syncToolbar(content,data);syncFilterControls(data);updateResultCount();
+    var top=content.querySelector('.bf_rctr');if(top)window.scrollTo({top:Math.max(0,top.getBoundingClientRect().top+window.scrollY-24),behavior:'auto'});
+  }
   function loadResultPage(page,state){
-    if(pageLoading||!activeToken)return;state=state||{};var current=Number(latestData&&latestData.page)||1;
+    if(!activeToken)return;
+    if(pageLoading){pendingPageRequest={page:page,state:state||{}};qaPrUpdating('show');return;}
+    state=state||{};var current=Number(latestData&&latestData.page)||1;
     var requestedSort=state.sortMode||activeSortMode,requestedPrice=state.priceMode||activePriceMode,requestedCurrency=state.currency||activeCurrency;
     var requestedFilters=state.filters!==undefined?state.filters:activeFilterState,requestedPriceFrom=state.priceFrom!==undefined?state.priceFrom:activePriceFrom,requestedPriceTo=state.priceTo!==undefined?state.priceTo:activePriceTo,requestedHotelName=state.hotelName!==undefined?state.hotelName:activeHotelName;
     var hotelStage=isStopoverHotelStage(latestData),localDuration=hotelStage&&Array.isArray(requestedFilters.duration)?requestedFilters.duration.slice():[],upstreamFilters=Object.assign({},requestedFilters);if(hotelStage)delete upstreamFilters.duration;
-    if(page===current&&requestedSort===activeSortMode&&requestedPrice===activePriceMode&&requestedCurrency===activeCurrency&&filterSignature(requestedFilters,requestedPriceFrom,requestedPriceTo,requestedHotelName)===filterSignature(activeFilterState,activePriceFrom,activePriceTo,activeHotelName))return;pageLoading=true;
-    var content=document.getElementById('qa-pr-content'),results=content.querySelector('.bf_results'),nav=content.querySelector('.bf_pgctrl'),toolbar=content.querySelector('.bf_srow');if(results)results.classList.add('qa-pr-page-loading');if(nav)nav.classList.add('qa-pr-page-loading');if(toolbar)toolbar.classList.add('qa-pr-toolbar-loading');
-    post('/api/packages/page',{token:activeToken,page:page,sortMode:requestedSort,priceMode:requestedPrice,currency:requestedCurrency,filters:upstreamFilters,priceFrom:requestedPriceFrom,priceTo:requestedPriceTo,hotelName:requestedHotelName}).then(function(data){if(data.status!=='ready'||(!data.html&&Number(data.count)!==0))throw new Error('missing_page');if(hotelStage&&localDuration.length)data.filterState=Object.assign({},data.filterState||{},{duration:localDuration});latestData=data;activeSortMode=data.sortMode||requestedSort;activePriceMode=data.priceMode||requestedPrice;activeCurrency=data.currency||requestedCurrency;activeFilterState=data.filterState||requestedFilters;activePriceFrom=data.priceFrom!=null?String(data.priceFrom):'';activePriceTo=data.priceTo!=null?String(data.priceTo):'';activeHotelName=data.hotelName!=null?String(data.hotelName):'';results.innerHTML=data.html||'<div class="qa-pr-filter-empty">'+copy.noFiltered+'</div>';restoreResultCards(results);populateFilters(data.filters||{});buildPagination(data);syncToolbar(content,data);syncFilterControls(data);updateResultCount();var top=content.querySelector('.bf_rctr');if(top)window.scrollTo({top:Math.max(0,top.getBoundingClientRect().top+window.scrollY-24),behavior:'auto'});}).catch(function(){if(nav)nav.classList.add('qa-pr-page-error');}).finally(function(){pageLoading=false;if(results)results.classList.remove('qa-pr-page-loading');if(nav)nav.classList.remove('qa-pr-page-loading');if(toolbar)toolbar.classList.remove('qa-pr-toolbar-loading');});
+    var content=document.getElementById('qa-pr-content'),results=content.querySelector('.bf_results'),nav=content.querySelector('.bf_pgctrl'),toolbar=content.querySelector('.bf_srow');
+    var requested={sortMode:requestedSort,priceMode:requestedPrice,currency:requestedCurrency,filters:requestedFilters};
+    if(page===current&&requestedSort===activeSortMode&&requestedPrice===activePriceMode&&requestedCurrency===activeCurrency&&filterSignature(requestedFilters,requestedPriceFrom,requestedPriceTo,requestedHotelName)===filterSignature(activeFilterState,activePriceFrom,activePriceTo,activeHotelName)){
+      // Nothing new to ask for. If a queued click ended up equal to the last answer, show that answer now.
+      if(unrenderedPageData){var pendingData=unrenderedPageData;unrenderedPageData=null;renderPageData(pendingData,hotelStage,localDuration,requested);}
+      if(results)results.classList.remove('qa-pr-page-loading');if(nav)nav.classList.remove('qa-pr-page-loading');if(toolbar)toolbar.classList.remove('qa-pr-toolbar-loading');qaPrUpdating('hide');
+      return;
+    }
+    pageLoading=true;var carried=unrenderedPageData;unrenderedPageData=null;
+    if(results)results.classList.add('qa-pr-page-loading');if(nav){nav.classList.add('qa-pr-page-loading');nav.classList.remove('qa-pr-page-error');}if(toolbar)toolbar.classList.add('qa-pr-toolbar-loading');
+    qaPrUpdating('show');
+    var expectStage=latestData&&latestData.resultStage?latestData.resultStage:undefined;
+    var payload={token:activeToken,page:page,sortMode:requestedSort,priceMode:requestedPrice,currency:requestedCurrency,filters:upstreamFilters,priceFrom:requestedPriceFrom,priceTo:requestedPriceTo,hotelName:requestedHotelName,expectStage:expectStage};
+    function check(data){if(!data||data.status!=='ready'||(!data.html&&Number(data.count)!==0))throw new Error('missing_page');return data;}
+    function attempt(n){
+      return postPage(payload,n>0).then(check).catch(function(error){
+        var message=String(error&&error.message||'');
+        var sessionGone=/expired_session|stage_changed|not_results|http_410|http_409/.test(message);
+        if(!sessionGone&&n<1)return qaPrWait(1200).then(function(){return attempt(n+1);});
+        // Rebuild the search on the server (same search details) and re-apply this page / these filters.
+        qaPrUpdating('now',lang==='ar'?'جارٍ تحديث البحث، لحظات من فضلك…':'Refreshing your search, one moment…');
+        return freshPackageSession().then(function(fresh){
+          if(expectStage&&fresh.resultStage&&fresh.resultStage!==expectStage)throw new Error('cannot_recover');
+          activeToken=fresh.token;payload=Object.assign({},payload,{token:fresh.token});
+          try{sessionStorage.setItem('qaPackageResultToken',JSON.stringify({token:activeToken,product:product,lang:lang,time:Date.now()}));}catch(_){}
+          return postPage(payload,false).then(check).catch(function(){return qaPrWait(1200).then(function(){return postPage(payload,true).then(check);});});
+        });
+      });
+    }
+    attempt(0).then(function(data){
+      if(pendingPageRequest){
+        // A newer click is waiting: remember this answer but do not redraw the filters the visitor is changing.
+        latestData=data;activeSortMode=data.sortMode||requestedSort;activePriceMode=data.priceMode||requestedPrice;activeCurrency=data.currency||requestedCurrency;activeFilterState=data.filterState||requestedFilters;activePriceFrom=data.priceFrom!=null?String(data.priceFrom):'';activePriceTo=data.priceTo!=null?String(data.priceTo):'';activeHotelName=data.hotelName!=null?String(data.hotelName):'';
+        if(hotelStage&&localDuration.length)activeFilterState=Object.assign({},activeFilterState,{duration:localDuration});
+        unrenderedPageData=data;
+        return;
+      }
+      renderPageData(data,hotelStage,localDuration,requested);qaPrUpdating('hide');
+    }).catch(function(){
+      if(nav)nav.classList.add('qa-pr-page-error');
+      pendingPageRequest=null;
+      if(carried){try{renderPageData(carried,hotelStage,localDuration,requested);}catch(_){}}
+      else if(latestData)syncFilterControls(latestData);
+      qaPrUpdating('error',lang==='ar'?'تعذر تحديث النتائج. يرجى المحاولة مرة أخرى.':'Could not update the results. Please try again.');
+    }).finally(function(){
+      pageLoading=false;
+      if(pendingPageRequest){var next=pendingPageRequest;pendingPageRequest=null;loadResultPage(next.page,next.state);return;}
+      if(results)results.classList.remove('qa-pr-page-loading');if(nav)nav.classList.remove('qa-pr-page-loading');if(toolbar)toolbar.classList.remove('qa-pr-toolbar-loading');
+    });
   }
   function parseMinutes(text){
     var raw=String(text||'').trim();
