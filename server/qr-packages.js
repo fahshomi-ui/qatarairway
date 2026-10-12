@@ -377,7 +377,8 @@ const SNAPSHOT = (opts) => {
   out.isPayment = /payment\.php/i.test(location.pathname) || !!(flow && /bf_paymentpagectr/.test(flow.className));
   out.ready = document.readyState;
   const visBtn = (sel) => Array.from(document.querySelectorAll(sel)).some((b) => b.offsetParent !== null);
-  out.detBtn = out.isDetails && visBtn(".js-bf_roomratescompact_selectedchoicebuttons .js-bf_selectproduct, .js-bf_selectproduct");
+  // same candidates confirmDetails() presses (stopover details use js-bf_selectproduct, flight+hotel uses the checked option's choice button)
+  out.detBtn = out.isDetails && visBtn('.js-bf_roomratescompact_selectedchoicebuttons .js-bf_selectproduct, .js-bf_selectproduct, .js-bf_option[data-checked="true"] .js-bf_choicebutton, .js-bf_choicebutton');
   out.contBtn = visBtn(".bf_continue");
   out.slidebox = !!Array.from(document.querySelectorAll(".bf_slidebox.show,.bf_slidebox.open")).find((n) => n.offsetParent !== null || n.getBoundingClientRect().width > 0);
   out.cssLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href).filter(Boolean);
@@ -619,6 +620,8 @@ async function waitStage(s, { timeout = 90000, sinceNav = 0, prevUrl = null } = 
       const calm = s.pending === 0 && Date.now() - s.lastNet >= 600;
       if (snap.isPayment && snap.hasBasket && (calm || since >= 2500)) return { kind: "payment", snap };
       if (snap.isDetails && snap.detBtn && since >= 400) return { kind: "details", snap };
+      // unknown details layout: hand it to confirmDetails() after a short wait instead of hanging
+      if (snap.isDetails && since >= 6000) return { kind: "details", snap };
       if (/bf_flow_addprod|\/extras\//i.test(snap.url + " " + snap.flowClass) && snap.contBtn && (calm || since >= 3000)) return { kind: "extras", snap };
     }
     const q = s.pending === 0 && Date.now() - s.lastNet >= 2000;
@@ -627,7 +630,7 @@ async function waitStage(s, { timeout = 90000, sinceNav = 0, prevUrl = null } = 
     if (snap.isResults && snap.items === 0 && Date.now() - s.navAt > 12000 && (snap.noResults || (!snap.searching && Date.now() - s.navAt > 30000))) return { kind: "no_results", snap };
     if (snap.isPayment && snap.hasBasket) return { kind: "payment", snap };
     // never hand back a details/extras page whose button is not there yet (it would be "no button")
-    if (!snap.isResults && snap.isDetails && snap.detBtn && snap.ready !== "loading") return { kind: "details", snap };
+    if (!snap.isResults && snap.isDetails && snap.ready !== "loading") return { kind: "details", snap };
     if (!snap.isResults && /bf_flow_addprod|\/extras\//i.test(snap.url + " " + snap.flowClass) && snap.contBtn && snap.ready !== "loading") return { kind: "extras", snap };
     if (!snap.isResults && snap.hasBasket && /book|checkout|payment|passenger|confirm/i.test(snap.url + " " + snap.flowClass)) return { kind: "payment", snap };
     if (!snap.isResults && snap.hasBasket && Date.now() - s.navAt > 5000) return { kind: "payment", snap };
@@ -1249,9 +1252,11 @@ async function fastHotelSelect(s, choice, selections) {
     { c: cssStr(choice), sels: (selections || []).filter(Boolean).map(cssStr) }
   );
   if (!res || !res.ok) {
+    s.fastInfo = { at: new Date().toISOString(), used: false, err: (res && res.err) || "no_result", detail: ((res && res.detail) || "").slice(0, 200) };
     log("fast select not used", s.token.slice(0, 8), res && res.err, (res && res.detail) || "");
     return null;
   }
+  s.fastInfo = { at: new Date().toISOString(), used: true, ms: Date.now() - t0 };
   log("fast select", s.token.slice(0, 8), "option", res.opt.slice(0, 8), "main", res.main.slice(0, 8), res.addStatus, Date.now() - t0 + "ms");
   const prevUrl = page.url();
   await page.goto(res.origin + res.base + "/payment.php?" + res.main, { waitUntil: "commit", timeout: 45000 }).catch((e) => log("fast select goto", String(e.message).slice(0, 100)));
@@ -1268,6 +1273,7 @@ function hotelSelect(s, choice, selections) {
     const prev = page.url();
     if (process.env.QH_FAST_SELECT !== "0") {
       const fast = await fastHotelSelect(s, choice, selections).catch((e) => {
+        s.fastInfo = { at: new Date().toISOString(), used: false, err: "exception", detail: String((e && e.message) || e).slice(0, 200) };
         log("fast select error", s.token.slice(0, 8), String((e && e.message) || e).slice(0, 120));
         return null;
       });
@@ -1546,6 +1552,7 @@ module.exports = function registerQrPackages(app) {
         status: s.status,
         ageS: Math.round((Date.now() - s.createdAt) / 1000),
         idleS: Math.round((Date.now() - s.lastUsed) / 1000),
+        fast: s.fastInfo || null,
         url: (() => {
           try {
             return s.page.url().replace(HOL, "");
