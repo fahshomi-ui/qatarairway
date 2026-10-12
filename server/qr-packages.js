@@ -375,6 +375,10 @@ const SNAPSHOT = (opts) => {
   out.hasBasket = !!document.querySelector(".bf_basket,.bf_basketctr,.bf_basket_total,.bf_basket_item_product");
   out.isDetails = !!(flow && /bf_flow_details/.test(flow.className));
   out.isPayment = /payment\.php/i.test(location.pathname) || !!(flow && /bf_paymentpagectr/.test(flow.className));
+  out.ready = document.readyState;
+  const visBtn = (sel) => Array.from(document.querySelectorAll(sel)).some((b) => b.offsetParent !== null);
+  out.detBtn = out.isDetails && visBtn(".js-bf_roomratescompact_selectedchoicebuttons .js-bf_selectproduct, .js-bf_selectproduct");
+  out.contBtn = visBtn(".bf_continue");
   out.slidebox = !!Array.from(document.querySelectorAll(".bf_slidebox.show,.bf_slidebox.open")).find((n) => n.offsetParent !== null || n.getBoundingClientRect().width > 0);
   out.cssLinks = Array.from(document.querySelectorAll('link[rel="stylesheet"]')).map((l) => l.href).filter(Boolean);
   out.inlineSig = Array.from(document.querySelectorAll("style")).length + ":" + Array.from(document.querySelectorAll("style")).reduce((a, n) => a + Math.round((n.textContent || "").length / 50000), 0);
@@ -590,8 +594,10 @@ async function resultsPayload(s, snap, extra) {
 async function waitStage(s, { timeout = 90000, sinceNav = 0, prevUrl = null } = {}) {
   const end = Date.now() + timeout;
   let last = null;
+  let readyUrl = "";
+  let readySince = 0;
   while (Date.now() < end) {
-    await sleep(700);
+    await sleep(350);
     // after a click, give the official page time to leave the current URL
     if (prevUrl && s.page.url() === prevUrl && Date.now() < end - timeout + 25000) continue;
     let snap;
@@ -602,13 +608,27 @@ async function waitStage(s, { timeout = 90000, sinceNav = 0, prevUrl = null } = 
     }
     last = snap;
     if (snap.challenge) continue;
+    // Booking-step pages (hotel details, extras, payment) only need their button/basket:
+    // act as soon as the page has fully loaded instead of waiting for all background traffic.
+    if (!snap.isResults && snap.ready === "complete") {
+      if (readyUrl !== snap.url) {
+        readyUrl = snap.url;
+        readySince = Date.now();
+      }
+      const since = Date.now() - readySince;
+      const calm = s.pending === 0 && Date.now() - s.lastNet >= 600;
+      if (snap.isPayment && snap.hasBasket && (calm || since >= 2500)) return { kind: "payment", snap };
+      if (snap.isDetails && snap.detBtn && since >= 400) return { kind: "details", snap };
+      if (/bf_flow_addprod|\/extras\//i.test(snap.url + " " + snap.flowClass) && snap.contBtn && (calm || since >= 3000)) return { kind: "extras", snap };
+    }
     const q = s.pending === 0 && Date.now() - s.lastNet >= 2000;
     if (!q) continue;
     if (snap.isResults && snap.items > 0 && !snap.searching) return { kind: "results", snap };
     if (snap.isResults && snap.items === 0 && Date.now() - s.navAt > 12000 && (snap.noResults || (!snap.searching && Date.now() - s.navAt > 30000))) return { kind: "no_results", snap };
     if (snap.isPayment && snap.hasBasket) return { kind: "payment", snap };
-    if (!snap.isResults && snap.isDetails) return { kind: "details", snap };
-    if (!snap.isResults && /bf_flow_addprod|\/extras\//i.test(snap.url + " " + snap.flowClass)) return { kind: "extras", snap };
+    // never hand back a details/extras page whose button is not there yet (it would be "no button")
+    if (!snap.isResults && snap.isDetails && snap.detBtn && snap.ready !== "loading") return { kind: "details", snap };
+    if (!snap.isResults && /bf_flow_addprod|\/extras\//i.test(snap.url + " " + snap.flowClass) && snap.contBtn && snap.ready !== "loading") return { kind: "extras", snap };
     if (!snap.isResults && snap.hasBasket && /book|checkout|payment|passenger|confirm/i.test(snap.url + " " + snap.flowClass)) return { kind: "payment", snap };
     if (!snap.isResults && snap.hasBasket && Date.now() - s.navAt > 5000) return { kind: "payment", snap };
   }
@@ -1167,6 +1187,77 @@ async function hotelRates(s, choice) {
   });
 }
 
+// Fast room selection: send the official selection requests straight from the hotels page
+// (exactly what the official hotel-details and extras pages send), then open the booking page.
+// This skips rendering two heavy official pages. Returns null when the fast path cannot be used
+// before anything was sent/navigated, so the caller can fall back to the click-through path.
+async function fastHotelSelect(s, choice, selections) {
+  const page = s.page;
+  const t0 = Date.now();
+  const res = await page.evaluate(
+    async ({ c, sels }) => {
+      if (!/\/results\//.test(location.pathname)) return { err: "not_results" };
+      const t = document.querySelector('.js-bf_showrates[data-results="' + c + '"]');
+      const card = t && t.closest(".bf_rsitem");
+      const groups = card ? card.querySelectorAll(".js-bf_options") : [];
+      if (groups.length > 1 || sels.length > 1) return { err: "multi_room" };
+      let opt = sels[0] || "";
+      if (!opt && groups.length === 1) {
+        const o = groups[0].querySelector('.js-bf_option[data-checked="true"],.js-bf_option.bf_option--selected') || groups[0].querySelector(".js-bf_option");
+        const i = o && o.querySelector(".js-bf_optioninput");
+        opt = (i && i.value) || "";
+      }
+      if (!/^[0-9a-f-]{36}$/i.test(opt)) return { err: "no_option" };
+      const resUrl = location.pathname;
+      const base = resUrl.split("/results/")[0];
+      const enc = (o) => Object.keys(o).map((k) => encodeURIComponent(k) + "=" + encodeURIComponent(o[k])).join("&");
+      const post = async (url, body) => {
+        const r = await fetch(url, {
+          method: "POST",
+          credentials: "include",
+          headers: { "content-type": "application/x-www-form-urlencoded; charset=UTF-8", "x-requested-with": "XMLHttpRequest" },
+          body: enc(body),
+        });
+        const txt = await r.text();
+        try {
+          return JSON.parse(txt);
+        } catch (e) {
+          return { http: r.status, raw: txt.slice(0, 160) };
+        }
+      };
+      const sel = await post(resUrl, { m: "selectResults", inSlidebox: "0", inAddprod: "false", pagetype: "details", "results[0]": opt, "opts[selectionMethod]": "selectProduct", "opts[compositeRoom]": "1" });
+      if (!sel || !sel.success || !Array.isArray(sel.otherRequests) || !sel.otherRequests.length) return { err: "select", sent: true, detail: JSON.stringify(sel).slice(0, 200) };
+      const chkBody = { m: "checkSelect", inSlidebox: "0", inAddprod: "false" };
+      sel.otherRequests.forEach((x, j) => {
+        chkBody["otherRequests[" + j + "]"] = x;
+      });
+      let chk = null;
+      for (let i = 0; i < 40; i += 1) {
+        chk = await post(resUrl, chkBody);
+        if (chk && Number(chk.status) === 4) break;
+        if (chk && chk.success === false) return { err: "check", sent: true, detail: JSON.stringify(chk).slice(0, 200) };
+        await new Promise((r) => setTimeout(r, 500));
+      }
+      if (!chk || Number(chk.status) !== 4) return { err: "check_timeout", sent: true, detail: JSON.stringify(chk).slice(0, 200) };
+      const m = String(sel.nextpage || "").match(/\/extras\/([0-9a-f-]{36})/i);
+      const main = (m && m[1]) || sel.otherRequests[0];
+      // what the official extras page does on load, then its "Continue to booking" (no extras)
+      await post(base + "/results/" + main, { m: "checkSearchedSelect", inSlidebox: "false", inAddprod: "true" }).catch(() => null);
+      const a = await fetch(base + "/extras/" + main, { method: "POST", credentials: "include", headers: { "content-type": "application/x-www-form-urlencoded" }, body: "a=addProds", redirect: "manual" }).catch(() => null);
+      return { ok: true, origin: location.origin, base, main, opt, next: String(chk.nextpage || ""), addStatus: a ? a.type + ":" + a.status : "failed" };
+    },
+    { c: cssStr(choice), sels: (selections || []).filter(Boolean).map(cssStr) }
+  );
+  if (!res || !res.ok) {
+    log("fast select not used", s.token.slice(0, 8), res && res.err, (res && res.detail) || "");
+    return null;
+  }
+  log("fast select", s.token.slice(0, 8), "option", res.opt.slice(0, 8), "main", res.main.slice(0, 8), res.addStatus, Date.now() - t0 + "ms");
+  const prevUrl = page.url();
+  await page.goto(res.origin + res.base + "/payment.php?" + res.main, { waitUntil: "commit", timeout: 45000 }).catch((e) => log("fast select goto", String(e.message).slice(0, 100)));
+  return { prevUrl };
+}
+
 function hotelSelect(s, choice, selections) {
   if (s.job && s.job.status === "selecting") return { token: s.token, status: "selecting", stage: "selecting" };
   const job = { status: "selecting", data: null, error: null };
@@ -1175,6 +1266,15 @@ function hotelSelect(s, choice, selections) {
     const page = s.page;
     await removeOverlays(page);
     const prev = page.url();
+    if (process.env.QH_FAST_SELECT !== "0") {
+      const fast = await fastHotelSelect(s, choice, selections).catch((e) => {
+        log("fast select error", s.token.slice(0, 8), String((e && e.message) || e).slice(0, 120));
+        return null;
+      });
+      if (fast) return advance(s, fast.prevUrl, 60000);
+      // the official page moved on its own: continue from wherever it is now
+      if (page.url() !== prev) return advance(s, prev, 60000);
+    }
     // make sure the rates are open
     await page.evaluate((c) => {
       const t = document.querySelector('.js-bf_showrates[data-results="' + c + '"]');
@@ -1338,8 +1438,9 @@ module.exports = function registerQrPackages(app) {
   route("/api/packages/hotel-select", async (body, req) => hotelSelect(need(req), String(body.choice || ""), Array.isArray(body.selections) ? body.selections : []));
   route("/api/packages/hotel-select-status", async (body, req) => {
     const s = need(req);
-    const end = Date.now() + 5000;
-    while (Date.now() < end && s.job && s.job.status === "selecting") await sleep(400);
+    // long-poll: answer the moment the selection finishes (the page waits 1s between polls)
+    const end = Date.now() + 15000;
+    while (Date.now() < end && s.job && s.job.status === "selecting") await sleep(200);
     return hotelSelectStatus(s);
   });
   route("/api/packages/summary", async (body, req) => summary(need(req)));
