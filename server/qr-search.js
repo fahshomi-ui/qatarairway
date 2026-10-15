@@ -1262,7 +1262,7 @@ module.exports = function registerQrSearch(app) {
       const t0 = Date.now();
       const r = await browserPost(OFFERS_PATH, body, lang, 50000);
       // flights first: the page loads the date strip on its own, so don't hold results for it
-      let calendar = await Promise.race([calendarP, sleep(600).then(() => undefined)]);
+      let calendar = await Promise.race([calendarP, sleep(100).then(() => undefined)]);
       const calLate = calendar === undefined;
       if (calLate) calendar = null;
       log(`search ${body.itineraries.map((i) => `${i.origin}-${i.destination}@${i.departureDate}${i.isRequested ? "*" : ""}`).join(",")} -> ${r.status} in ${Date.now() - t0}ms`);
