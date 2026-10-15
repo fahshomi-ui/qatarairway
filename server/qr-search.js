@@ -243,7 +243,7 @@ async function wiggle(page, n = 4) {
 
 // QR rejects a second protected call that follows the previous one within a few seconds
 // (observed: 2 s apart -> 403, >= 5 s apart -> 200). Keep calls on a session spaced out.
-const MIN_CALL_GAP_MS = Number(process.env.QR_MIN_GAP_MS || 4000);
+const MIN_CALL_GAP_MS = Number(process.env.QR_MIN_GAP_MS || 300);
 async function spaceCalls(w) {
   const wait = (w && w.lastCallAt ? w.lastCallAt + MIN_CALL_GAP_MS : 0) - Date.now();
   if (wait > 0) await sleep(wait);
@@ -553,6 +553,7 @@ async function warmPage(browser) {
   await detectTimezone();
   const context = await browser.newContext(ctxOptions());
   try {
+    if (process.env.QR_BRIDGE !== "0") await context.addInitScript(BRIDGE_JS);
     // Save memory/bandwidth: skip images & media (not used by the bot sensor).
     await context.route("**/*", (route) => {
       const t = route.request().resourceType();
@@ -628,6 +629,42 @@ function serial(fn, prio = 1) {
   });
 }
 
+// Runs in the page's MAIN world (init script): performs our search with the page's own
+// XMLHttpRequest, exactly like the official app does, so the site's own scripts see and
+// prepare the call. Patchright's evaluate() runs in an isolated world and bypasses them.
+const BRIDGE_JS = `(() => {
+  const send = (q) => {
+    const out = (status, text) => {
+      const r = document.createElement("template");
+      r.id = "qa-res-" + q.id;
+      r.setAttribute("data-s", String(status));
+      r.setAttribute("data-t", text || "");
+      (document.body || document.documentElement).appendChild(r);
+    };
+    try {
+      const x = new XMLHttpRequest();
+      x.open("POST", q.url, true);
+      x.withCredentials = true;
+      Object.keys(q.headers || {}).forEach((k) => x.setRequestHeader(k, q.headers[k]));
+      x.timeout = 20000;
+      x.onload = () => out(x.status, x.responseText);
+      x.onerror = () => out(0, "");
+      x.ontimeout = () => out(0, "timeout");
+      x.send(q.body);
+    } catch (e) {
+      out(0, String(e));
+    }
+  };
+  window.addEventListener("qa-req", () => {
+    document.querySelectorAll("template[data-qa-req]").forEach((el) => {
+      let q = null;
+      try { q = JSON.parse(el.getAttribute("data-q")); } catch (e) {}
+      el.remove();
+      if (q) send(q);
+    });
+  });
+})();`;
+
 const PAGE_FETCH = async ({ url, body, lang, apiKey }) => {
   const hex = (n) => Array.from({ length: n }, () => Math.floor(Math.random() * 16).toString(16)).join("");
   const clean = (v) => (v ? String(v).replace(/^"+|"+$/g, "") : "");
@@ -642,6 +679,39 @@ const PAGE_FETCH = async ({ url, body, lang, apiKey }) => {
   if (!did) did = hex(32);
   const tid = hex(32);
   const spid = hex(16);
+  const headers = {
+    Accept: "application/json, text/plain, */*",
+    "Accept-Language": lang || "en",
+    "Content-Type": "application/json",
+    nbx_fs_api_key: apiKey,
+    "qr-lang": lang || "en",
+    "request-id": `|${tid}.${spid}`,
+    "session-id": sid,
+    traceparent: `00-${tid}-${spid}-01`,
+    "X-AssignedDeviceID": did,
+  };
+  // 1) main-world XHR through the bridge (same path as the official app)
+  const id = hex(12);
+  const el = document.createElement("template");
+  el.setAttribute("data-qa-req", "1");
+  el.setAttribute("data-q", JSON.stringify({ id, url, headers, body: JSON.stringify(body) }));
+  document.documentElement.appendChild(el);
+  window.dispatchEvent(new Event("qa-req"));
+  if (!el.isConnected) {
+    for (let i = 0; i < 230; i += 1) {
+      const r = document.getElementById("qa-res-" + id);
+      if (r) {
+        const status = Number(r.getAttribute("data-s"));
+        const text = r.getAttribute("data-t") || "";
+        r.remove();
+        return { status, text, via: "xhr" };
+      }
+      await new Promise((res) => setTimeout(res, 100));
+    }
+    return { status: 0, text: "", error: "bridge_timeout", via: "xhr" };
+  }
+  el.remove();
+  // 2) fallback: plain fetch (bridge not installed on this page)
   const ctrl = new AbortController();
   const timer = setTimeout(() => ctrl.abort(), 20000);
   try {
@@ -662,7 +732,7 @@ const PAGE_FETCH = async ({ url, body, lang, apiKey }) => {
       body: JSON.stringify(body),
     });
     const text = await r.text();
-    return { status: r.status, text };
+    return { status: r.status, text, via: "fetch" };
   } catch (e) {
     return { status: 0, text: "", error: String(e) };
   } finally {
@@ -703,6 +773,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         at: new Date().toISOString().slice(11, 19),
         p: path === OFFERS_PATH ? "offers" : "cal",
         st: r.status,
+        via: r.via,
         ms: Date.now() - tf,
         ctx: w ? w.id : null,
         n: w ? w.uses : null,
@@ -1337,4 +1408,4 @@ module.exports = function registerQrSearch(app) {
   }
 };
 
-module.exports._internals = { ensureDisplay, normalizeOffer, buildQrBody, calendarFromRaw, fmt, browserPost, fetchCalendarRaw, OFFERS_PATH, PAGE_FETCH, FS_API_KEY };
+module.exports._internals = { ensureDisplay, normalizeOffer, buildQrBody, calendarFromRaw, fmt, browserPost, fetchCalendarRaw, OFFERS_PATH, PAGE_FETCH, FS_API_KEY, BRIDGE_JS };
