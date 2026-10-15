@@ -396,17 +396,20 @@ function promoteSpare(why) {
 async function refreshCtx(w, why) {
   if (!w || !w.page || w.page.isClosed()) return false;
   const n0 = w.spa.length;
+  const t0 = Date.now();
   try {
     await w.page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 30000 });
-    await w.page.waitForTimeout(5000);
-    await wiggle(w.page, 3);
+    // wait for the official app's own search call (fresh sensor + acceptance signal), max 6 s
+    for (let i = 0; i < 30 && w.spa.length === n0; i += 1) await w.page.waitForTimeout(200);
+    await wiggle(w.page, 2);
   } catch (e) {
     return false;
   }
+  w.refreshMs = Date.now() - t0;
   const got = w.spa.slice(n0);
   const ok = got.length ? got.includes(200) : true;
   w.refreshedAt = Date.now();
-  B.refreshLog = (B.refreshLog || []).concat([{ at: new Date().toISOString().slice(11, 19), id: w.id, why, spa: got, ok }]).slice(-12);
+  B.refreshLog = (B.refreshLog || []).concat([{ at: new Date().toISOString().slice(11, 19), id: w.id, why, spa: got, ok, ms: w.refreshMs }]).slice(-12);
   return ok;
 }
 
@@ -668,6 +671,13 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         B.fails = 0;
         B.okCount += 1;
         B.lastOkAt = Date.now();
+        if (w && path === OFFERS_PATH && process.env.QR_POST_REFRESH !== "0") {
+          // QR often rejects a second call on the same sensor data; re-arm the session while
+          // the visitor is reading the results, so their next search goes straight through.
+          setTimeout(() => {
+            if (B.cur === w) serial(() => (B.cur === w ? refreshCtx(w, "post") : null)).catch(() => {});
+          }, 50);
+        }
         return r;
       }
       B.fails += 1;
@@ -1253,9 +1263,10 @@ module.exports = function registerQrSearch(app) {
           }
         });
       }
+      if (B.page && B.fails >= 2) promoteSpare("primary rejected");
       if (!B.page) startWarm();
       else if (!spareOk()) startSpare();
-    }, 60 * 1000).unref();
+    }, 30 * 1000).unref();
   }
 };
 
