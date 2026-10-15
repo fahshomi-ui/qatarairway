@@ -196,11 +196,12 @@ function warmUrl() {
   return `${FS_PAGE}?${q.toString()}`;
 }
 
-async function warm() {
+// Two warmed Chromes: the primary serves requests, the spare is ready to take over instantly
+// when the primary gets blocked (403) or ages out, so users never wait for a ~35 s warm-up.
+async function launchWarmed() {
   const pw = getPw();
   if (!pw) throw new Error("browser_unavailable");
   await ensureDisplay();
-  const old = B.browser;
   const t0 = Date.now();
   const browser = await launchGuard(() => pw.chromium.launch({
     headless: process.env.QR_HEADLESS === "1",
@@ -221,9 +222,15 @@ async function warm() {
       B.page = null;
       B.readyAt = 0;
     }
+    if (B.spare && B.spare.browser === browser) B.spare = null;
   });
   try {
-    await warmPage(browser, t0);
+    const w = await warmPage(browser);
+    w.valid = await validateWarmed(w);
+    w.readyAt = Date.now();
+    log(`browser warmed in ${Date.now() - t0}ms valid=${w.valid}`);
+    B.warmLog = (B.warmLog || []).concat([{ at: new Date().toISOString().slice(11, 19), ms: Date.now() - t0, valid: w.valid }]).slice(-12);
+    return w;
   } catch (e) {
     // never leave a half-warmed Chrome running (each one is a whole process tree)
     try {
@@ -231,8 +238,93 @@ async function warm() {
     } catch (e2) {}
     throw e;
   }
-  // swapped: retire the previous browser once any in-flight request on it is done
-  if (old && old !== browser) setTimeout(() => old.close().catch(() => {}), 30000).unref();
+}
+
+// Prove the warmed session is accepted by a real (tiny) flight-offers call before trusting it.
+async function validateWarmed(w) {
+  if (process.env.QR_NO_VALIDATE === "1") return true;
+  const d = todayPlus(20 + Math.floor(Math.random() * 10));
+  const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: "LHR", date: d }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
+  for (let i = 0; i < 4; i += 1) {
+    let r;
+    try {
+      r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
+    } catch (e) {
+      return false;
+    }
+    if (r.status && r.status !== 403) return true; // accepted (not bot-blocked)
+    await wiggle(w.page, 3);
+    await sleep(1200 + i * 600);
+    if (i === 1) {
+      try {
+        await w.page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 45000 });
+        await w.page.waitForTimeout(4000);
+        await wiggle(w.page, 3);
+      } catch (e) {}
+    }
+  }
+  return false;
+}
+
+function retire(browser) {
+  if (browser) setTimeout(() => browser.close().catch(() => {}), 30000).unref();
+}
+
+function install(w) {
+  const old = B.browser;
+  B.browser = w.browser;
+  B.context = w.context;
+  B.page = w.page;
+  B.readyAt = w.readyAt;
+  B.fails = w.valid === false ? 2 : 0; // unproven session: swap to a proven spare asap
+  if (old && old !== w.browser) retire(old); // let any in-flight request on it finish
+}
+
+function spareOk() {
+  return B.spare && B.spare.page && !B.spare.page.isClosed() && Date.now() - B.spare.readyAt < 25 * 60 * 1000;
+}
+
+// Promote the spare to primary (instant). Returns true when swapped.
+function promoteSpare(why) {
+  if (!spareOk()) return false;
+  const w = B.spare;
+  B.spare = null;
+  install(w);
+  B.swaps = (B.swaps || 0) + 1;
+  log("swapped to spare browser:", why);
+  startSpare();
+  return true;
+}
+
+function startSpare() {
+  if (B.spareWarming || process.env.QR_NO_SPARE === "1") return B.spareWarming;
+  B.spareWarming = (async () => {
+    await sleep(3000);
+    let w = null;
+    for (let k = 0; k < 3 && !w; k += 1) {
+      const c = await launchWarmed();
+      if (c.valid) w = c;
+      else {
+        log("spare not accepted, re-warming");
+        await c.browser.close().catch(() => {});
+        await sleep(5000);
+      }
+    }
+    if (!w) throw new Error("spare_not_accepted");
+    const old = B.spare;
+    B.spare = w;
+    if (old && old.browser !== w.browser) retire(old.browser);
+  })()
+    .catch((e) => log("spare warm failed:", String((e && e.message) || e)))
+    .finally(() => {
+      B.spareWarming = null;
+    });
+  return B.spareWarming;
+}
+
+async function warm() {
+  install(await launchWarmed());
+  if (!spareOk()) startSpare();
 }
 
 function startWarm() {
@@ -251,7 +343,7 @@ function startWarm() {
   return B.warming;
 }
 
-async function warmPage(browser, t0) {
+async function warmPage(browser) {
   const context = await browser.newContext({ locale: "en-US", viewport: { width: 1366, height: 800 } });
   // Save memory/bandwidth: skip images & media (not used by the bot sensor).
   await context.route("**/*", (route) => {
@@ -266,21 +358,19 @@ async function warmPage(browser, t0) {
   await page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 60000 });
   await page.waitForTimeout(6000);
   await wiggle(page, 3);
-  B.browser = browser;
-  B.context = context;
-  B.page = page;
-  B.readyAt = Date.now();
-  B.fails = 0;
-  log(`browser warmed in ${Date.now() - t0}ms`);
+  return { browser, context, page, readyAt: Date.now() };
 }
 
 async function ensurePage() {
   const alive = B.page && !B.page.isClosed();
+  const old = Date.now() - B.readyAt > 18 * 60 * 1000;
+  if (alive && (B.fails >= 2 || old) && promoteSpare(B.fails >= 2 ? "blocked x" + B.fails : "aged")) return B.page;
   if (alive && B.fails < 8) {
-    // refresh in the background (old page keeps serving) when it is old or getting blocked
-    if (Date.now() - B.readyAt > 18 * 60 * 1000 || B.fails >= 3) startWarm();
+    // no spare ready: refresh in the background while the current page keeps serving
+    if (old || B.fails >= 3) startWarm();
     return B.page;
   }
+  if (!alive && promoteSpare("primary gone")) return B.page;
   await startWarm();
   return B.page;
 }
@@ -356,6 +446,10 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         r = { status: 0, text: "", error: String(e) };
         if (page === B.page) await closeBrowser();
       }
+      if (process.env.QR_TEST_FAIL_N && (B.testFails || 0) < Number(process.env.QR_TEST_FAIL_N)) {
+        B.testFails = (B.testFails || 0) + 1; // test hook only: simulate an Akamai 403
+        r = { status: 403, text: "" };
+      }
       last = r;
       if (r.status === 200 || r.status === 204 || (r.status >= 400 && r.status < 500 && r.status !== 403)) {
         B.fails = 0;
@@ -369,6 +463,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         await wiggle(B.page, 3);
         await sleep(900 + attempt * 300);
       }
+      if (B.fails >= 2 && promoteSpare("blocked x" + B.fails)) continue; // instant fresh session
       if (B.fails >= 3) startWarm(); // fresh profile in the background
       if (B.warming && B.fails >= 5) {
         // blocked repeatedly: wait for the fresh browser (within this request's deadline)
@@ -793,6 +888,11 @@ module.exports = function registerQrSearch(app) {
       lastOkSecAgo: B.lastOkAt ? Math.round((Date.now() - B.lastOkAt) / 1000) : null,
       lastError: B.lastError,
       cacheSize: cache.size,
+      spareReady: !!spareOk(),
+      spareAgeSec: B.spare ? Math.round((Date.now() - B.spare.readyAt) / 1000) : null,
+      spareWarming: !!B.spareWarming,
+      swaps: B.swaps || 0,
+      warmLog: B.warmLog || [],
     });
   });
 
@@ -802,7 +902,10 @@ module.exports = function registerQrSearch(app) {
       serial(() => ensurePage()).catch(() => {});
     }, 8000);
     setInterval(() => {
-      if (!B.warming && (!B.page || Date.now() - B.readyAt > 18 * 60 * 1000)) startWarm();
+      if (B.warming) return;
+      if (!B.page || Date.now() - B.readyAt > 18 * 60 * 1000) {
+        if (!promoteSpare("aged")) startWarm();
+      } else if (!spareOk()) startSpare();
     }, 2 * 60 * 1000).unref();
   }
 };
