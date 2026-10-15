@@ -257,7 +257,9 @@ function warmUrl() {
 // almost never wait for a ~35 s warm-up.
 const SPARES = Math.max(0, Number(process.env.QR_SPARES || 2));
 const CHROME_MAX_AGE = 3 * 60 * 60 * 1000;
-const SPARE_MAX_AGE = 25 * 60 * 1000;
+const SPARE_MAX_AGE = 3 * 60 * 60 * 1000; // kept fresh by refreshCtx; new sessions are hard to get
+const CTX_REFRESH_MS = 12 * 60 * 1000;
+const NEW_CTX_GAP_MS = 90 * 1000; // QR rejects brand-new sessions opened in quick succession
 
 async function launchChrome() {
   const pw = getPw();
@@ -311,6 +313,7 @@ function getChrome() {
 async function warmCtx() {
   const browser = await getChrome();
   const t0 = Date.now();
+  B.lastNewCtxAt = t0;
   const w = await warmPage(browser);
   w.valid = await validateWarmed(w);
   w.readyAt = Date.now();
@@ -343,8 +346,8 @@ async function validateWarmed(w) {
   return !!(r.status && r.status !== 403);
 }
 
-function install(w) {
-  const prevCtx = B.context;
+function install(w, keepPrev) {
+  const prevCtx = keepPrev ? null : B.context;
   B.cur = w;
   B.browser = w.browser;
   B.context = w.context;
@@ -377,11 +380,54 @@ function spareOk() {
 // Promote a ready spare to primary (instant). Returns true when swapped.
 function promoteSpare(why) {
   if (!spareOk()) return false;
-  install(B.spares.shift());
+  const i = B.spares.findIndex((x) => !x.busy);
+  if (i < 0) return false;
+  const old = B.cur;
+  install(B.spares.splice(i, 1)[0], true);
   B.swaps = (B.swaps || 0) + 1;
   log("swapped to spare context:", why, "spares left", B.spares.length);
+  if (old && old.page && !old.page.isClosed()) reviveLater(old);
   fillSpares();
   return true;
+}
+
+// Re-run the official page inside an existing context: refreshes the bot sensor and shows
+// whether the session is still accepted, without opening a brand-new session.
+async function refreshCtx(w, why) {
+  if (!w || !w.page || w.page.isClosed()) return false;
+  const n0 = w.spa.length;
+  try {
+    await w.page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 30000 });
+    await w.page.waitForTimeout(5000);
+    await wiggle(w.page, 3);
+  } catch (e) {
+    return false;
+  }
+  const got = w.spa.slice(n0);
+  const ok = got.length ? got.includes(200) : true;
+  w.refreshedAt = Date.now();
+  B.refreshLog = (B.refreshLog || []).concat([{ at: new Date().toISOString().slice(11, 19), id: w.id, why, spa: got, ok }]).slice(-12);
+  return ok;
+}
+
+// A context that just got a 403: give it a minute, refresh it, keep it as a spare if accepted.
+function reviveLater(w) {
+  w.busy = true;
+  setTimeout(async () => {
+    let ok = false;
+    try {
+      ok = await refreshCtx(w, "revive");
+    } catch (e) {}
+    w.busy = false;
+    if (ok && B.spares.length < SPARES + 1 && w.browser.isConnected()) {
+      w.readyAt = Date.now();
+      B.spares.push(w);
+      log("revived context", w.id, "as spare");
+    } else {
+      w.context.close().catch(() => {});
+      reapChromes();
+    }
+  }, 45000).unref();
 }
 
 function fillSpares() {
@@ -390,6 +436,10 @@ function fillSpares() {
   B.spareWarming = (async () => {
     await sleep(3000);
     for (let tries = 0; tries < 2 * SPARES + 2; tries += 1) {
+      pruneSpares();
+      if (B.spares.length >= SPARES) return;
+      const gap = (B.lastNewCtxAt || 0) + NEW_CTX_GAP_MS - Date.now();
+      if (gap > 0) await sleep(gap);
       pruneSpares();
       if (B.spares.length >= SPARES) return;
       if (!headroomFor(150)) throw new Error("no_pids_headroom");
@@ -410,7 +460,6 @@ function fillSpares() {
           B.spareBackoffUntil = Date.now() + mins * 60 * 1000;
           throw new Error("rejected twice, cooling down " + mins + " min");
         }
-        await sleep(15000);
       }
     }
   })()
@@ -506,7 +555,7 @@ async function warmPage(browser) {
 
 async function ensurePage() {
   const alive = B.page && !B.page.isClosed();
-  const old = Date.now() - B.readyAt > 18 * 60 * 1000;
+  const old = false; // never rotate a working session just for age (new sessions get rejected)
   if (alive && (B.fails >= 2 || old) && promoteSpare(B.fails >= 2 ? "blocked x" + B.fails : "aged")) return B.page;
   if (alive && B.fails < 8) {
     // no spare ready: refresh in the background while the current page keeps serving
@@ -572,6 +621,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
   return serial(async () => {
     const until = Date.now() + deadlineMs;
     let last = { status: 0, text: "", error: "not_started" };
+    let refreshed = false;
     for (let attempt = 0; attempt < 10 && Date.now() < until; attempt += 1) {
       let page;
       try {
@@ -623,6 +673,11 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       B.fails += 1;
       B.failCount += 1;
       if (promoteSpare("blocked x" + B.fails)) continue; // instant fresh session, no extra wait
+      if (!refreshed && B.cur && B.cur.page === B.page) {
+        refreshed = true; // no spare: refresh this session's sensor once and retry (~6 s)
+        await refreshCtx(B.cur, "403");
+        continue;
+      }
       if (B.page) {
         await wiggle(B.page, 3);
         await sleep(900 + attempt * 300);
@@ -1166,6 +1221,8 @@ module.exports = function registerQrSearch(app) {
       swaps: B.swaps || 0,
       warmLog: B.warmLog || [],
       reqLog: B.reqLog || [],
+      refreshLog: B.refreshLog || [],
+      primary: B.cur ? { id: B.cur.id, uses: B.cur.uses, ageSec: Math.round((Date.now() - B.cur.readyAt) / 1000) } : null,
     });
   });
   registerLab(app, cors);
@@ -1177,10 +1234,28 @@ module.exports = function registerQrSearch(app) {
     }, 8000);
     setInterval(() => {
       if (B.warming) return;
-      if (!B.page || Date.now() - B.readyAt > 18 * 60 * 1000) {
-        if (!promoteSpare("aged")) startWarm();
-      } else if (!spareOk()) startSpare();
-    }, 2 * 60 * 1000).unref();
+      const now = Date.now();
+      const w = B.cur;
+      if (B.page && w && w.page === B.page && now - Math.max(w.lastUse || 0, w.refreshedAt || 0, w.readyAt || 0) > CTX_REFRESH_MS) {
+        // idle primary: refresh through the request queue (never in the middle of a search)
+        serial(() => refreshCtx(w, "idle").then((ok) => {
+          if (!ok) B.fails = Math.max(B.fails, 1);
+        })).catch(() => {});
+      }
+      const sp = B.spares.find((x) => !x.busy && now - Math.max(x.refreshedAt || 0, x.readyAt || 0) > CTX_REFRESH_MS);
+      if (sp) {
+        sp.busy = true;
+        refreshCtx(sp, "spare idle").then((ok) => {
+          sp.busy = false;
+          if (!ok) {
+            B.spares = B.spares.filter((x) => x !== sp);
+            sp.context.close().catch(() => {});
+          }
+        });
+      }
+      if (!B.page) startWarm();
+      else if (!spareOk()) startSpare();
+    }, 60 * 1000).unref();
   }
 };
 
