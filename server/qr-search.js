@@ -135,6 +135,15 @@ function procStats() {
   return out;
 }
 
+// pids budget (cgroup pids.max counts Chrome threads, ~240 per Chrome)
+function headroomFor(n) {
+  const st = procStats();
+  B.proc = st;
+  const max = Number(st.pidsMax), cur = Number(st.pidsCurrent);
+  if (!(max > 0) || !(cur >= 0)) return true;
+  return cur + n < max * 0.88;
+}
+
 function restartContainer(why) {
   log("RESTARTING PROCESS:", why, JSON.stringify(procStats()));
   setTimeout(() => process.exit(1), 500);
@@ -159,6 +168,13 @@ setInterval(() => {
   B.proc = st;
   const max = Number(st.pidsMax);
   if (max > 0 && Number(st.pidsCurrent) > max * 0.85) log("WARN pids near limit", st.pidsCurrent + "/" + max, "chrome", st.chrome, "zombies", st.zombies);
+  if (max > 0 && Number(st.pidsCurrent) > max * 0.8 && B.spare) {
+    // make room for package sessions: drop the spare Chrome
+    const sp = B.spare;
+    B.spare = null;
+    log("dropping spare browser (pids " + st.pidsCurrent + "/" + max + ")");
+    sp.browser.close().catch(() => {});
+  }
   if (st.zombies > 300) restartContainer("too many zombies " + st.zombies);
 }, 60000).unref();
 
@@ -267,7 +283,7 @@ async function validateWarmed(w) {
 }
 
 function retire(browser) {
-  if (browser) setTimeout(() => browser.close().catch(() => {}), 30000).unref();
+  if (browser) setTimeout(() => browser.close().catch(() => {}), 10000).unref();
 }
 
 function install(w) {
@@ -299,9 +315,10 @@ function promoteSpare(why) {
 function startSpare() {
   if (B.spareWarming || process.env.QR_NO_SPARE === "1") return B.spareWarming;
   B.spareWarming = (async () => {
-    await sleep(3000);
+    await sleep(12000); // let a just-retired browser exit first
     let w = null;
     for (let k = 0; k < 3 && !w; k += 1) {
+      if (!headroomFor(300)) throw new Error("no_pids_headroom");
       const c = await launchWarmed();
       if (c.valid) w = c;
       else {
