@@ -241,6 +241,14 @@ async function wiggle(page, n = 4) {
   }
 }
 
+// QR rejects a second protected call that follows the previous one within a few seconds
+// (observed: 2 s apart -> 403, >= 5 s apart -> 200). Keep calls on a session spaced out.
+const MIN_CALL_GAP_MS = Number(process.env.QR_MIN_GAP_MS || 4000);
+async function spaceCalls(w) {
+  const wait = (w && w.lastCallAt ? w.lastCallAt + MIN_CALL_GAP_MS : 0) - Date.now();
+  if (wait > 0) await sleep(wait);
+}
+
 function warmUrl() {
   const q = new URLSearchParams({
     widget: "QR", searchType: "F", addTaxToFare: "Y", minPurTime: "0", selLang: "en",
@@ -340,10 +348,12 @@ async function warmCtx() {
 async function validateWarmed(w) {
   if (process.env.QR_NO_VALIDATE === "1") return true;
   const spa = w.spa || [];
-  if (spa.length && !spa.includes(200)) return false; // the official app itself was rejected
+  if (spa.includes(200)) return true; // the official app's own search was accepted
+  if (spa.length) return false; // the official app itself was rejected
   const d = todayPlus(20 + Math.floor(Math.random() * 10));
   const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: "LHR", date: d }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
   await wiggle(w.page, 2);
+  await spaceCalls(w);
   let r;
   try {
     w.own = true;
@@ -553,7 +563,10 @@ async function warmPage(browser) {
     const w = { browser, context, page, readyAt: 0, id: (B.ctxSeq = (B.ctxSeq || 0) + 1), uses: 0, lastUse: 0, spa: [] };
     page.on("response", (r) => {
       try {
-        if (r.url().includes(OFFERS_PATH) && r.request().method() === "POST" && !w.own) w.spa.push(r.status());
+        if (r.url().includes(OFFERS_PATH) && r.request().method() === "POST") {
+          w.lastCallAt = Date.now();
+          if (!w.own) w.spa.push(r.status());
+        }
       } catch (e) {}
     });
     await page.goto(HOME_URL, { waitUntil: "load", timeout: 60000 });
@@ -584,12 +597,35 @@ async function ensurePage() {
   return B.page;
 }
 
-// Serialise all browser work on the single page.
-let chain = Promise.resolve();
-function serial(fn) {
-  const p = chain.then(fn, fn);
-  chain = p.catch(() => {});
-  return p;
+// Serialise all browser work on the single page. Searches (prio 2) run newest-first: the page
+// prefetches several searches at once, and the visitor's latest action must not wait behind
+// older prefetches. Maintenance work (prio 1) runs only when no search is waiting.
+const Q = [];
+let qBusy = false;
+let qSeq = 0;
+function pumpQ() {
+  if (qBusy || !Q.length) return;
+  let bi = 0;
+  for (let i = 1; i < Q.length; i += 1) {
+    const a = Q[i];
+    const b = Q[bi];
+    if (a.prio > b.prio || (a.prio === b.prio && a.prio >= 2 && a.seq > b.seq) || (a.prio === b.prio && a.prio < 2 && a.seq < b.seq)) bi = i;
+  }
+  const t = Q.splice(bi, 1)[0];
+  qBusy = true;
+  Promise.resolve()
+    .then(t.fn)
+    .then(t.res, t.rej)
+    .finally(() => {
+      qBusy = false;
+      pumpQ();
+    });
+}
+function serial(fn, prio = 1) {
+  return new Promise((res, rej) => {
+    Q.push({ fn, res, rej, prio, seq: (qSeq += 1) });
+    pumpQ();
+  });
 }
 
 const PAGE_FETCH = async ({ url, body, lang, apiKey }) => {
@@ -652,6 +688,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       }
       let r;
       const w = B.cur && B.cur.page === page ? B.cur : null;
+      await spaceCalls(w);
       const tf = Date.now();
       try {
         if (w) w.own = true;
@@ -675,6 +712,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       if (w) {
         w.uses += 1;
         w.lastUse = Date.now();
+        w.lastCallAt = Date.now();
       }
       if (process.env.QR_TEST_FAIL_N && (B.testFails || 0) < Number(process.env.QR_TEST_FAIL_N)) {
         B.testFails = (B.testFails || 0) + 1; // test hook only: simulate an Akamai 403
@@ -685,7 +723,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         B.fails = 0;
         B.okCount += 1;
         B.lastOkAt = Date.now();
-        if (w && path === OFFERS_PATH && process.env.QR_POST_REFRESH !== "0") {
+        if (w && path === OFFERS_PATH && process.env.QR_POST_REFRESH === "1") {
           // QR often rejects a second call on the same sensor data; re-arm the session while
           // the visitor is reading the results, so their next search goes straight through.
           setTimeout(() => {
@@ -714,7 +752,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       }
     }
     return last;
-  });
+  }, 2);
 }
 
 async function serverPost(path, body, lang) {
@@ -1241,6 +1279,7 @@ module.exports = function registerQrSearch(app) {
       lastOkSecAgo: B.lastOkAt ? Math.round((Date.now() - B.lastOkAt) / 1000) : null,
       lastError: B.lastError,
       cacheSize: cache.size,
+      queue: Q.length,
       spareReady: !!spareOk(),
       spares: B.spares.length,
       spareBackoffSec: Math.max(0, Math.round(((B.spareBackoffUntil || 0) - Date.now()) / 1000)),
