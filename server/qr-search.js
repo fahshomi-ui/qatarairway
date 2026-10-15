@@ -199,8 +199,8 @@ function warmUrl() {
 async function warm() {
   const pw = getPw();
   if (!pw) throw new Error("browser_unavailable");
-  await closeBrowser();
   await ensureDisplay();
+  const old = B.browser;
   const t0 = Date.now();
   const browser = await launchGuard(() => pw.chromium.launch({
     headless: process.env.QR_HEADLESS === "1",
@@ -231,6 +231,24 @@ async function warm() {
     } catch (e2) {}
     throw e;
   }
+  // swapped: retire the previous browser once any in-flight request on it is done
+  if (old && old !== browser) setTimeout(() => old.close().catch(() => {}), 30000).unref();
+}
+
+function startWarm() {
+  if (!B.warming) {
+    B.warming = warm()
+      .catch((e) => {
+        B.lastError = String(e && e.message ? e.message : e);
+        log("warm failed:", B.lastError);
+        throw e;
+      })
+      .finally(() => {
+        B.warming = null;
+      });
+    B.warming.catch(() => {});
+  }
+  return B.warming;
 }
 
 async function warmPage(browser, t0) {
@@ -257,20 +275,13 @@ async function warmPage(browser, t0) {
 }
 
 async function ensurePage() {
-  const fresh = B.page && !B.page.isClosed() && Date.now() - B.readyAt < 25 * 60 * 1000;
-  if (fresh && B.fails < 5) return B.page;
-  if (!B.warming) {
-    B.warming = warm()
-      .catch((e) => {
-        B.lastError = String(e && e.message ? e.message : e);
-        log("warm failed:", B.lastError);
-        throw e;
-      })
-      .finally(() => {
-        B.warming = null;
-      });
+  const alive = B.page && !B.page.isClosed();
+  if (alive && B.fails < 8) {
+    // refresh in the background (old page keeps serving) when it is old or getting blocked
+    if (Date.now() - B.readyAt > 18 * 60 * 1000 || B.fails >= 3) startWarm();
+    return B.page;
   }
-  await B.warming;
+  await startWarm();
   return B.page;
 }
 
@@ -343,7 +354,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         r = await page.evaluate(PAGE_FETCH, { url: BASE + path, body, lang, apiKey: FS_API_KEY });
       } catch (e) {
         r = { status: 0, text: "", error: String(e) };
-        await closeBrowser();
+        if (page === B.page) await closeBrowser();
       }
       last = r;
       if (r.status === 200 || r.status === 204 || (r.status >= 400 && r.status < 500 && r.status !== 403)) {
@@ -358,7 +369,11 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         await wiggle(B.page, 3);
         await sleep(900 + attempt * 300);
       }
-      if (B.fails >= 6) await closeBrowser(); // re-warm with a fresh profile
+      if (B.fails >= 3) startWarm(); // fresh profile in the background
+      if (B.warming && B.fails >= 5) {
+        // blocked repeatedly: wait for the fresh browser (within this request's deadline)
+        await Promise.race([B.warming.catch(() => {}), sleep(Math.max(0, until - Date.now() - 6000))]);
+      }
     }
     return last;
   });
@@ -692,7 +707,7 @@ module.exports = function registerQrSearch(app) {
         .catch(() => null);
 
       const t0 = Date.now();
-      const r = await browserPost(OFFERS_PATH, body, lang, 22000);
+      const r = await browserPost(OFFERS_PATH, body, lang, 50000);
       const calendar = await calendarP;
       log(`search ${body.itineraries.map((i) => `${i.origin}-${i.destination}@${i.departureDate}${i.isRequested ? "*" : ""}`).join(",")} -> ${r.status} in ${Date.now() - t0}ms`);
 
@@ -787,10 +802,8 @@ module.exports = function registerQrSearch(app) {
       serial(() => ensurePage()).catch(() => {});
     }, 8000);
     setInterval(() => {
-      if (!B.warming && (!B.page || Date.now() - B.readyAt > 20 * 60 * 1000)) {
-        serial(() => ensurePage()).catch(() => {});
-      }
-    }, 5 * 60 * 1000).unref();
+      if (!B.warming && (!B.page || Date.now() - B.readyAt > 18 * 60 * 1000)) startWarm();
+    }, 2 * 60 * 1000).unref();
   }
 };
 
