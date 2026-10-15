@@ -260,13 +260,25 @@ const CHROME_MAX_AGE = 3 * 60 * 60 * 1000;
 const SPARE_MAX_AGE = 3 * 60 * 60 * 1000; // kept fresh by refreshCtx; new sessions are hard to get
 const CTX_REFRESH_MS = 12 * 60 * 1000;
 const NEW_CTX_GAP_MS = 90 * 1000; // QR rejects brand-new sessions opened in quick succession
+// After consecutive rejected new sessions, wait longer before opening another (IP cool-down).
+function newCtxGap() {
+  const r = B.newRejects || 0;
+  return [NEW_CTX_GAP_MS, 3, 6, 12, 15][Math.min(4, r)] * (r ? 60 * 1000 : 1);
+}
+function newCtxAllowed() {
+  return Date.now() >= (B.lastNewCtxAt || 0) + newCtxGap();
+}
 
 async function launchChrome() {
   const pw = getPw();
   if (!pw) throw new Error("browser_unavailable");
   await ensureDisplay();
+  const proxy = process.env.QR_PROXY_SERVER
+    ? { server: process.env.QR_PROXY_SERVER, username: process.env.QR_PROXY_USER || undefined, password: process.env.QR_PROXY_PASS || undefined }
+    : undefined;
   const browser = await launchGuard(() => pw.chromium.launch({
     headless: process.env.QR_HEADLESS === "1",
+    proxy,
     channel: process.env.QR_CHROME_CHANNEL || "chrome",
     args: [
       "--no-sandbox",
@@ -318,6 +330,7 @@ async function warmCtx() {
   w.valid = await validateWarmed(w);
   w.readyAt = Date.now();
   log(`context warmed in ${Date.now() - t0}ms valid=${w.valid}`);
+  B.newRejects = w.valid ? 0 : (B.newRejects || 0) + 1;
   B.warmLog = (B.warmLog || []).concat([{ at: new Date().toISOString().slice(11, 19), ms: Date.now() - t0, valid: w.valid, id: w.id, spa: w.spa.slice(0, 4), vst: w.vst || [] }]).slice(-12);
   return w;
 }
@@ -441,7 +454,7 @@ function fillSpares() {
     for (let tries = 0; tries < 2 * SPARES + 2; tries += 1) {
       pruneSpares();
       if (B.spares.length >= SPARES) return;
-      const gap = (B.lastNewCtxAt || 0) + NEW_CTX_GAP_MS - Date.now();
+      const gap = (B.lastNewCtxAt || 0) + newCtxGap() - Date.now();
       if (gap > 0) await sleep(gap);
       pruneSpares();
       if (B.spares.length >= SPARES) return;
@@ -487,6 +500,7 @@ async function warm() {
 }
 
 function startWarm() {
+  if (!B.warming && B.page && !B.page.isClosed() && !newCtxAllowed()) return Promise.resolve(); // cooling down
   if (!B.warming) {
     B.warming = warm()
       .catch((e) => {
@@ -692,6 +706,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         await wiggle(B.page, 3);
         await sleep(900 + attempt * 300);
       }
+      if (refreshed && !spareOk() && !B.warming && !newCtxAllowed()) break; // blocked, cooling down: fail fast
       if (B.fails >= 3) startWarm(); // fresh profile in the background
       if (B.warming && B.fails >= 5) {
         // blocked repeatedly: wait for the fresh browser (within this request's deadline)
@@ -1225,6 +1240,10 @@ module.exports = function registerQrSearch(app) {
       spareReady: !!spareOk(),
       spares: B.spares.length,
       spareBackoffSec: Math.max(0, Math.round(((B.spareBackoffUntil || 0) - Date.now()) / 1000)),
+      newSessionInSec: Math.max(0, Math.round(((B.lastNewCtxAt || 0) + newCtxGap() - Date.now()) / 1000)),
+      newRejects: B.newRejects || 0,
+      primaryFails: B.fails,
+      proxy: !!process.env.QR_PROXY_SERVER,
       spareAgeSec: B.spares[0] ? Math.round((Date.now() - B.spares[0].readyAt) / 1000) : null,
       chromes: B.chromes.length,
       spareWarming: !!B.spareWarming,
@@ -1264,6 +1283,11 @@ module.exports = function registerQrSearch(app) {
         });
       }
       if (B.page && B.fails >= 2) promoteSpare("primary rejected");
+      if (B.page && w && w.page === B.page && B.fails >= 2 && !w.busy && now - Math.max(w.refreshedAt || 0, w.readyAt || 0) > 3 * 60 * 1000) {
+        serial(() => refreshCtx(w, "blocked").then((ok) => {
+          if (ok) B.fails = 0; // the same session is accepted again
+        })).catch(() => {});
+      }
       if (!B.page) startWarm();
       else if (!spareOk()) startSpare();
     }, 30 * 1000).unref();
