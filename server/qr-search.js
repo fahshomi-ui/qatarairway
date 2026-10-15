@@ -311,7 +311,7 @@ async function warmCtx() {
   w.valid = await validateWarmed(w);
   w.readyAt = Date.now();
   log(`context warmed in ${Date.now() - t0}ms valid=${w.valid}`);
-  B.warmLog = (B.warmLog || []).concat([{ at: new Date().toISOString().slice(11, 19), ms: Date.now() - t0, valid: w.valid }]).slice(-12);
+  B.warmLog = (B.warmLog || []).concat([{ at: new Date().toISOString().slice(11, 19), ms: Date.now() - t0, valid: w.valid, id: w.id, spa: w.spa.slice(0, 4), vst: w.vst || [] }]).slice(-12);
   return w;
 }
 
@@ -321,12 +321,18 @@ async function validateWarmed(w) {
   const d = todayPlus(20 + Math.floor(Math.random() * 10));
   const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: "LHR", date: d }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
   for (let i = 0; i < 4; i += 1) {
+    w.vTries = i + 1;
     let r;
     try {
+      w.own = true;
       r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
     } catch (e) {
       return false;
+    } finally {
+      w.own = false;
     }
+    w.uses = (w.uses || 0) + 1;
+    w.vst = (w.vst || []).concat([r.status]);
     if (r.status && r.status !== 403) return true; // accepted (not bot-blocked)
     await wiggle(w.page, 3);
     await sleep(1200 + i * 600);
@@ -343,6 +349,7 @@ async function validateWarmed(w) {
 
 function install(w) {
   const prevCtx = B.context;
+  B.cur = w;
   B.browser = w.browser;
   B.context = w.context;
   B.page = w.page;
@@ -453,13 +460,20 @@ async function warmPage(browser) {
       return route.continue();
     });
     const page = await context.newPage();
+    const w = { browser, context, page, readyAt: 0, id: (B.ctxSeq = (B.ctxSeq || 0) + 1), uses: 0, lastUse: 0, spa: [] };
+    page.on("response", (r) => {
+      try {
+        if (r.url().includes(OFFERS_PATH) && r.request().method() === "POST" && !w.own) w.spa.push(r.status());
+      } catch (e) {}
+    });
     await page.goto(HOME_URL, { waitUntil: "load", timeout: 60000 });
     await page.waitForTimeout(4000);
     await wiggle(page, 5);
     await page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 60000 });
     await page.waitForTimeout(6000);
     await wiggle(page, 3);
-    return { browser, context, page, readyAt: Date.now() };
+    w.readyAt = Date.now();
+    return w;
   } catch (e) {
     context.close().catch(() => {}); // never leak a half-warmed context
     throw e;
@@ -546,11 +560,30 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         continue;
       }
       let r;
+      const w = B.cur && B.cur.page === page ? B.cur : null;
+      const tf = Date.now();
       try {
+        if (w) w.own = true;
         r = await page.evaluate(PAGE_FETCH, { url: BASE + path, body, lang, apiKey: FS_API_KEY });
       } catch (e) {
         r = { status: 0, text: "", error: String(e) };
         if (page === B.page) await dropPrimary();
+      } finally {
+        if (w) w.own = false;
+      }
+      B.reqLog = (B.reqLog || []).concat([{
+        at: new Date().toISOString().slice(11, 19),
+        p: path === OFFERS_PATH ? "offers" : "cal",
+        st: r.status,
+        ms: Date.now() - tf,
+        ctx: w ? w.id : null,
+        n: w ? w.uses : null,
+        age: w ? Math.round((tf - w.readyAt) / 1000) : null,
+        idle: w && w.lastUse ? Math.round((tf - w.lastUse) / 1000) : null,
+      }]).slice(-40);
+      if (w) {
+        w.uses += 1;
+        w.lastUse = Date.now();
       }
       if (process.env.QR_TEST_FAIL_N && (B.testFails || 0) < Number(process.env.QR_TEST_FAIL_N)) {
         B.testFails = (B.testFails || 0) + 1; // test hook only: simulate an Akamai 403
@@ -565,11 +598,11 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       }
       B.fails += 1;
       B.failCount += 1;
+      if (promoteSpare("blocked x" + B.fails)) continue; // instant fresh session, no extra wait
       if (B.page) {
         await wiggle(B.page, 3);
         await sleep(900 + attempt * 300);
       }
-      if (B.fails >= 2 && promoteSpare("blocked x" + B.fails)) continue; // instant fresh session
       if (B.fails >= 3) startWarm(); // fresh profile in the background
       if (B.warming && B.fails >= 5) {
         // blocked repeatedly: wait for the fresh browser (within this request's deadline)
@@ -872,6 +905,83 @@ function cacheSet(k, val, ttlMs) {
   if (cache.size > 500) cache.delete(cache.keys().next().value);
 }
 
+
+// ---------------------------------------------------------------- lab (diagnostics, key-protected)
+// Measures how long a fresh session stays accepted under different refresh strategies.
+const LAB_HASH = "ccc730b25af3508fdc7b412c456360c984ead2eff4e8e96e6339771fb0b6d4ed";
+let labBusy = false;
+async function labRun(mode, n, gapMs) {
+  const browser = await getChrome();
+  const w = await warmPage(browser);
+  const out = { mode, warmSpa: w.spa.slice(), steps: [] };
+  let sensor = 0;
+  w.page.on("request", (q) => {
+    try {
+      if (q.method() === "POST" && /sensor_data/.test(q.postData() || "")) sensor += 1;
+    } catch (e) {}
+  });
+  const dests = ["LHR", "IST", "AMM", "CAI", "JED", "BKK", "KUL", "CDG", "FRA", "MCT", "BEY", "RUH"];
+  try {
+    for (let k = 0; k < n; k += 1) {
+      const s0 = sensor;
+      const t0 = Date.now();
+      const spa0 = w.spa.length;
+      try {
+        if (mode === "wiggle") await wiggle(w.page, 3);
+        if (mode === "reload") {
+          await w.page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 45000 });
+          await w.page.waitForTimeout(3000);
+          await wiggle(w.page, 3);
+        }
+        if (mode === "home") {
+          await w.page.goto(HOME_URL, { waitUntil: "domcontentloaded", timeout: 45000 });
+          await w.page.waitForTimeout(3000);
+          await wiggle(w.page, 3);
+        }
+      } catch (e) {}
+      const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: dests[k % dests.length], date: todayPlus(15 + k) }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
+      const tf = Date.now();
+      w.own = true;
+      let r;
+      try {
+        r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
+      } catch (e) {
+        r = { status: 0, error: String(e).slice(0, 80) };
+      }
+      w.own = false;
+      let abck = "";
+      try {
+        abck = ((await w.context.cookies()).find((c) => c.name === "_abck") || {}).value || "";
+      } catch (e) {}
+      out.steps.push({ k, st: r.status, prep: tf - t0, ms: Date.now() - tf, sensor: sensor - s0, spa: w.spa.slice(spa0), abck: abck.split("~")[1] });
+      await sleep(gapMs);
+    }
+  } finally {
+    w.context.close().catch(() => {});
+    reapChromes();
+  }
+  return out;
+}
+function registerLab(app, cors) {
+  app.get("/api/qr-lab", cors, async (req, res) => {
+    const k = String(req.query.k || "");
+    if (require("crypto").createHash("sha256").update(k).digest("hex") !== LAB_HASH) return res.status(404).end();
+    if (labBusy) return res.json({ error: "busy" });
+    if (!headroomFor(150)) return res.json({ error: "no_headroom", proc: procStats() });
+    labBusy = true;
+    try {
+      const mode = String(req.query.mode || "none");
+      const n = Math.max(1, Math.min(8, Number(req.query.n) || 5));
+      const gap = Math.max(0, Math.min(30000, Number(req.query.gap) || 2000));
+      res.json(await labRun(mode, n, gap));
+    } catch (e) {
+      res.json({ error: String((e && e.message) || e) });
+    } finally {
+      labBusy = false;
+    }
+  });
+}
+
 // ---------------------------------------------------------------- routes
 module.exports = function registerQrSearch(app) {
   const cors = (req, res, next) => {
@@ -1002,8 +1112,10 @@ module.exports = function registerQrSearch(app) {
       spareWarming: !!B.spareWarming,
       swaps: B.swaps || 0,
       warmLog: B.warmLog || [],
+      reqLog: B.reqLog || [],
     });
   });
+  registerLab(app, cors);
 
   // Warm the browser shortly after boot and keep it fresh, so user searches are fast.
   if (process.env.QR_BROWSER_DISABLED !== "1" && getPw()) {
@@ -1019,4 +1131,4 @@ module.exports = function registerQrSearch(app) {
   }
 };
 
-module.exports._internals = { ensureDisplay, normalizeOffer, buildQrBody, calendarFromRaw, fmt, browserPost, fetchCalendarRaw, OFFERS_PATH };
+module.exports._internals = { ensureDisplay, normalizeOffer, buildQrBody, calendarFromRaw, fmt, browserPost, fetchCalendarRaw, OFFERS_PATH, PAGE_FETCH, FS_API_KEY };
