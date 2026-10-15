@@ -71,6 +71,9 @@ const B = {
   lastError: null,
   lastOkAt: 0,
 };
+B.spares = []; // warmed, validated contexts ready to take over
+B.chromes = []; // every Chrome launched and not yet closed
+
 
 // Railway may override the Docker CMD (custom start command), so start a virtual
 // display ourselves when none is available.
@@ -168,25 +171,61 @@ setInterval(() => {
   B.proc = st;
   const max = Number(st.pidsMax);
   if (max > 0 && Number(st.pidsCurrent) > max * 0.85) log("WARN pids near limit", st.pidsCurrent + "/" + max, "chrome", st.chrome, "zombies", st.zombies);
-  if (max > 0 && Number(st.pidsCurrent) > max * 0.8 && B.spare) {
-    // make room for package sessions: drop the spare Chrome
-    const sp = B.spare;
-    B.spare = null;
-    log("dropping spare browser (pids " + st.pidsCurrent + "/" + max + ")");
-    sp.browser.close().catch(() => {});
+  if (max > 0 && Number(st.pidsCurrent) > max * 0.8 && B.spares.length) {
+    // make room for package sessions: drop a spare context
+    const sp = B.spares.pop();
+    log("dropping a spare context (pids " + st.pidsCurrent + "/" + max + ")");
+    sp.context.close().catch(() => {});
   }
   if (st.zombies > 300) restartContainer("too many zombies " + st.zombies);
 }, 60000).unref();
 
+async function closeChrome(br) {
+  if (!br) return;
+  B.chromes = B.chromes.filter((c) => c.browser !== br);
+  if (B.chrome === br) B.chrome = null;
+  try {
+    await br.close();
+  } catch (e) {}
+}
+
+// Close Chromes nothing uses anymore (e.g. the previous one after an age rotation).
+function reapChromes() {
+  const inUse = new Set([B.browser, B.chrome, ...B.spares.map((x) => x.browser)].filter(Boolean));
+  for (const c of B.chromes.slice()) {
+    if (!inUse.has(c.browser)) {
+      log("closing unused chrome");
+      closeChrome(c.browser);
+    }
+  }
+}
+
+// Full reset (hard failures only).
 async function closeBrowser() {
-  const b = B.browser;
+  const all = B.chromes.map((c) => c.browser);
   B.browser = null;
   B.context = null;
   B.page = null;
   B.readyAt = 0;
-  if (b) {
+  B.spares = [];
+  B.chrome = null;
+  B.chromes = [];
+  for (const b of all) {
     try {
       await b.close();
+    } catch (e) {}
+  }
+}
+
+// Drop only the primary context; spares in the same Chrome keep working.
+async function dropPrimary() {
+  const c = B.context;
+  B.context = null;
+  B.page = null;
+  B.readyAt = 0;
+  if (c) {
+    try {
+      await c.close();
     } catch (e) {}
   }
 }
@@ -212,13 +251,18 @@ function warmUrl() {
   return `${FS_PAGE}?${q.toString()}`;
 }
 
-// Two warmed Chromes: the primary serves requests, the spare is ready to take over instantly
-// when the primary gets blocked (403) or ages out, so users never wait for a ~35 s warm-up.
-async function launchWarmed() {
+// One Chrome hosting a small pool of independently warmed contexts (each has its own cookies,
+// i.e. its own Akamai session, ~80 threads vs ~240 for a whole Chrome). The primary context
+// serves requests; validated spare contexts take over instantly on 403s or age, so users
+// almost never wait for a ~35 s warm-up.
+const SPARES = Math.max(0, Number(process.env.QR_SPARES || 2));
+const CHROME_MAX_AGE = 3 * 60 * 60 * 1000;
+const SPARE_MAX_AGE = 25 * 60 * 1000;
+
+async function launchChrome() {
   const pw = getPw();
   if (!pw) throw new Error("browser_unavailable");
   await ensureDisplay();
-  const t0 = Date.now();
   const browser = await launchGuard(() => pw.chromium.launch({
     headless: process.env.QR_HEADLESS === "1",
     channel: process.env.QR_CHROME_CHANNEL || "chrome",
@@ -231,29 +275,44 @@ async function launchWarmed() {
     ],
   }));
   B.launchFails = 0;
+  B.chromes.push({ browser, at: Date.now() });
   browser.on("disconnected", () => {
+    B.chromes = B.chromes.filter((c) => c.browser !== browser);
+    if (B.chrome === browser) B.chrome = null;
     if (B.browser === browser) {
       B.browser = null;
       B.context = null;
       B.page = null;
       B.readyAt = 0;
     }
-    if (B.spare && B.spare.browser === browser) B.spare = null;
+    B.spares = B.spares.filter((x) => x.browser !== browser);
   });
-  try {
-    const w = await warmPage(browser);
-    w.valid = await validateWarmed(w);
-    w.readyAt = Date.now();
-    log(`browser warmed in ${Date.now() - t0}ms valid=${w.valid}`);
-    B.warmLog = (B.warmLog || []).concat([{ at: new Date().toISOString().slice(11, 19), ms: Date.now() - t0, valid: w.valid }]).slice(-12);
-    return w;
-  } catch (e) {
-    // never leave a half-warmed Chrome running (each one is a whole process tree)
-    try {
-      await browser.close();
-    } catch (e2) {}
-    throw e;
+  B.chrome = browser;
+  B.chromeAt = Date.now();
+  B.chromeLaunches = (B.chromeLaunches || 0) + 1;
+  log("chrome launched");
+  return browser;
+}
+
+function getChrome() {
+  if (B.chrome && B.chrome.isConnected() && Date.now() - B.chromeAt < CHROME_MAX_AGE) return Promise.resolve(B.chrome);
+  if (!B.chromeLaunching) {
+    B.chromeLaunching = launchChrome().finally(() => {
+      B.chromeLaunching = null;
+    });
   }
+  return B.chromeLaunching;
+}
+
+async function warmCtx() {
+  const browser = await getChrome();
+  const t0 = Date.now();
+  const w = await warmPage(browser);
+  w.valid = await validateWarmed(w);
+  w.readyAt = Date.now();
+  log(`context warmed in ${Date.now() - t0}ms valid=${w.valid}`);
+  B.warmLog = (B.warmLog || []).concat([{ at: new Date().toISOString().slice(11, 19), ms: Date.now() - t0, valid: w.valid }]).slice(-12);
+  return w;
 }
 
 // Prove the warmed session is accepted by a real (tiny) flight-offers call before trusting it.
@@ -282,66 +341,81 @@ async function validateWarmed(w) {
   return false;
 }
 
-function retire(browser) {
-  if (browser) setTimeout(() => browser.close().catch(() => {}), 10000).unref();
-}
-
 function install(w) {
-  const old = B.browser;
+  const prevCtx = B.context;
   B.browser = w.browser;
   B.context = w.context;
   B.page = w.page;
   B.readyAt = w.readyAt;
   B.fails = w.valid === false ? 2 : 0; // unproven session: swap to a proven spare asap
-  if (old && old !== w.browser) retire(old); // let any in-flight request on it finish
+  if (prevCtx && prevCtx !== w.context) {
+    // let any in-flight request on the old context finish, then free it
+    setTimeout(() => {
+      prevCtx.close().catch(() => {});
+      reapChromes();
+    }, 10000).unref();
+  } else reapChromes();
+}
+
+function pruneSpares() {
+  const now = Date.now();
+  B.spares = B.spares.filter((x) => {
+    const ok = x.page && !x.page.isClosed() && x.browser.isConnected() && now - x.readyAt < SPARE_MAX_AGE;
+    if (!ok) x.context.close().catch(() => {});
+    return ok;
+  });
 }
 
 function spareOk() {
-  return B.spare && B.spare.page && !B.spare.page.isClosed() && Date.now() - B.spare.readyAt < 25 * 60 * 1000;
+  pruneSpares();
+  return B.spares.length > 0;
 }
 
-// Promote the spare to primary (instant). Returns true when swapped.
+// Promote a ready spare to primary (instant). Returns true when swapped.
 function promoteSpare(why) {
   if (!spareOk()) return false;
-  const w = B.spare;
-  B.spare = null;
-  install(w);
+  install(B.spares.shift());
   B.swaps = (B.swaps || 0) + 1;
-  log("swapped to spare browser:", why);
-  startSpare();
+  log("swapped to spare context:", why, "spares left", B.spares.length);
+  fillSpares();
   return true;
 }
 
-function startSpare() {
-  if (B.spareWarming || process.env.QR_NO_SPARE === "1") return B.spareWarming;
+function fillSpares() {
+  if (B.spareWarming || SPARES <= 0 || process.env.QR_NO_SPARE === "1") return B.spareWarming;
   B.spareWarming = (async () => {
-    await sleep(12000); // let a just-retired browser exit first
-    let w = null;
-    for (let k = 0; k < 3 && !w; k += 1) {
-      if (!headroomFor(300)) throw new Error("no_pids_headroom");
-      const c = await launchWarmed();
-      if (c.valid) w = c;
+    await sleep(3000);
+    for (let tries = 0; tries < 2 * SPARES + 2; tries += 1) {
+      pruneSpares();
+      if (B.spares.length >= SPARES) return;
+      if (!headroomFor(150)) throw new Error("no_pids_headroom");
+      const c = await warmCtx();
+      if (c.valid) B.spares.push(c);
       else {
-        log("spare not accepted, re-warming");
-        await c.browser.close().catch(() => {});
-        await sleep(5000);
+        log("spare not accepted, retrying");
+        c.context.close().catch(() => {});
+        await sleep(4000);
       }
     }
-    if (!w) throw new Error("spare_not_accepted");
-    const old = B.spare;
-    B.spare = w;
-    if (old && old.browser !== w.browser) retire(old.browser);
   })()
     .catch((e) => log("spare warm failed:", String((e && e.message) || e)))
     .finally(() => {
       B.spareWarming = null;
+      reapChromes();
     });
   return B.spareWarming;
 }
+const startSpare = fillSpares;
 
 async function warm() {
-  install(await launchWarmed());
-  if (!spareOk()) startSpare();
+  try {
+    install(await warmCtx());
+    B.warmFails = 0;
+  } catch (e) {
+    B.warmFails = (B.warmFails || 0) + 1;
+    throw e;
+  }
+  fillSpares();
 }
 
 function startWarm() {
@@ -362,20 +436,25 @@ function startWarm() {
 
 async function warmPage(browser) {
   const context = await browser.newContext({ locale: "en-US", viewport: { width: 1366, height: 800 } });
-  // Save memory/bandwidth: skip images & media (not used by the bot sensor).
-  await context.route("**/*", (route) => {
-    const t = route.request().resourceType();
-    if (t === "image" || t === "media") return route.abort();
-    return route.continue();
-  });
-  const page = await context.newPage();
-  await page.goto(HOME_URL, { waitUntil: "load", timeout: 60000 });
-  await page.waitForTimeout(4000);
-  await wiggle(page, 5);
-  await page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 60000 });
-  await page.waitForTimeout(6000);
-  await wiggle(page, 3);
-  return { browser, context, page, readyAt: Date.now() };
+  try {
+    // Save memory/bandwidth: skip images & media (not used by the bot sensor).
+    await context.route("**/*", (route) => {
+      const t = route.request().resourceType();
+      if (t === "image" || t === "media") return route.abort();
+      return route.continue();
+    });
+    const page = await context.newPage();
+    await page.goto(HOME_URL, { waitUntil: "load", timeout: 60000 });
+    await page.waitForTimeout(4000);
+    await wiggle(page, 5);
+    await page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 60000 });
+    await page.waitForTimeout(6000);
+    await wiggle(page, 3);
+    return { browser, context, page, readyAt: Date.now() };
+  } catch (e) {
+    context.close().catch(() => {}); // never leak a half-warmed context
+    throw e;
+  }
 }
 
 async function ensurePage() {
@@ -452,7 +531,8 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         page = await ensurePage();
       } catch (e) {
         last = { status: 0, text: "", error: String(e) };
-        await closeBrowser();
+        if ((B.warmFails || 0) >= 2) await closeBrowser(); // Chrome itself looks broken
+        else await dropPrimary();
         await sleep(500);
         continue;
       }
@@ -461,7 +541,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         r = await page.evaluate(PAGE_FETCH, { url: BASE + path, body, lang, apiKey: FS_API_KEY });
       } catch (e) {
         r = { status: 0, text: "", error: String(e) };
-        if (page === B.page) await closeBrowser();
+        if (page === B.page) await dropPrimary();
       }
       if (process.env.QR_TEST_FAIL_N && (B.testFails || 0) < Number(process.env.QR_TEST_FAIL_N)) {
         B.testFails = (B.testFails || 0) + 1; // test hook only: simulate an Akamai 403
@@ -906,7 +986,9 @@ module.exports = function registerQrSearch(app) {
       lastError: B.lastError,
       cacheSize: cache.size,
       spareReady: !!spareOk(),
-      spareAgeSec: B.spare ? Math.round((Date.now() - B.spare.readyAt) / 1000) : null,
+      spares: B.spares.length,
+      spareAgeSec: B.spares[0] ? Math.round((Date.now() - B.spares[0].readyAt) / 1000) : null,
+      chromes: B.chromes.length,
       spareWarming: !!B.spareWarming,
       swaps: B.swaps || 0,
       warmLog: B.warmLog || [],
