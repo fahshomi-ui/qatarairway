@@ -272,6 +272,10 @@ async function launchChrome() {
       "--no-first-run",
       "--no-default-browser-check",
       "--window-size=1366,900",
+      // real browsers always expose WebGL; without a GPU use Chrome's software renderer
+      "--enable-unsafe-swiftshader",
+      "--use-angle=swiftshader",
+      "--ignore-gpu-blocklist",
     ],
   }));
   B.launchFails = 0;
@@ -446,8 +450,32 @@ function startWarm() {
   return B.warming;
 }
 
+// Look like an ordinary desktop: screen larger than the window, local timezone of the egress IP.
+function ctxOptions() {
+  const o = { locale: "en-US", viewport: { width: 1366, height: 800 }, screen: { width: 1920, height: 1080 } };
+  if (B.tz) o.timezoneId = B.tz;
+  return o;
+}
+async function detectTimezone() {
+  if (B.tz || B.tzTried) return;
+  B.tzTried = true;
+  try {
+    const ctrl = new AbortController();
+    const t = setTimeout(() => ctrl.abort(), 5000);
+    const r = await fetch("http://ip-api.com/json/?fields=status,timezone,countryCode,city", { signal: ctrl.signal });
+    clearTimeout(t);
+    const j = await r.json();
+    if (j && j.status === "success" && j.timezone) {
+      B.tz = j.timezone;
+      B.geo = `${j.city || ""},${j.countryCode || ""}`;
+      log("egress timezone", B.tz, B.geo);
+    }
+  } catch (e) {}
+}
+
 async function warmPage(browser) {
-  const context = await browser.newContext({ locale: "en-US", viewport: { width: 1366, height: 800 } });
+  await detectTimezone();
+  const context = await browser.newContext(ctxOptions());
   try {
     // Save memory/bandwidth: skip images & media (not used by the bot sensor).
     await context.route("**/*", (route) => {
@@ -909,10 +937,11 @@ let labBusy = false;
 let labResult = null;
 async function labFingerprint() {
   const browser = await getChrome();
-  const context = await browser.newContext({ locale: "en-US", viewport: { width: 1366, height: 800 } });
+  await detectTimezone();
+  const context = await browser.newContext(ctxOptions());
   try {
     const page = await context.newPage();
-    await page.goto("about:blank");
+    await page.goto("https://example.com/");
     return await page.evaluate(() => {
       const o = {};
       const n = navigator;
@@ -927,8 +956,9 @@ async function labFingerprint() {
       o.fonts = fonts.filter((f) => document.fonts.check("12px '" + f + "'"));
       o.uaData = n.userAgentData ? { brands: n.userAgentData.brands.map((b) => b.brand + " " + b.version), mobile: n.userAgentData.mobile, platform: n.userAgentData.platform } : null;
       o.conn = n.connection ? { type: n.connection.effectiveType, rtt: n.connection.rtt } : null;
+      o.mem = n.deviceMemory;
       return o;
-    });
+    }).then((o) => Object.assign(o, { geo: B.geo, tzSet: B.tz }));
   } finally {
     context.close().catch(() => {});
   }
