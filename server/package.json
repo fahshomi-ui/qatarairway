@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "main": "index.js",
   "scripts": {
-    "start": "node index.js",
+    "start": "if command -v tini >/dev/null 2>&1; then exec tini -s -g -- node index.js; else exec node index.js; fi",
     "dev": "node index.js"
   },
   "keywords": [],

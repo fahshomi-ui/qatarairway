@@ -158,8 +158,8 @@ setInterval(() => {
   const st = procStats();
   B.proc = st;
   const max = Number(st.pidsMax);
-  if (max > 0 && Number(st.pidsCurrent) > max * 0.85) restartContainer("pids near limit " + st.pidsCurrent + "/" + max);
-  else if (st.zombies > 300) restartContainer("too many zombies " + st.zombies);
+  if (max > 0 && Number(st.pidsCurrent) > max * 0.85) log("WARN pids near limit", st.pidsCurrent + "/" + max, "chrome", st.chrome, "zombies", st.zombies);
+  if (st.zombies > 300) restartContainer("too many zombies " + st.zombies);
 }, 60000).unref();
 
 async function closeBrowser() {
