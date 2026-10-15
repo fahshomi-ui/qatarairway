@@ -383,6 +383,7 @@ function promoteSpare(why) {
 
 function fillSpares() {
   if (B.spareWarming || SPARES <= 0 || process.env.QR_NO_SPARE === "1") return B.spareWarming;
+  if (Date.now() < (B.spareBackoffUntil || 0)) return null; // QR is rejecting new sessions: cool down
   B.spareWarming = (async () => {
     await sleep(3000);
     for (let tries = 0; tries < 2 * SPARES + 2; tries += 1) {
@@ -390,10 +391,18 @@ function fillSpares() {
       if (B.spares.length >= SPARES) return;
       if (!headroomFor(150)) throw new Error("no_pids_headroom");
       const c = await warmCtx();
-      if (c.valid) B.spares.push(c);
-      else {
-        log("spare not accepted, retrying");
+      if (c.valid) {
+        B.spares.push(c);
+        B.rejectRun = 0;
+      } else {
+        B.rejectRun = (B.rejectRun || 0) + 1;
+        log("spare not accepted, retrying (run " + B.rejectRun + ")");
         c.context.close().catch(() => {});
+        if (B.rejectRun >= 3) {
+          // stop adding load while the IP is being challenged; try again later
+          B.spareBackoffUntil = Date.now() + 4 * 60 * 1000;
+          throw new Error("rejected x" + B.rejectRun + ", cooling down 4 min");
+        }
         await sleep(4000);
       }
     }
@@ -987,6 +996,7 @@ module.exports = function registerQrSearch(app) {
       cacheSize: cache.size,
       spareReady: !!spareOk(),
       spares: B.spares.length,
+      spareBackoffSec: Math.max(0, Math.round(((B.spareBackoffUntil || 0) - Date.now()) / 1000)),
       spareAgeSec: B.spares[0] ? Math.round((Date.now() - B.spares[0].readyAt) / 1000) : null,
       chromes: B.chromes.length,
       spareWarming: !!B.spareWarming,
