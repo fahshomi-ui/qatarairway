@@ -315,36 +315,28 @@ async function warmCtx() {
   return w;
 }
 
-// Prove the warmed session is accepted by a real (tiny) flight-offers call before trusting it.
+// Judge a warmed session mostly by the official page's own flight-offers call (no extra
+// protected requests: every rejected call raises the IP's bot score). At most one own call.
 async function validateWarmed(w) {
   if (process.env.QR_NO_VALIDATE === "1") return true;
+  const spa = w.spa || [];
+  if (spa.length && !spa.includes(200)) return false; // the official app itself was rejected
   const d = todayPlus(20 + Math.floor(Math.random() * 10));
   const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: "LHR", date: d }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
-  for (let i = 0; i < 4; i += 1) {
-    w.vTries = i + 1;
-    let r;
-    try {
-      w.own = true;
-      r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
-    } catch (e) {
-      return false;
-    } finally {
-      w.own = false;
-    }
-    w.uses = (w.uses || 0) + 1;
-    w.vst = (w.vst || []).concat([r.status]);
-    if (r.status && r.status !== 403) return true; // accepted (not bot-blocked)
-    await wiggle(w.page, 3);
-    await sleep(1200 + i * 600);
-    if (i === 1) {
-      try {
-        await w.page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 45000 });
-        await w.page.waitForTimeout(4000);
-        await wiggle(w.page, 3);
-      } catch (e) {}
-    }
+  await wiggle(w.page, 2);
+  let r;
+  try {
+    w.own = true;
+    r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
+  } catch (e) {
+    return false;
+  } finally {
+    w.own = false;
   }
-  return false;
+  w.uses = (w.uses || 0) + 1;
+  w.lastUse = Date.now();
+  w.vst = [r.status];
+  return !!(r.status && r.status !== 403);
 }
 
 function install(w) {
@@ -401,16 +393,20 @@ function fillSpares() {
       if (c.valid) {
         B.spares.push(c);
         B.rejectRun = 0;
+        B.backoffN = 0;
       } else {
         B.rejectRun = (B.rejectRun || 0) + 1;
         log("spare not accepted, retrying (run " + B.rejectRun + ")");
         c.context.close().catch(() => {});
-        if (B.rejectRun >= 3) {
-          // stop adding load while the IP is being challenged; try again later
-          B.spareBackoffUntil = Date.now() + 4 * 60 * 1000;
-          throw new Error("rejected x" + B.rejectRun + ", cooling down 4 min");
+        if (B.rejectRun >= 2) {
+          // stop adding load while the IP is being challenged; back off progressively
+          const mins = [4, 8, 15, 20][Math.min(3, B.backoffN || 0)];
+          B.backoffN = (B.backoffN || 0) + 1;
+          B.rejectRun = 0;
+          B.spareBackoffUntil = Date.now() + mins * 60 * 1000;
+          throw new Error("rejected twice, cooling down " + mins + " min");
         }
-        await sleep(4000);
+        await sleep(15000);
       }
     }
   })()
@@ -910,6 +906,33 @@ function cacheSet(k, val, ttlMs) {
 // Measures how long a fresh session stays accepted under different refresh strategies.
 const LAB_HASH = "ccc730b25af3508fdc7b412c456360c984ead2eff4e8e96e6339771fb0b6d4ed";
 let labBusy = false;
+let labResult = null;
+async function labFingerprint() {
+  const browser = await getChrome();
+  const context = await browser.newContext({ locale: "en-US", viewport: { width: 1366, height: 800 } });
+  try {
+    const page = await context.newPage();
+    await page.goto("about:blank");
+    return await page.evaluate(() => {
+      const o = {};
+      const n = navigator;
+      Object.assign(o, { ua: n.userAgent, webdriver: n.webdriver, hc: n.hardwareConcurrency, mem: n.deviceMemory, langs: n.languages, platform: n.platform, plugins: n.plugins.length, tz: Intl.DateTimeFormat().resolvedOptions().timeZone, screen: [screen.width, screen.height, screen.availWidth, screen.availHeight, screen.colorDepth, devicePixelRatio], outer: [outerWidth, outerHeight, innerWidth, innerHeight] });
+      try {
+        const c = document.createElement("canvas");
+        const gl = c.getContext("webgl") || c.getContext("experimental-webgl");
+        const ext = gl && gl.getExtension("WEBGL_debug_renderer_info");
+        o.webgl = gl ? [gl.getParameter(ext ? ext.UNMASKED_VENDOR_WEBGL : gl.VENDOR), gl.getParameter(ext ? ext.UNMASKED_RENDERER_WEBGL : gl.RENDERER)] : null;
+      } catch (e) { o.webgl = "err " + e; }
+      const fonts = ["Arial", "Times New Roman", "Courier New", "Verdana", "Helvetica", "Georgia", "Segoe UI", "Roboto", "Liberation Sans", "DejaVu Sans", "Noto Sans"];
+      o.fonts = fonts.filter((f) => document.fonts.check("12px '" + f + "'"));
+      o.uaData = n.userAgentData ? { brands: n.userAgentData.brands.map((b) => b.brand + " " + b.version), mobile: n.userAgentData.mobile, platform: n.userAgentData.platform } : null;
+      o.conn = n.connection ? { type: n.connection.effectiveType, rtt: n.connection.rtt } : null;
+      return o;
+    });
+  } finally {
+    context.close().catch(() => {});
+  }
+}
 async function labRun(mode, n, gapMs) {
   const browser = await getChrome();
   const w = await warmPage(browser);
@@ -968,17 +991,17 @@ function registerLab(app, cors) {
     if (require("crypto").createHash("sha256").update(k).digest("hex") !== LAB_HASH) return res.status(404).end();
     if (labBusy) return res.json({ error: "busy" });
     if (!headroomFor(150)) return res.json({ error: "no_headroom", proc: procStats() });
+    if (req.query.get) return res.json({ busy: labBusy, result: labResult });
     labBusy = true;
-    try {
-      const mode = String(req.query.mode || "none");
-      const n = Math.max(1, Math.min(8, Number(req.query.n) || 5));
-      const gap = Math.max(0, Math.min(30000, Number(req.query.gap) || 2000));
-      res.json(await labRun(mode, n, gap));
-    } catch (e) {
-      res.json({ error: String((e && e.message) || e) });
-    } finally {
-      labBusy = false;
-    }
+    labResult = null;
+    const mode = String(req.query.mode || "none");
+    const n = Math.max(1, Math.min(8, Number(req.query.n) || 5));
+    const gap = Math.max(0, Math.min(30000, Number(req.query.gap) || 2000));
+    (mode === "fp" ? labFingerprint() : labRun(mode, n, gap))
+      .then((r) => { labResult = r; })
+      .catch((e) => { labResult = { error: String((e && e.message) || e) }; })
+      .finally(() => { labBusy = false; });
+    res.json({ started: mode });
   });
 }
 
