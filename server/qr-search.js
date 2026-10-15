@@ -104,6 +104,64 @@ async function ensureDisplay() {
   log("started Xvfb on", disp);
 }
 
+// ---------------------------------------------------------------- process health
+// The container has a process (pid) limit. If Chrome cannot even start (EAGAIN) the
+// container is exhausted; restart it instead of staying broken (Railway restarts on exit).
+function procStats() {
+  const fs = require("fs");
+  const out = { total: 0, zombies: 0, chrome: 0, pidsMax: null, pidsCurrent: null, pid1: null };
+  try {
+    out.pid1 = fs.readFileSync("/proc/1/cmdline", "utf8").split("\0").join(" ").trim().slice(0, 120);
+  } catch (e) {}
+  try {
+    for (const d of fs.readdirSync("/proc")) {
+      if (!/^\d+$/.test(d)) continue;
+      try {
+        const st = fs.readFileSync("/proc/" + d + "/stat", "utf8");
+        const name = st.slice(st.indexOf("(") + 1, st.lastIndexOf(")"));
+        const state = st.slice(st.lastIndexOf(")") + 2, st.lastIndexOf(")") + 3);
+        out.total += 1;
+        if (state === "Z") out.zombies += 1;
+        if (/chrome/i.test(name)) out.chrome += 1;
+      } catch (e) {}
+    }
+  } catch (e) {}
+  for (const [k, f] of [["pidsMax", "/sys/fs/cgroup/pids.max"], ["pidsCurrent", "/sys/fs/cgroup/pids.current"], ["pidsMax", "/sys/fs/cgroup/pids/pids.max"], ["pidsCurrent", "/sys/fs/cgroup/pids/pids.current"]]) {
+    if (out[k] != null) continue;
+    try {
+      out[k] = fs.readFileSync(f, "utf8").trim();
+    } catch (e) {}
+  }
+  return out;
+}
+
+function restartContainer(why) {
+  log("RESTARTING PROCESS:", why, JSON.stringify(procStats()));
+  setTimeout(() => process.exit(1), 500);
+}
+
+async function launchGuard(fn) {
+  try {
+    return await fn();
+  } catch (e) {
+    const msg = String((e && e.message) || e);
+    B.launchFails = (B.launchFails || 0) + 1;
+    if (/Resource temporarily unavailable|EAGAIN|posix_spawn|Cannot allocate memory|ENOMEM/i.test(msg) || B.launchFails >= 3) {
+      restartContainer("chrome launch failed x" + B.launchFails + ": " + msg.slice(0, 160));
+    }
+    throw e;
+  }
+}
+
+// Watchdog: no successful search for a long time while searches keep failing -> restart.
+setInterval(() => {
+  const st = procStats();
+  B.proc = st;
+  const max = Number(st.pidsMax);
+  if (max > 0 && Number(st.pidsCurrent) > max * 0.85) restartContainer("pids near limit " + st.pidsCurrent + "/" + max);
+  else if (st.zombies > 300) restartContainer("too many zombies " + st.zombies);
+}, 60000).unref();
+
 async function closeBrowser() {
   const b = B.browser;
   B.browser = null;
@@ -144,7 +202,7 @@ async function warm() {
   await closeBrowser();
   await ensureDisplay();
   const t0 = Date.now();
-  const browser = await pw.chromium.launch({
+  const browser = await launchGuard(() => pw.chromium.launch({
     headless: process.env.QR_HEADLESS === "1",
     channel: process.env.QR_CHROME_CHANNEL || "chrome",
     args: [
@@ -154,7 +212,8 @@ async function warm() {
       "--no-default-browser-check",
       "--window-size=1366,900",
     ],
-  });
+  }));
+  B.launchFails = 0;
   browser.on("disconnected", () => {
     if (B.browser === browser) {
       B.browser = null;
@@ -163,6 +222,18 @@ async function warm() {
       B.readyAt = 0;
     }
   });
+  try {
+    await warmPage(browser, t0);
+  } catch (e) {
+    // never leave a half-warmed Chrome running (each one is a whole process tree)
+    try {
+      await browser.close();
+    } catch (e2) {}
+    throw e;
+  }
+}
+
+async function warmPage(browser, t0) {
   const context = await browser.newContext({ locale: "en-US", viewport: { width: 1366, height: 800 } });
   // Save memory/bandwidth: skip images & media (not used by the bot sensor).
   await context.route("**/*", (route) => {
@@ -698,6 +769,8 @@ module.exports = function registerQrSearch(app) {
     res.json({
       browserAvailable: !!getPw(),
       browserReady: !!(B.page && !B.page.isClosed()),
+      proc: procStats(),
+      launchFails: B.launchFails || 0,
       warming: !!B.warming,
       readyForSec: B.readyAt ? Math.round((Date.now() - B.readyAt) / 1000) : null,
       ok: B.okCount,
