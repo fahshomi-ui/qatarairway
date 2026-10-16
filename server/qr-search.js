@@ -244,6 +244,7 @@ async function wiggle(page, n = 4) {
 // QR rejects a second protected call that follows the previous one within a few seconds
 // (observed: 2 s apart -> 403, >= 5 s apart -> 200). Keep calls on a session spaced out.
 const MIN_CALL_GAP_MS = Number(process.env.QR_MIN_GAP_MS || 300);
+const WARM_SPA = process.env.QR_WARM_SPA === "1";
 async function spaceCalls(w) {
   const wait = (w && w.lastCallAt ? w.lastCallAt + MIN_CALL_GAP_MS : 0) - Date.now();
   if (wait > 0) await sleep(wait);
@@ -267,11 +268,11 @@ const SPARES = Math.max(0, Number(process.env.QR_SPARES || 2));
 const CHROME_MAX_AGE = 3 * 60 * 60 * 1000;
 const SPARE_MAX_AGE = 3 * 60 * 60 * 1000; // kept fresh by refreshCtx; new sessions are hard to get
 const CTX_REFRESH_MS = 12 * 60 * 1000;
-const NEW_CTX_GAP_MS = 90 * 1000; // QR rejects brand-new sessions opened in quick succession
+const NEW_CTX_GAP_MS = 30 * 1000; // spacing between brand-new sessions
 // After consecutive rejected new sessions, wait longer before opening another (IP cool-down).
 function newCtxGap() {
   const r = B.newRejects || 0;
-  return [NEW_CTX_GAP_MS, 3, 6, 12, 15][Math.min(4, r)] * (r ? 60 * 1000 : 1);
+  return [NEW_CTX_GAP_MS, 0.5, 1, 2, 5][Math.min(4, r)] * (r ? 60 * 1000 : 1);
 }
 function newCtxAllowed() {
   return Date.now() >= (B.lastNewCtxAt || 0) + newCtxGap();
@@ -352,7 +353,7 @@ async function validateWarmed(w) {
   if (spa.length) return false; // the official app itself was rejected
   const d = todayPlus(20 + Math.floor(Math.random() * 10));
   const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: "LHR", date: d }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
-  await wiggle(w.page, 2);
+  if (WARM_SPA) await wiggle(w.page, 2);
   await spaceCalls(w);
   let r;
   try {
@@ -421,6 +422,15 @@ async function refreshCtx(w, why) {
   const n0 = w.spa.length;
   const t0 = Date.now();
   try {
+    if (!WARM_SPA) {
+      // reopen the home page and make the first call right away (see warmPage)
+      await w.page.goto(HOME_URL, { waitUntil: "domcontentloaded", timeout: 45000 });
+      const ok = await validateWarmed(w);
+      w.refreshMs = Date.now() - t0;
+      w.refreshedAt = Date.now();
+      B.refreshLog = (B.refreshLog || []).concat([{ at: new Date().toISOString().slice(11, 19), id: w.id, why, spa: [], ok, ms: w.refreshMs }]).slice(-12);
+      return ok;
+    }
     await w.page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 30000 });
     // wait for the official app's own search call (fresh sensor + acceptance signal), max 6 s
     for (let i = 0; i < 30 && w.spa.length === n0; i += 1) await w.page.waitForTimeout(200);
@@ -478,9 +488,9 @@ function fillSpares() {
         B.rejectRun = (B.rejectRun || 0) + 1;
         log("spare not accepted, retrying (run " + B.rejectRun + ")");
         c.context.close().catch(() => {});
-        if (B.rejectRun >= 2) {
+        if (B.rejectRun >= 4) {
           // stop adding load while the IP is being challenged; back off progressively
-          const mins = [4, 8, 15, 20][Math.min(3, B.backoffN || 0)];
+          const mins = [1, 2, 5, 10][Math.min(3, B.backoffN || 0)];
           B.backoffN = (B.backoffN || 0) + 1;
           B.rejectRun = 0;
           B.spareBackoffUntil = Date.now() + mins * 60 * 1000;
@@ -570,12 +580,23 @@ async function warmPage(browser) {
         }
       } catch (e) {}
     });
+    if (!WARM_SPA) {
+      // The first protected call decides the session: made right when the page opens it is
+      // accepted and the session stays good; made after the bot script has finished its
+      // checks (or after synthetic mouse moves) it is usually rejected. So: open and go.
+      await page.goto(HOME_URL, { waitUntil: "domcontentloaded", timeout: 60000 });
+      w.readyAt = Date.now();
+      return w;
+    }
     await page.goto(HOME_URL, { waitUntil: "load", timeout: 60000 });
-    await page.waitForTimeout(4000);
+    await page.waitForTimeout(3000);
     await wiggle(page, 5);
-    await page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 60000 });
-    await page.waitForTimeout(6000);
-    await wiggle(page, 3);
+    if (WARM_SPA) {
+      // legacy: open the official results page (its own early search call can burn the session)
+      await page.goto(warmUrl(), { waitUntil: "domcontentloaded", timeout: 60000 });
+      await page.waitForTimeout(6000);
+      await wiggle(page, 3);
+    }
     w.readyAt = Date.now();
     return w;
   } catch (e) {
@@ -812,7 +833,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         continue;
       }
       if (B.page) {
-        await wiggle(B.page, 3);
+        if (WARM_SPA) await wiggle(B.page, 3);
         await sleep(900 + attempt * 300);
       }
       if (refreshed && !spareOk() && !B.warming && !newCtxAllowed()) break; // blocked, cooling down: fail fast
