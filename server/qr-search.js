@@ -171,7 +171,7 @@ setInterval(() => {
   B.proc = st;
   const max = Number(st.pidsMax);
   if (max > 0 && Number(st.pidsCurrent) > max * 0.85) log("WARN pids near limit", st.pidsCurrent + "/" + max, "chrome", st.chrome, "zombies", st.zombies);
-  const idleSpare = B.spares.find((x) => !x.busy);
+  const idleSpare = B.spares.find((x) => !x.busy && !x.inflight);
   if (max > 0 && Number(st.pidsCurrent) > max * 0.8 && idleSpare) {
     // make room for package sessions: drop an idle spare context
     B.spares = B.spares.filter((x) => x !== idleSpare);
@@ -266,7 +266,7 @@ function warmUrl() {
 // i.e. its own Akamai session, ~80 threads vs ~240 for a whole Chrome). The primary context
 // serves requests; validated spare contexts take over instantly on 403s or age, so users
 // almost never wait for a ~35 s warm-up.
-const SPARES = Math.max(0, Number(process.env.QR_SPARES || 3));
+const SPARES = Math.max(0, Number(process.env.QR_SPARES || 4));
 const CHROME_MAX_AGE = 3 * 60 * 60 * 1000;
 const SPARE_MAX_AGE = 3 * 60 * 60 * 1000; // kept fresh by refreshCtx; new sessions are hard to get
 const CTX_REFRESH_MS = 12 * 60 * 1000;
@@ -301,6 +301,9 @@ async function launchChrome() {
       "--enable-unsafe-swiftshader",
       "--use-angle=swiftshader",
       "--ignore-gpu-blocklist",
+      ...(process.env.QR_LITE === "0"
+        ? []
+        : ["--disable-site-isolation-trials", "--disable-features=IsolateOrigins,site-per-process,Translate,OptimizationHints,MediaRouter", "--renderer-process-limit=4", "--disable-background-networking"]),
     ],
   }));
   B.launchFails = 0;
@@ -350,7 +353,7 @@ async function warmCtx() {
 // protected requests: every rejected call raises the IP's bot score). At most one own call.
 async function validateWarmed(w) {
   if (process.env.QR_NO_VALIDATE === "1") return true;
-  const spa = w.spa || [];
+  const spa = WARM_SPA ? w.spa || [] : [];
   if (spa.includes(200)) return true; // the official app's own search was accepted
   if (spa.length) return false; // the official app itself was rejected
   const d = todayPlus(20 + Math.floor(Math.random() * 10));
@@ -359,12 +362,12 @@ async function validateWarmed(w) {
   await spaceCalls(w);
   let r;
   try {
-    w.own = true;
+    w.ownN = (w.ownN || 0) + 1;
     r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
   } catch (e) {
     return false;
   } finally {
-    w.own = false;
+    w.ownN = Math.max(0, (w.ownN || 0) - 1);
   }
   w.uses = (w.uses || 0) + 1;
   w.armUses = (w.armUses || 0) + 1;
@@ -395,7 +398,7 @@ function install(w, keepPrev) {
 function pruneSpares() {
   const now = Date.now();
   B.spares = B.spares.filter((x) => {
-    const ok = x.page && !x.page.isClosed() && x.browser.isConnected() && (x.busy || now - x.readyAt < SPARE_MAX_AGE);
+    const ok = x.page && !x.page.isClosed() && x.browser.isConnected() && (x.busy || x.inflight || now - x.readyAt < SPARE_MAX_AGE);
     if (!ok) x.context.close().catch(() => {});
     return ok;
   });
@@ -584,7 +587,7 @@ async function warmPage(browser) {
       try {
         if (r.url().includes(OFFERS_PATH) && r.request().method() === "POST") {
           w.lastCallAt = Date.now();
-          if (!w.own) w.spa.push(r.status());
+          if (!w.ownN) w.spa.push(r.status());
         }
       } catch (e) {}
     });
@@ -770,18 +773,30 @@ const PAGE_FETCH = async ({ url, body, lang, apiKey }) => {
 };
 
 // ---------------------------------------------------------------- session pool
-// Every accepted session (primary + spares) serves searches IN PARALLEL, one call at a time
-// each. Visitors are served first-come-first-served by whichever session is free. A session
-// is re-armed (home page reopened + one call) after REARM_AFTER calls, before QR's per-sensor
-// call budget (~7 calls) runs out, so visitors don't hit the 403 that follows.
+// Every accepted session (primary + spares) serves searches IN PARALLEL, up to SLOTS calls at
+// once each. Visitors are served first-come-first-served by the least loaded session. QR
+// accepts ~7 calls per sensor run (the next gets 403), so a session is re-armed (home page
+// reopened + one call, ~4 s) after REARM_AFTER calls when others can cover, and always before
+// REARM_HARD. Only one session re-arms at a time unless forced.
 const REARM_AFTER = Math.max(2, Number(process.env.QR_REARM_AFTER || 5));
+const REARM_HARD = Math.max(REARM_AFTER, Number(process.env.QR_REARM_HARD || 6));
+const SLOTS = Math.max(1, Number(process.env.QR_SLOTS || 2));
 const waiters = [];
 let kickT = null;
+function sessionAlive(w) {
+  return !!(w && w.page && !w.page.isClosed() && w.browser && w.browser.isConnected());
+}
 function sessionUsable(w) {
-  return !!(w && !w.busy && w.page && !w.page.isClosed() && w.browser && w.browser.isConnected());
+  return sessionAlive(w) && !w.busy && !w.rearming && (w.inflight || 0) < SLOTS && (w.armUses || 0) < REARM_HARD;
+}
+function isPooled(w) {
+  return w === B.cur || B.spares.includes(w);
 }
 function busySessions() {
-  return [B.cur, ...B.spares].filter((w) => w && w.busy).length;
+  return [B.cur, ...B.spares].filter((w) => w && (w.busy || w.inflight)).length;
+}
+function inflightTotal() {
+  return [B.cur, ...B.spares].reduce((n, w) => n + ((w && w.inflight) || 0), 0);
 }
 function pickSession() {
   pruneSpares();
@@ -789,7 +804,8 @@ function pickSession() {
   const prim = B.cur && B.page && B.cur.page === B.page && sessionUsable(B.cur) && B.fails < 8 ? B.cur : null;
   if (prim && (B.fails < 2 || !c.length)) c.push(prim); // doubtful primary only as last resort
   if (!c.length) return null;
-  c.sort((x, y) => (x === prim && B.fails >= 2 ? 1 : 0) - (y === prim && B.fails >= 2 ? 1 : 0) || (x.lastCallAt || 0) - (y.lastCallAt || 0));
+  const bad = (x) => (x === prim && B.fails >= 2 ? 1 : 0);
+  c.sort((x, y) => bad(x) - bad(y) || (x.inflight || 0) - (y.inflight || 0) || (x.lastCallAt || 0) - (y.lastCallAt || 0));
   return c[0];
 }
 function kick() {
@@ -815,7 +831,8 @@ function dispatch() {
     if (!w) break;
     const wt = waiters.shift();
     clearTimeout(wt.timer);
-    w.busy = true;
+    w.inflight = (w.inflight || 0) + 1;
+    w.armUses = (w.armUses || 0) + 1; // counted at start: parallel calls share the budget
     wt.resolve(w);
   }
   if (waiters.length) ensureSession();
@@ -832,44 +849,48 @@ function acquire(until) {
     dispatch();
   });
 }
+// A search call on w finished.
+function done(w) {
+  w.inflight = Math.max(0, (w.inflight || 0) - 1);
+  if (!w.inflight && isPooled(w)) maybeRearm(w);
+  kick();
+}
+// kept for maintenance code paths: drop an exclusive lock
 function release(w) {
   if (w) w.busy = false;
   kick();
 }
-// Take a rejected session out of service (keeps it reviving in the background).
+// Take a rejected session out of service (it revives in the background).
 function retire(w, why) {
   if (w === B.cur) {
     B.fails = Math.max(B.fails + 1, 2);
-    if (!promoteSpare(why)) release(w); // nothing to swap to: keep it, the caller decides
+    promoteSpare(why); // nothing to swap to: it stays as a last-resort primary
     return;
   }
   B.spares = B.spares.filter((x) => x !== w);
   reviveLater(w);
   fillSpares();
 }
-// QR accepts ~7 calls per sensor run (the 8th gets 403). Re-arm early (soft limit) only when
-// it doesn't leave visitors without a session: one session re-arms at a time and at least one
-// other stays serving. At the hard limit the session re-arms regardless.
-const REARM_HARD = Math.max(REARM_AFTER, Number(process.env.QR_REARM_HARD || 6));
 function maybeRearm(w) {
-  if (!w.page || w.page.isClosed()) return false;
   const n = w.armUses || 0;
-  if (n < REARM_AFTER) return false;
+  if (n < REARM_AFTER || w.inflight || w.busy || w.rearming || !sessionAlive(w)) return false;
   if (n < REARM_HARD) {
-    const pool = [B.cur, ...B.spares].filter((x) => x && x !== w && x.page && !x.page.isClosed());
-    const rearming = pool.filter((x) => x.rearming).length;
-    const serving = pool.filter((x) => !x.rearming).length;
-    if (rearming > 0 || serving < 1) return false; // later
+    const pool = [B.cur, ...B.spares].filter((x) => x && x !== w && sessionAlive(x));
+    if (pool.some((x) => x.rearming) || !pool.some((x) => !x.rearming && !x.busy)) return false; // later
   }
   w.rearming = true;
+  w.busy = true;
   refreshCtx(w, n >= REARM_HARD ? "rearm!" : "rearm")
     .then((ok) => {
       w.rearming = false;
-      return ok ? release(w) : retire(w, "rearm rejected");
+      w.busy = false;
+      if (!ok) retire(w, "rearm rejected");
+      kick();
     })
     .catch(() => {
       w.rearming = false;
-      release(w);
+      w.busy = false;
+      kick();
     });
   return true;
 }
@@ -885,15 +906,14 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
     const tf = Date.now();
     let r;
     try {
-      w.own = true;
+      w.ownN = (w.ownN || 0) + 1;
       r = await w.page.evaluate(PAGE_FETCH, { url: BASE + path, body, lang, apiKey: FS_API_KEY });
     } catch (e) {
       r = { status: 0, text: "", error: String(e) };
     } finally {
-      w.own = false;
+      w.ownN = Math.max(0, (w.ownN || 0) - 1);
     }
     w.uses = (w.uses || 0) + 1;
-    w.armUses = (w.armUses || 0) + 1;
     w.lastUse = Date.now();
     w.lastCallAt = Date.now();
     B.reqLog = (B.reqLog || []).concat([{
@@ -906,6 +926,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       n: w.uses,
       arm: w.armUses,
       busy: busySessions(),
+      fly: inflightTotal(),
       wait: waiters.length,
     }]).slice(-40);
     if (process.env.QR_TEST_FAIL_N && (B.testFails || 0) < Number(process.env.QR_TEST_FAIL_N)) {
@@ -918,7 +939,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
       if (isPrim) B.fails = 0;
       B.okCount += 1;
       B.lastOkAt = Date.now();
-      if (!maybeRearm(w)) release(w);
+      done(w);
       return r;
     }
     B.failCount += 1;
@@ -929,30 +950,35 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
         B.spares = B.spares.filter((x) => x !== w);
         w.context.close().catch(() => {});
       }
-      w.busy = false;
-      kick();
+      done(w);
       continue;
     }
     if (r.status !== 403) {
       // network hiccup / 5xx: not a rejection
-      release(w);
+      done(w);
       await sleep(400 + attempt * 300);
       continue;
     }
     if (!isPrim) {
       retire(w, "spare blocked"); // next attempt runs on another session immediately
+      done(w);
       continue;
     }
     B.fails += 1;
-    if (promoteSpare("blocked x" + B.fails)) continue; // old primary now revives in background
-    if (!refreshed) {
-      refreshed = true; // no spare: re-arm this session once and retry (~4 s)
-      const ok = await refreshCtx(w, "403");
-      if (ok) B.fails = 0;
-      release(w);
+    if (promoteSpare("blocked x" + B.fails)) {
+      done(w); // old primary now revives in background
       continue;
     }
-    release(w);
+    if (!refreshed) {
+      refreshed = true; // no spare: re-arm this session once and retry (~4 s)
+      w.busy = true;
+      const ok = await refreshCtx(w, "403");
+      w.busy = false;
+      if (ok) B.fails = 0;
+      done(w);
+      continue;
+    }
+    done(w);
     await sleep(900 + attempt * 300);
     if (!spareOk() && !B.warming && !newCtxAllowed()) break; // blocked, cooling down: fail fast
     if (B.fails >= 3) startWarm();
@@ -1317,14 +1343,14 @@ async function labRun(mode, n, gapMs) {
       } catch (e) {}
       const { body } = buildQrBody({ legs: [{ origin: "DOH", destination: dests[k % dests.length], date: todayPlus(15 + k) }], adults: 1, children: 0, infants: 0, cabinClass: "E" });
       const tf = Date.now();
-      w.own = true;
+      w.ownN = (w.ownN || 0) + 1;
       let r;
       try {
         r = await w.page.evaluate(PAGE_FETCH, { url: BASE + OFFERS_PATH, body, lang: "en", apiKey: FS_API_KEY });
       } catch (e) {
         r = { status: 0, error: String(e).slice(0, 80) };
       }
-      w.own = false;
+      w.ownN = Math.max(0, (w.ownN || 0) - 1);
       let abck = "";
       try {
         abck = ((await w.context.cookies()).find((c) => c.name === "_abck") || {}).value || "";
@@ -1503,6 +1529,8 @@ module.exports = function registerQrSearch(app) {
       cacheSize: cache.size,
       queue: waiters.length,
       busySessions: busySessions(),
+      inflight: inflightTotal(),
+      slots: SLOTS,
       rearmAfter: REARM_AFTER,
       spareReady: !!spareOk(),
       spares: B.spares.length,
@@ -1532,14 +1560,14 @@ module.exports = function registerQrSearch(app) {
       if (B.warming) return;
       const now = Date.now();
       const w = B.cur;
-      if (B.page && w && w.page === B.page && !w.busy && now - Math.max(w.lastUse || 0, w.refreshedAt || 0, w.readyAt || 0) > CTX_REFRESH_MS) {
+      if (B.page && w && w.page === B.page && !w.busy && !w.inflight && now - Math.max(w.lastUse || 0, w.refreshedAt || 0, w.readyAt || 0) > CTX_REFRESH_MS) {
         // idle primary: refresh while nobody uses it
         w.busy = true;
         refreshCtx(w, "idle").then((ok) => {
           if (!ok) B.fails = Math.max(B.fails, 2);
         }).catch(() => {}).finally(() => release(w));
       }
-      const sp = B.spares.find((x) => !x.busy && now - Math.max(x.refreshedAt || 0, x.readyAt || 0) > CTX_REFRESH_MS);
+      const sp = B.spares.find((x) => !x.busy && !x.inflight && now - Math.max(x.refreshedAt || 0, x.readyAt || 0) > CTX_REFRESH_MS);
       if (sp) {
         sp.busy = true;
         refreshCtx(sp, "spare idle").then((ok) => {
@@ -1552,14 +1580,10 @@ module.exports = function registerQrSearch(app) {
         }).catch(() => { sp.busy = false; kick(); });
       }
       for (const x of [B.cur, ...B.spares]) {
-        if (x && !x.busy && (x.armUses || 0) >= REARM_AFTER && !waiters.length) {
-          x.busy = true;
-          if (!maybeRearm(x)) release(x);
-          break;
-        }
+        if (x && !x.busy && !x.inflight && (x.armUses || 0) >= REARM_AFTER && !waiters.length && maybeRearm(x)) break;
       }
       if (B.page && B.fails >= 2) promoteSpare("primary rejected");
-      if (B.page && w && w.page === B.page && B.fails >= 2 && !w.busy && now - Math.max(w.refreshedAt || 0, w.readyAt || 0) > 3 * 60 * 1000) {
+      if (B.page && w && w.page === B.page && B.fails >= 2 && !w.busy && !w.inflight && now - Math.max(w.refreshedAt || 0, w.readyAt || 0) > 3 * 60 * 1000) {
         w.busy = true;
         refreshCtx(w, "blocked").then((ok) => {
           if (ok) B.fails = 0; // the same session is accepted again
