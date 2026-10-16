@@ -792,7 +792,7 @@ let kickT = null;
 // getting an error.
 const RPM_MAX = Number(process.env.QR_RPM_MAX || 160);
 const RPM_MIN = Number(process.env.QR_RPM_MIN || 30);
-const RL = { rpm: Number(process.env.QR_RPM || 90), until: 0, hits: 0, last429: 0, cut: 0, streak: 0, times: [], timer: null };
+const RL = { rpm: Number(process.env.QR_RPM || 60), until: 0, hits: 0, last429: 0, cut: 0, streak: 0, times: [], timer: null };
 function rlNote() {
   RL.times.push(Date.now());
   if (RL.times.length > 400) RL.times.splice(0, RL.times.length - 400);
@@ -820,9 +820,13 @@ function on429() {
   RL.until = Math.max(RL.until, now + Math.min(12000, 2500 * RL.streak));
   log("QR 429: pacing at", RL.rpm, "calls/min, pause", RL.until - now, "ms");
 }
+// probe upwards only while traffic actually presses on the current pace (the learned limit
+// survives quiet periods)
 setInterval(() => {
-  if (Date.now() - RL.last429 > 45000 && RL.rpm < RPM_MAX) RL.rpm = Math.min(RPM_MAX, RL.rpm + 5);
-}, 30000).unref();
+  const now = Date.now();
+  const used = RL.times.filter((t) => now - t < 60000).length;
+  if (now - RL.last429 > 120000 && used >= RL.rpm * 0.7 && RL.rpm < RPM_MAX) RL.rpm = Math.min(RPM_MAX, RL.rpm + 4);
+}, 60000).unref();
 function sessionAlive(w) {
   return !!(w && w.page && !w.page.isClosed() && w.browser && w.browser.isConnected());
 }
@@ -1491,7 +1495,7 @@ module.exports = function registerQrSearch(app) {
         .catch(() => null);
 
       const t0 = Date.now();
-      const r = await browserPost(OFFERS_PATH, body, lang, 70000);
+      const r = await browserPost(OFFERS_PATH, body, lang, 50000);
       // flights first: the page loads the date strip on its own, so don't hold results for it
       let calendar = await Promise.race([calendarP, sleep(100).then(() => undefined)]);
       const calLate = calendar === undefined;
@@ -1524,7 +1528,7 @@ module.exports = function registerQrSearch(app) {
         alertMessages: data.alertMessages || [],
         calendar,
       };
-      cacheSet(key, out, 4 * 60 * 1000);
+      cacheSet(key, out, 10 * 60 * 1000); // popular routes: later visitors get it instantly
       if (calLate) calendarP.then((c) => { if (c) out.calendar = c; }); // cached copy gets it later
       return out;
     } catch (e) {
