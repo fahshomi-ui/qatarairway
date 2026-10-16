@@ -266,7 +266,7 @@ function warmUrl() {
 // i.e. its own Akamai session, ~80 threads vs ~240 for a whole Chrome). The primary context
 // serves requests; validated spare contexts take over instantly on 403s or age, so users
 // almost never wait for a ~35 s warm-up.
-const SPARES = Math.max(0, Number(process.env.QR_SPARES || 2));
+const SPARES = Math.max(0, Number(process.env.QR_SPARES || 3));
 const CHROME_MAX_AGE = 3 * 60 * 60 * 1000;
 const SPARE_MAX_AGE = 3 * 60 * 60 * 1000; // kept fresh by refreshCtx; new sessions are hard to get
 const CTX_REFRESH_MS = 12 * 60 * 1000;
@@ -850,7 +850,7 @@ function retire(w, why) {
 // QR accepts ~7 calls per sensor run (the 8th gets 403). Re-arm early (soft limit) only when
 // it doesn't leave visitors without a session: one session re-arms at a time and at least one
 // other stays serving. At the hard limit the session re-arms regardless.
-const REARM_HARD = Math.max(REARM_AFTER, Number(process.env.QR_REARM_HARD || 7));
+const REARM_HARD = Math.max(REARM_AFTER, Number(process.env.QR_REARM_HARD || 6));
 function maybeRearm(w) {
   if (!w.page || w.page.isClosed()) return false;
   const n = w.armUses || 0;
