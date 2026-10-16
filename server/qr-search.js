@@ -373,6 +373,8 @@ async function validateWarmed(w) {
   w.armUses = (w.armUses || 0) + 1;
   w.lastUse = Date.now();
   w.lastCallAt = Date.now();
+  rlNote();
+  if (r.status === 429) on429();
   w.vst = [r.status];
   return !!(r.status && r.status !== 403);
 }
@@ -783,6 +785,44 @@ const REARM_HARD = Math.max(REARM_AFTER, Number(process.env.QR_REARM_HARD || 6))
 const SLOTS = Math.max(1, Number(process.env.QR_SLOTS || 2));
 const waiters = [];
 let kickT = null;
+
+// QR also rate-limits per IP (429 Too Many Requests) when traffic is sustained (~140 calls in
+// 2.5 min was too much). Pace calls under that limit and learn it (AIMD): every 429 lowers the
+// rate and pauses briefly; quiet periods raise it again. Visitors wait a little instead of
+// getting an error.
+const RPM_MAX = Number(process.env.QR_RPM_MAX || 160);
+const RPM_MIN = Number(process.env.QR_RPM_MIN || 30);
+const RL = { rpm: Number(process.env.QR_RPM || 90), until: 0, hits: 0, last429: 0, cut: 0, streak: 0, times: [], timer: null };
+function rlNote() {
+  RL.times.push(Date.now());
+  if (RL.times.length > 400) RL.times.splice(0, RL.times.length - 400);
+}
+function rlWaitMs() {
+  const now = Date.now();
+  if (now < RL.until) return RL.until - now;
+  while (RL.times.length && now - RL.times[0] > 60000) RL.times.shift();
+  if (RL.times.length >= RL.rpm) return 60000 - (now - RL.times[0]) + 5;
+  const burst = Math.max(4, Math.ceil(RL.rpm / 5)); // smooth: at most rpm/5 calls in any 10 s
+  let n = 0, oldest = now;
+  for (let i = RL.times.length - 1; i >= 0 && now - RL.times[i] < 10000; i -= 1) { n += 1; oldest = RL.times[i]; }
+  if (n >= burst) return 10000 - (now - oldest) + 5;
+  return 0;
+}
+function on429() {
+  const now = Date.now();
+  RL.hits += 1;
+  RL.streak = now - RL.last429 < 20000 ? RL.streak + 1 : 1;
+  RL.last429 = now;
+  if (now - RL.cut > 5000) {
+    RL.cut = now; // parallel 429s from one burst count once
+    RL.rpm = Math.max(RPM_MIN, Math.floor(RL.rpm * 0.75));
+  }
+  RL.until = Math.max(RL.until, now + Math.min(12000, 2500 * RL.streak));
+  log("QR 429: pacing at", RL.rpm, "calls/min, pause", RL.until - now, "ms");
+}
+setInterval(() => {
+  if (Date.now() - RL.last429 > 45000 && RL.rpm < RPM_MAX) RL.rpm = Math.min(RPM_MAX, RL.rpm + 5);
+}, 30000).unref();
 function sessionAlive(w) {
   return !!(w && w.page && !w.page.isClosed() && w.browser && w.browser.isConnected());
 }
@@ -827,8 +867,17 @@ function ensureSession() {
 }
 function dispatch() {
   while (waiters.length) {
+    const rw = rlWaitMs();
+    if (rw > 0) {
+      if (!RL.timer) {
+        RL.timer = setTimeout(() => { RL.timer = null; kick(); }, rw);
+        RL.timer.unref();
+      }
+      break;
+    }
     const w = pickSession();
     if (!w) break;
+    rlNote();
     const wt = waiters.shift();
     clearTimeout(wt.timer);
     w.inflight = (w.inflight || 0) + 1;
@@ -899,7 +948,7 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
   const until = Date.now() + deadlineMs; // includes time spent waiting for a free session
   let last = { status: 0, text: "", error: "busy" };
   let refreshed = false;
-  for (let attempt = 0; attempt < 8 && Date.now() < until; attempt += 1) {
+  for (let attempt = 0; attempt < 10 && Date.now() < until; attempt += 1) {
     const w = await acquire(until);
     if (!w) break;
     await spaceCalls(w);
@@ -935,6 +984,11 @@ async function browserPost(path, body, lang, deadlineMs = 22000) {
     }
     last = r;
     const isPrim = w === B.cur;
+    if (r.status === 429) {
+      on429();
+      done(w);
+      continue; // dispatch holds new calls until the pause ends, then this retries
+    }
     if (r.status === 200 || r.status === 204 || (r.status >= 400 && r.status < 500 && r.status !== 403)) {
       if (isPrim) B.fails = 0;
       B.okCount += 1;
@@ -1437,7 +1491,7 @@ module.exports = function registerQrSearch(app) {
         .catch(() => null);
 
       const t0 = Date.now();
-      const r = await browserPost(OFFERS_PATH, body, lang, 40000);
+      const r = await browserPost(OFFERS_PATH, body, lang, 70000);
       // flights first: the page loads the date strip on its own, so don't hold results for it
       let calendar = await Promise.race([calendarP, sleep(100).then(() => undefined)]);
       const calLate = calendar === undefined;
@@ -1531,6 +1585,7 @@ module.exports = function registerQrSearch(app) {
       busySessions: busySessions(),
       inflight: inflightTotal(),
       slots: SLOTS,
+      rate: { rpm: RL.rpm, last60s: RL.times.filter((t) => Date.now() - t < 60000).length, pauseMs: Math.max(0, RL.until - Date.now()), hits429: RL.hits, last429SecAgo: RL.last429 ? Math.round((Date.now() - RL.last429) / 1000) : null },
       rearmAfter: REARM_AFTER,
       spareReady: !!spareOk(),
       spares: B.spares.length,
