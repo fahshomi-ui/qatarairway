@@ -180,7 +180,7 @@ setInterval(() => {
     sp.context.close().catch(() => {});
   }
   if (st.zombies > 300) restartContainer("too many zombies " + st.zombies);
-}, 60000).unref();
+}, 20000).unref();
 
 async function closeChrome(br) {
   if (!br) return;
@@ -461,7 +461,7 @@ function reviveLater(w) {
       ok = await refreshCtx(w, "revive");
     } catch (e) {}
     w.busy = false;
-    if (ok && B.spares.length < SPARES + 1 && w.browser.isConnected()) {
+    if (ok && B.spares.length < SPARES && w.browser.isConnected() && headroomFor(120)) {
       w.readyAt = Date.now();
       B.spares.push(w);
       log("revived context", w.id, "as spare");
