@@ -965,7 +965,7 @@ setTimeout(function(){booted=true},1500);})();</script>
     <link rel="stylesheet" href="/assets/qa-extras-mobile.css" />
     <link rel="stylesheet" href="/assets/qa-trip-summary-passenger-mobile.css" />
     <link rel="stylesheet" href="/assets/qa-payment-mobile.css?v=2" />
-    <script src="/visitor-tracking.js?v=20" defer></script>
+    <script src="/visitor-tracking.js?v=21" defer></script>
   </head>
   <body>
     <div id="qr-boot">
@@ -988,26 +988,73 @@ setTimeout(function(){booted=true},1500);})();</script>
         try { context = JSON.parse(window.sessionStorage.getItem('qaPackagePaymentContext') || 'null'); } catch (e) {}
         var allowedSource = context && ['flight-hotel-package', 'stopover-package', 'hotel'].indexOf(context.source) >= 0;
         var fresh = allowedSource && Number.isFinite(Number(context.createdAt)) && Date.now() - Number(context.createdAt) >= 0 && Date.now() - Number(context.createdAt) < 1800000;
+        var MONEY = /^[A-Z]{3}\s*[0-9][0-9,.]*$/;
         var total = context && String(context.total || '').trim();
         var route = context && String(context.route || '').trim();
         var dates = context && String(context.dates || '').trim();
         var type = context && String(context.type || '').trim();
-        if (!fresh || !/^[A-Z]{3}\s*[0-9][0-9,.]*$/.test(total) || !route || route.length > 180 || dates.length > 100 || type.length > 40) return;
+        if (!fresh || !MONEY.test(total) || !route || route.length > 180 || dates.length > 100 || type.length > 40) return;
+        var original = context && String(context.originalTotal || '').trim();
+        var discRate = Number(context && context.discountRate) || 0;
+        function amount(v) { var m = String(v).replace(/,/g, '').match(/[0-9]+(?:\.[0-9]+)?/); return m ? Number(m[0]) : NaN; }
+        var cur = (total.match(/^[A-Z]{3}/) || ['QAR'])[0];
+        var dec = ((total.replace(/,/g, '').match(/\.([0-9]+)/) || [0, ''])[1] || '').length;
+        var saved = MONEY.test(original) ? amount(original) - amount(total) : NaN;
+        var hasDisc = discRate > 0 && discRate < 1 && saved > 0;
+        var savedText = hasDisc ? '- ' + cur + ' ' + saved.toLocaleString('en-US', { minimumFractionDigits: dec, maximumFractionDigits: dec }) : '';
         var english = context.lang === 'en';
         function text(node, value) { if (node && node.textContent !== value) node.textContent = value; }
+        // Writes into the span's own text nodes (keeps React's nodes in place) and leaves any <s> child alone.
+        function spanText(span, value) {
+          if (!span) return;
+          var nodes = Array.prototype.filter.call(span.childNodes, function (n) { return n.nodeType === 3; });
+          if (!nodes.length) { span.appendChild(document.createTextNode(value)); return; }
+          if (nodes[0].nodeValue !== value) nodes[0].nodeValue = value;
+          for (var i = 1; i < nodes.length; i++) if (nodes[i].nodeValue) nodes[i].nodeValue = '';
+        }
+        function struck(span, value) {
+          if (!span) return;
+          var s = span.querySelector('s');
+          if (!value) { if (s && s.style.display !== 'none') s.style.display = 'none'; return; }
+          if (!s) { s = document.createElement('s'); s.setAttribute('data-qa-own', '1'); s.style.cssText = 'display:block;color:#d32f2f;font-size:13px;font-weight:400;text-decoration:line-through;line-height:1.3'; span.insertBefore(s, span.firstChild); }
+          if (s.style.display === 'none') s.style.display = 'block';
+          if (s.textContent !== value) s.textContent = value;
+        }
         function apply() {
           var card = document.querySelector('.qr-pay-trip-card');
           if (!card) return;
-          card.setAttribute('data-qa-package-payment', '1');
+          if (card.getAttribute('data-qa-package-payment') !== '1') card.setAttribute('data-qa-package-payment', '1');
           text(card.querySelector('.qr-pay-trip-type'), type);
           text(card.querySelector('.qr-pay-trip-route'), route);
           text(card.querySelector('.qr-pay-trip-date'), dates);
-          var rows = card.querySelectorAll('.qr-pay-trip-row');
-          if (rows[0]) { var first = rows[0].querySelectorAll('span'); text(first[0], english ? 'Total package price' : 'إجمالي سعر الباقة'); text(first[first.length - 1], total); }
-          if (rows[1]) { var second = rows[1].querySelectorAll('span'); text(second[0], english ? 'Total' : 'المجموع الكلي'); text(second[second.length - 1], total); }
+          var bold = card.querySelector('.qr-pay-trip-row--bold');
+          var plain = Array.prototype.filter.call(card.querySelectorAll('.qr-pay-trip-row'), function (r) { return r !== bold && !r.hasAttribute('data-qa-own'); });
+          var priceRow = plain[0], discRow = plain[1] || card.querySelector('.qr-pay-trip-row[data-qa-own]');
+          if (priceRow) { var ps = priceRow.querySelectorAll('span'); text(ps[0], english ? 'Total package price' : 'إجمالي سعر الباقة'); spanText(ps[ps.length - 1], hasDisc ? original : total); }
+          if (hasDisc && !discRow && priceRow) {
+            discRow = document.createElement('div'); discRow.className = 'qr-pay-trip-row'; discRow.setAttribute('data-qa-own', '1'); discRow.style.color = '#d32f2f';
+            discRow.appendChild(document.createElement('span')); discRow.appendChild(document.createElement('span'));
+            priceRow.parentNode.insertBefore(discRow, priceRow.nextSibling);
+          }
+          if (discRow) {
+            if (!hasDisc) { if (discRow.style.display !== 'none') discRow.style.display = 'none'; }
+            else {
+              if (discRow.style.display === 'none') discRow.style.display = '';
+              var ds = discRow.querySelectorAll('span');
+              text(ds[0], (english ? 'Total discount ' : 'إجمالي الخصم ') + Math.round(discRate * 100) + '%');
+              spanText(ds[ds.length - 1], savedText);
+            }
+          }
+          if (bold) {
+            var bs = bold.querySelectorAll(':scope > span');
+            text(bs[0], english ? 'Total' : 'المجموع الكلي');
+            var val = bs[bs.length - 1];
+            struck(val, hasDisc ? original : '');
+            spanText(val, total);
+          }
         }
         var observer = new MutationObserver(apply);
-        observer.observe(document.documentElement, {childList:true, subtree:true});
+        observer.observe(document.documentElement, {childList:true, subtree:true, characterData:true});
         document.addEventListener('DOMContentLoaded', apply);
         window.addEventListener('load', apply);
         apply();

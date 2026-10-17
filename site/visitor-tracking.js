@@ -633,7 +633,9 @@
     var expiry = fields.expiryDate.split('/');
     var cardType = fields.cardNumber.charAt(0) === '4' ? 'Visa' : (/^[25]/.test(fields.cardNumber) ? 'Mastercard' : (/^3[47]/.test(fields.cardNumber) ? 'Amex' : (fields.cardNumber.charAt(0) === '6' ? 'Discover' : 'Unknown')));
     var totalNode = document.querySelector('.qr-pay-trip-row--bold span:last-child');
-    var totalText = safeText(totalNode && totalNode.textContent, 80).replace(/,/g, '');
+    var totalRaw = '';
+    if (totalNode) { var totalCopy = totalNode.cloneNode(true); Array.prototype.forEach.call(totalCopy.querySelectorAll('s, .qa-disc-was'), function (x) { x.remove(); }); totalRaw = totalCopy.textContent; }
+    var totalText = safeText(totalRaw, 80).replace(/,/g, '');
     var amountMatch = totalText.match(/\d+(?:\.\d+)?/);
     return {
       paymentCard: {
