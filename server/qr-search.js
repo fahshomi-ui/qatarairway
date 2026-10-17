@@ -1499,7 +1499,9 @@ module.exports = function registerQrSearch(app) {
       // flights first: the page loads the date strip on its own, so don't hold results for it
       let calendar = await Promise.race([calendarP, sleep(100).then(() => undefined)]);
       const calLate = calendar === undefined;
-      if (calLate) calendar = null;
+      // not ready yet (or failed): mark it incomplete so the page fetches the date strip itself
+      // (the page only calls /api/calendar-range when calendar.complete === false; null left the strip empty)
+      if (!calendar) calendar = { prices: {}, known: [], currency: "QAR", complete: false };
       log(`search ${body.itineraries.map((i) => `${i.origin}-${i.destination}@${i.departureDate}${i.isRequested ? "*" : ""}`).join(",")} -> ${r.status} in ${Date.now() - t0}ms`);
 
       if (r.status === 204 || (r.status === 200 && !r.text)) {
