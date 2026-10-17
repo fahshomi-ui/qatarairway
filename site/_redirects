@@ -1,3 +1,5 @@
+/qa-live-offers/ar.json https://www.qatarairways.com/ar-qa/homepage.newHomepageDestinationPrice.home_page_destinatio_840363066.selectedRoutes.ar.DOH.json 200
+/qa-live-offers/en.json https://www.qatarairways.com/en-qa/homepage.newHomepageDestinationPrice.home_page_destinatio_840363066.selectedRoutes.en.DOH.json 200
 /qr-api/* https://qatarairway-production.up.railway.app/:splat 200
 /packages-results /package-results.html 200
 /packages-results/* /package-results.html 200
