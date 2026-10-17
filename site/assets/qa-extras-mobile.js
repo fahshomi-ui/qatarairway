@@ -291,6 +291,8 @@
       var rendered = formatLike(baseText, base.amount + baggageAmount);
       text(grand, rendered);
       grand.dataset.qaBagRenderedText = rendered;
+      var wasTotal = summary.querySelector('.qa-disc-was-total');
+      if (wasTotal) text(wasTotal, formatLike(baseText, base.amount + baggageAmount + (Number(wasTotal.getAttribute('data-disc')) || 0)));
     }
   }
 
@@ -314,6 +316,8 @@
     var cloneGrand = clone.querySelector('.qr-mkt-summary-total strong');
     var parsedGrand = money(grandText);
     if (cloneGrand && parsedGrand) cloneGrand.textContent = formatLike(grandText, parsedGrand.amount + baggageAmount);
+    var cloneWas = clone.querySelector('.qa-disc-was-total');
+    if (cloneWas && parsedGrand) cloneWas.textContent = formatLike(grandText, parsedGrand.amount + baggageAmount + (Number(cloneWas.getAttribute('data-disc')) || 0));
     host.replaceChildren(clone);
     host.dataset.signature = signature;
     tray.dataset.nativeButtonCount = String(nativeButtons.length);
@@ -396,6 +400,21 @@
     var baggage = selectedQar() * info.rate;
     text(tray.querySelector('.qa-extras-added-amount'), formatLike(grandText || fareText || info.reference, nativeExtras + baggage));
     text(tray.querySelector('.qa-extras-grand-total'), formatLike(grandText || info.reference, (grand ? grand.amount : 0) + baggage));
+    var wasSource = page.querySelector('.qa-disc-was-total');
+    var trayWas = tray.querySelector('.qa-extras-was-total');
+    var trayDisc = wasSource ? (Number(wasSource.getAttribute('data-disc')) || 0) : 0;
+    if (trayDisc > 0 && grand) {
+      if (!trayWas) {
+        trayWas = document.createElement('s');
+        trayWas.className = 'qa-extras-was-total';
+        trayWas.style.cssText = 'color:#d32f2f;font-weight:400;font-size:12px;text-decoration:line-through;margin:0 6px;white-space:nowrap';
+        var grandEl = tray.querySelector('.qa-extras-grand-total');
+        grandEl.parentNode.insertBefore(trayWas, grandEl);
+      }
+      text(trayWas, formatLike(grandText || info.reference, grand.amount + baggage + trayDisc));
+    } else if (trayWas) {
+      trayWas.remove();
+    }
     syncTraySummary(page, tray, grandText, baggage);
     bindTrayGestures(tray);
     setTrayOpen(state.trayOpen);
