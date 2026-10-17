@@ -1297,14 +1297,30 @@ function normalizeOffer(offer, dict, ar) {
 }
 
 // ---------------------------------------------------------------- calendar
-async function fetchCalendarRaw(payload, anchorDate, flexibility, lang) {
+// One QR fare-calendar call per (route, dates, pax, lang): the search starts it, the page's own
+// date-strip request (/api/calendar-range) joins the same call instead of starting a second one,
+// and later visitors get the cached copy instantly.
+const calInflight = new Map();
+function fetchCalendarRaw(payload, anchorDate, flexibility, lang) {
   const { body } = buildQrBody(payload, anchorDate);
   body.flexibility = Math.max(1, Math.min(15, Math.round(Number(flexibility) || 3)));
-  let r = await serverPost(CALENDAR_PATH, body, lang);
-  if (r.status === 403 || r.status === 0) r = await browserPost(CALENDAR_PATH, body, lang, 12000);
-  if (r.status === 204) return { faresFromCalendar: [], moreDates: [] };
-  if (r.status !== 200) throw new Error(`calendar_${r.status}`);
-  return JSON.parse(r.text);
+  const key = `cal|${lang}|${JSON.stringify(body)}`;
+  const hit = cacheGet(key);
+  if (hit) return Promise.resolve(hit);
+  if (calInflight.has(key)) return calInflight.get(key);
+  const job = (async () => {
+    let r = await serverPost(CALENDAR_PATH, body, lang);
+    if (r.status === 403 || r.status === 0) r = await browserPost(CALENDAR_PATH, body, lang, 12000);
+    let raw;
+    if (r.status === 204) raw = { faresFromCalendar: [], moreDates: [] };
+    else if (r.status !== 200) throw new Error(`calendar_${r.status}`);
+    else raw = JSON.parse(r.text);
+    cacheSet(key, raw, 10 * 60 * 1000);
+    return raw;
+  })();
+  calInflight.set(key, job);
+  job.finally(() => calInflight.delete(key)).catch(() => {});
+  return job;
 }
 
 function calendarFromRaw(raw) {
@@ -1490,7 +1506,7 @@ module.exports = function registerQrSearch(app) {
   async function runSearch(p, body, reqLeg, key, lang, ar) {
     try {
       const reqDate = body.itineraries[reqLeg].departureDate;
-      const calendarP = fetchCalendarRaw(p, reqDate, 3, lang)
+      const calendarP = fetchCalendarRaw(p, reqDate, 7, lang) // same call the date strip makes (shared)
         .then(calendarFromRaw)
         .catch(() => null);
 
