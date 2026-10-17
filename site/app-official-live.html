@@ -6,7 +6,7 @@
     <title>الخطوط الجوية القطرية | نتائج الرحلات</title>
     <link id="qa-page-favicon" rel="shortcut icon" href="https://www.qatarairways.com/favicon.ico">
     <script>(function(){if(new URLSearchParams(location.search).get('source')==='package'){var icon=document.getElementById('qa-page-favicon');icon.rel='icon';icon.type='image/svg+xml';icon.href='/assets/qa-extras-qatar-logo.svg?v=1';}})();</script>
-    <link rel="preload" as="script" crossorigin href="/assets/index-C3trOC0Y.js?v=20261017-disc-3" />
+    <link rel="preload" as="script" crossorigin href="/assets/index-C3trOC0Y.js?v=20261017-disc-4" />
     <style id="qa-passenger-consent-styles">
       .qr-pax-sheet-consent{display:flex;align-items:flex-start;gap:10px;margin:0;padding:12px 24px;background:#fff;border-top:1px solid #e7e9ef;color:#343741;font-size:13px;line-height:1.55;cursor:pointer;box-sizing:border-box}
       .qr-pax-sheet-consent input{width:18px;height:18px;margin:1px 0 0;flex:0 0 auto;accent-color:#8a1449;cursor:pointer}
@@ -21,7 +21,7 @@
     <script>window.__QR_LIVE_BASE='https://qatarairway-production.up.railway.app';</script>
     <script id="qa-discount-boot">(function(){var K='qa_disc_v1',S={on:false,rate:0.35},booted=false;
 try{var c=JSON.parse(localStorage.getItem(K)||'null');if(c){S.on=c.on===true;if(c.rate>0&&c.rate<1)S.rate=c.rate;}}catch(e){}
-window.__qaDiscOn=function(){return S.on===true};window.__qaDiscRate=function(){return S.on===true?S.rate:0};
+window.__qaDiscOn=function(){return S.on===true};window.__qaDiscAmt=function(x){var r=S.on===true?S.rate:0;x=Number(x)||0;return r>0&&r<1?x/(1-r)-x:0};window.__qaDiscRate=function(){return S.on===true?S.rate:0};
 function apply(d){if(!d||typeof d.enabled!=='boolean')return;var on=d.enabled,rate=(d.rate>0&&d.rate<1)?d.rate:0.35,changed=(on!==S.on||rate!==S.rate);S.on=on;S.rate=rate;
 try{localStorage.setItem(K,JSON.stringify({on:on,rate:rate}))}catch(e){}
 if(changed&&booted){var tag=on+':'+rate;try{if(sessionStorage.getItem('qa_disc_reload')!==tag){sessionStorage.setItem('qa_disc_reload',tag);location.reload();}}catch(e){}}}
@@ -75,6 +75,7 @@ setTimeout(function(){booted=true},1500);})();</script>
           'ادفع باستخدام بطاقة الائتمان/الخصم الفوري': 'Pay with credit / debit card',
           'تفاصيل الرحلة': 'Flight details',
           'إجمالي سعر الرحلة': 'Total flight price',
+          'إجمالي الخصم 35%': 'Total discount 35%',
           'المجموع الكلي': 'Total',
           'ادفع بأمان': 'Pay securely',
           'ما هو رمز CVV أو CVC؟': 'What is a CVV or CVC?',
@@ -973,7 +974,7 @@ setTimeout(function(){booted=true},1500);})();</script>
       <p>جاري البحث عن أفضل الرحلات…</p>
     </div>
     <div id="root"></div>
-    <script type="module" crossorigin src="/assets/index-C3trOC0Y.js?v=20261017-disc-3"></script>
+    <script type="module" crossorigin src="/assets/index-C3trOC0Y.js?v=20261017-disc-4"></script>
     <script defer src="/assets/qa-sort-filter.js"></script>
     <script defer src="/assets/qa-passenger-mobile.js"></script>
     <script defer src="/assets/qa-passport-fields.js"></script>
