@@ -53,14 +53,16 @@
     '.qa-dp-x{position:absolute;top:10px;inset-inline-end:12px;width:34px;height:34px;border:0;border-radius:50%;background:#f3eef1;color:#5c0632;font-size:22px;line-height:34px;cursor:pointer;padding:0}' +
     '.qa-dp-x:hover{background:#e8dde3}' +
     '.qa-dp-logo{display:block;height:52px;width:auto;margin:6px auto 18px}' +
-    '.qa-dp-title{margin:0 0 20px;color:#5c0632;font-size:26px;font-weight:700;line-height:1.35}' +
-    '.qa-dp-title b{color:#c8102e;font-size:32px}' +
+    '.qa-dp-title{margin:0 0 22px;color:#5c0632;font-weight:700;line-height:1.25}' +
+    '.qa-dp-t1{display:block;font-size:26px}' +
+    '.qa-dp-pct{display:block;direction:ltr;unicode-bidi:isolate;color:#c8102e;font-size:56px;font-weight:800;line-height:1.1;margin:2px 0 4px}' +
+    '.qa-dp-t3{display:block;font-size:22px}' +
     '.qa-dp-cd{display:flex;justify-content:center;align-items:flex-start;gap:8px;direction:ltr}' +
     '.qa-dp-u{min-width:78px}' +
     '.qa-dp-n{display:block;background:#5c0632;color:#fff;border-radius:12px;font-size:32px;font-weight:700;line-height:1;padding:14px 6px;font-variant-numeric:tabular-nums;letter-spacing:1px}' +
     '.qa-dp-l{display:block;margin-top:7px;color:#6b5a63;font-size:13px}' +
     '.qa-dp-sep{color:#5c0632;font-size:30px;font-weight:700;line-height:60px}' +
-    '@media (max-width:420px){.qa-dp-card{padding:26px 16px 22px}.qa-dp-title{font-size:22px}.qa-dp-title b{font-size:27px}.qa-dp-u{min-width:66px}.qa-dp-n{font-size:27px;padding:12px 4px}.qa-dp-sep{line-height:52px;font-size:26px}}';
+    '@media (max-width:420px){.qa-dp-card{padding:26px 16px 22px}.qa-dp-t1{font-size:23px}.qa-dp-pct{font-size:48px}.qa-dp-t3{font-size:19px}.qa-dp-u{min-width:66px}.qa-dp-n{font-size:27px;padding:12px 4px}.qa-dp-sep{line-height:52px;font-size:26px}}';
 
   var ov = null, timer = 0;
   function pad(n) { return (n < 10 ? '0' : '') + n; }
@@ -101,13 +103,15 @@
     ov.setAttribute('role', 'dialog');
     ov.setAttribute('aria-modal', 'true');
     ov.dir = en ? 'ltr' : 'rtl';
-    var title = en ? '<b>' + pct + '</b> off all flights' : 'خصم <b>' + pct + '</b> على جميع الرحلات';
+    var title = en
+      ? '<span class="qa-dp-t1">Save</span><span class="qa-dp-pct" dir="ltr">' + pct + '</span><span class="qa-dp-t3">on all flights and packages</span>'
+      : '<span class="qa-dp-t1">خصم</span><span class="qa-dp-pct" dir="ltr">' + pct + '</span><span class="qa-dp-t3">على جميع الرحلات والباقات</span>';
     var L = en ? ['Hours', 'Minutes', 'Seconds'] : ['ساعات', 'دقائق', 'ثواني'];
     ov.innerHTML =
       '<div class="qa-dp-card">' +
         '<button type="button" class="qa-dp-x" aria-label="' + (en ? 'Close' : 'إغلاق') + '">&times;</button>' +
         '<img class="qa-dp-logo" alt="Qatar Airways" src="' + ORIGIN + '/assets/qa-extras-qatar-logo.svg">' +
-        '<p class="qa-dp-title">' + title + '</p>' +
+        '<div class="qa-dp-title">' + title + '</div>' +
         '<div class="qa-dp-cd">' +
           '<div class="qa-dp-u"><span class="qa-dp-n" data-u="h">00</span><span class="qa-dp-l">' + L[0] + '</span></div>' +
           '<span class="qa-dp-sep">:</span>' +
