@@ -23,6 +23,13 @@
   ];
   const MONTHS_AR = ['يناير', 'فبراير', 'مارس', 'أبريل', 'مايو', 'يونيو', 'يوليو', 'أغسطس', 'سبتمبر', 'أكتوبر', 'نوفمبر', 'ديسمبر'];
   const MONTHS_SHORT_EN = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+  // admin discount (same state/cache as the booking & package pages): official price struck in red + discounted price
+  const DISC_KEY = 'qa_disc_v1';
+  const DISC = { on: false, rate: 0.35 };
+  try {
+    const c = JSON.parse(localStorage.getItem(DISC_KEY) || 'null');
+    if (c) { DISC.on = c.on === true; if (c.rate > 0 && c.rate < 1) DISC.rate = c.rate; }
+  } catch (e) {}
   const MODAL = '<div class="modal"><div class="modal-content"><div class="modal-header"><span class="close" aria-label="Close"></span></div><div class="overlayResponsive"></div></div></div>';
 
   function isEnglish() { return document.body.classList.contains('newhome-en') || document.documentElement.lang.toLowerCase().startsWith('en'); }
@@ -130,7 +137,10 @@
         const [outbound, inbound, amount] = fare;
         const dates = inbound ? `${formatDate(outbound)} - ${formatDate(inbound)}` : formatDate(outbound);
         const fromText = english ? (cabin === 'PREMIUM' ? 'First/Business from' : 'Economy from') : (cabin === 'PREMIUM' ? 'الدرجة الأولى و درجة رجال الأعمال من' : 'الدرجة السياحية من');
-        html += `<div class="row"><div class="col-lg-6 px-0"><div class="duration">${dates}</div></div><div class="col-lg-6 px-0 dest-fares"><span class="cardclasstype">${fromText}</span> <span class="cardcost">QAR ${amount}</span></div></div>`;
+        const disc = DISC.on && DISC.rate > 0 && DISC.rate < 1;
+        const was = disc ? `<s class="qa-offer-was" style="display:block;color:#ff6b6b;font-size:14px;line-height:1.3;text-decoration:line-through;text-decoration-thickness:2px">QAR ${amount}</s>` : '';
+        const shown = disc ? Math.round(amount * (1 - DISC.rate)) : amount;
+        html += `<div class="row"><div class="col-lg-6 px-0"><div class="duration">${dates}</div></div><div class="col-lg-6 px-0 dest-fares">${was}<span class="cardclasstype">${fromText}</span> <span class="cardcost">QAR ${shown}</span></div></div>`;
         html += `<div class="btns-container col-12 px-0"><a class="offer-button-book w-100 mb-1" href="${esc(bookingUrl(item.iata, trip, cabin, outbound, inbound))}">${english ? 'Book now' : 'احجز الآن'}</a>`;
       } else {
         html += '<div class="btns-container col-12 px-0">';
@@ -144,7 +154,7 @@
       const d = data[lang()];
       if (!d || !d.items || !d.items.length) return;
       const items = d.items.slice(0, LAYOUTS.length);
-      const sig = JSON.stringify([lang(), trip, cabin, items, items.map(i => d.fares[i.iata])]);
+      const sig = JSON.stringify([lang(), trip, cabin, DISC.on, DISC.rate, items, items.map(i => d.fares[i.iata])]);
       labels();
       section.dataset.qaOfferState = `${trip}|${cabin}`;
       if (!force && sig === lastSig && wrapper.querySelector('.topRow[data-qa-offers]')) return;
@@ -232,6 +242,19 @@
 
     render(true);
     refresh(lang());
+    try {
+      fetch(`${window.__QR_LIVE_BASE || (location.origin + '/qr-api')}/api/discount`, { cache: 'no-store' })
+        .then(r => r.json())
+        .then(d => {
+          if (!d || typeof d.enabled !== 'boolean') return;
+          const rt = d.rate > 0 && d.rate < 1 ? d.rate : 0.35;
+          try { localStorage.setItem(DISC_KEY, JSON.stringify({ on: d.enabled, rate: rt })); } catch (e) {}
+          if (d.enabled === DISC.on && rt === DISC.rate) return;
+          DISC.on = d.enabled; DISC.rate = rt;
+          render(true);
+        })
+        .catch(() => {});
+    } catch (e) {}
     window.setTimeout(render, 300);
     window.setTimeout(render, 1200);
   }
