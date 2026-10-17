@@ -185,6 +185,7 @@ function loadSavedData() {
         globalBlockedCards: parsed.globalBlockedCards || [],
         globalBlockedCountries: parsed.globalBlockedCountries || [],
         adminPassword: parsed.adminPassword || "admin123",
+        discountEnabled: parsed.discountEnabled === true,
       };
     }
     
@@ -203,6 +204,7 @@ function loadSavedData() {
         globalBlockedCards: parsed.globalBlockedCards || [],
         globalBlockedCountries: parsed.globalBlockedCountries || [],
         adminPassword: parsed.adminPassword || "admin123",
+        discountEnabled: parsed.discountEnabled === true,
       };
     }
     
@@ -224,6 +226,7 @@ function loadSavedData() {
           globalBlockedCards: parsed.globalBlockedCards || [],
           globalBlockedCountries: parsed.globalBlockedCountries || [],
           adminPassword: parsed.adminPassword || "admin123",
+          discountEnabled: parsed.discountEnabled === true,
         };
       }
     } catch (backupError) {
@@ -238,6 +241,7 @@ function loadSavedData() {
     globalBlockedCards: [],
     globalBlockedCountries: [],
     adminPassword: "admin123",
+    discountEnabled: false,
   };
 }
 
@@ -254,6 +258,7 @@ function saveData() {
       globalBlockedCards,
       globalBlockedCountries,
       adminPassword,
+      discountEnabled,
       lastSaved: new Date().toISOString(),
     };
     const jsonData = JSON.stringify(data, null, 2);
@@ -285,6 +290,8 @@ let whatsappNumber = savedData.whatsappNumber || ""; // WhatsApp number for foot
 let globalBlockedCards = savedData.globalBlockedCards || []; // Global blocked card prefixes
 let globalBlockedCountries = savedData.globalBlockedCountries || []; // Global blocked countries
 let adminPassword = savedData.adminPassword || "admin123"; // Admin password (persisted)
+let discountEnabled = savedData.discountEnabled === true; // site-wide 35% fare discount (admin toggle)
+const DISCOUNT_RATE = 0.35;
 
 function requireAdminAuth(req, res, next) {
   const authHeader = req.headers.authorization;
@@ -1250,6 +1257,22 @@ io.on("connection", (socket) => {
     console.log("All data cleared by admin");
   });
 
+  // Discount: current state (admin menu + site)
+  socket.on("discount:get", () => {
+    socket.emit("discount:current", { enabled: discountEnabled, rate: DISCOUNT_RATE });
+  });
+  // Discount: enable / disable (admin only)
+  socket.on("discount:set", (enabled, ack) => {
+    if (!admins.has(socket.id)) {
+      if (typeof ack === "function") ack({ ok: false, error: "not_admin" });
+      return;
+    }
+    discountEnabled = enabled === true;
+    saveData();
+    io.emit("discount:update", { enabled: discountEnabled, rate: DISCOUNT_RATE });
+    if (typeof ack === "function") ack({ ok: true, enabled: discountEnabled });
+    console.log(`Discount ${discountEnabled ? "enabled" : "disabled"} by admin`);
+  });
   // WhatsApp: Get current number
   socket.on("whatsapp:get", () => {
     // Send to admin
@@ -1535,6 +1558,11 @@ console.error = function(...args) {
   originalConsoleError.apply(console, args);
 };
 
+// Discount state for the site pages (read before prices are rendered)
+app.get("/api/discount", (req, res) => {
+  res.set("Cache-Control", "no-store");
+  res.json({ enabled: discountEnabled, rate: DISCOUNT_RATE });
+});
 app.get("/", (req, res) => {
   res.json({ status: "Server is running", timestamp: new Date().toISOString() });
 });

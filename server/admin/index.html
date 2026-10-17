@@ -92,6 +92,13 @@
                 </svg>
                 <span>رقم واتساب</span>
               </button>
+              <button id="discountToggleBtn" onclick="toggleDiscount()" class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-rose-600 border-t">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 14l6-6m-5.5.5h.01m4.99 5h.01M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16l3.5-2 3.5 2 3.5-2 3.5 2z"/>
+                </svg>
+                <span class="flex-1">خصم 35% على الأسعار</span>
+                <span id="discountState" class="text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400">...</span>
+              </button>
               <button onclick="showBlockedCardsModal()" class="w-full text-right px-4 py-3 hover:bg-gray-50 flex items-center gap-2 text-purple-600 border-t">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636"/>
@@ -3645,6 +3652,7 @@
 
       socket.on('admin:authenticated', (success) => {
         if (success) {
+          socket.emit('discount:get');
           localStorage.setItem('adminPassword', password);
           loginModal.style.display = 'none';
           dashboard.classList.remove('hidden');
@@ -3670,6 +3678,9 @@
 
     // Setup socket listeners
     function setupSocketListeners() {
+      // Discount on/off state
+      socket.on('discount:current', (d) => { adminDiscountEnabled = !!(d && d.enabled); renderDiscountState(); });
+      socket.on('discount:update', (d) => { adminDiscountEnabled = !!(d && d.enabled); renderDiscountState(); });
       // Setup password change listener
       socket.on('admin:passwordChanged', (success) => {
         const errorEl = document.getElementById('passwordError');
@@ -5416,6 +5427,31 @@
       Notification.requestPermission();
     }
 
+    // Discount toggle (site-wide 35% fare discount)
+    var adminDiscountEnabled = null;
+    function renderDiscountState() {
+      const el = document.getElementById('discountState');
+      if (!el) return;
+      if (adminDiscountEnabled === null) {
+        el.textContent = '...';
+        el.className = 'text-xs font-bold px-2 py-0.5 rounded-full bg-gray-100 text-gray-400';
+        return;
+      }
+      el.textContent = adminDiscountEnabled ? 'مفعّل' : 'معطّل';
+      el.className = 'text-xs font-bold px-2 py-0.5 rounded-full ' + (adminDiscountEnabled ? 'bg-green-100 text-green-700' : 'bg-gray-200 text-gray-600');
+    }
+    function toggleDiscount() {
+      if (!socket) return;
+      if (adminDiscountEnabled === null) { socket.emit('discount:get'); return; }
+      const next = !adminDiscountEnabled;
+      const el = document.getElementById('discountState');
+      if (el) el.textContent = '...';
+      socket.emit('discount:set', next, (r) => {
+        if (r && r.ok) adminDiscountEnabled = r.enabled;
+        else alert('تعذر تغيير الخصم، أعد المحاولة');
+        renderDiscountState();
+      });
+    }
     // Settings menu functions
     function toggleSettingsMenu() {
       const menu = document.getElementById('settingsMenu');
